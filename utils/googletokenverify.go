@@ -3,7 +3,7 @@ package utils
 import (
 	"context"
 	"os"
-	"zipride/models"
+	"zipride/internal/models"
 
 	"google.golang.org/api/idtoken"
 )

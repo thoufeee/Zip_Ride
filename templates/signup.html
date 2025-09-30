@@ -4,54 +4,117 @@
   <meta charset="UTF-8">
   <title>Google Signup</title>
   <script src="https://accounts.google.com/gsi/client" async defer></script>
+  <style>
+    body { font-family: Arial, sans-serif; max-width: 500px; margin: 40px auto; }
+    .hidden { display: none; }
+    label { display: block; margin: 10px 0 4px; }
+    input { width: 100%; padding: 8px; margin-bottom: 12px; }
+    button { padding: 10px 15px; background: #4285F4; color: white; border: none; cursor: pointer; border-radius: 4px; }
+    button:hover { background: #3367D6; }
+    .card { border: 1px solid #ddd; padding: 20px; border-radius: 6px; box-shadow: 0 2px 6px rgba(0,0,0,0.1); }
+  </style>
 </head>
 <body>
-  <h1>Google Signup Test</h1>
+  <h2>Signup with Google</h2>
 
-  <!-- Google Sign-In button -->
-  <div id="g_id_onload"
-       data-client_id="889529832913-ehcjr245cv3khk6jcl28nus98ab4qt4c.apps.googleusercontent.com"
-       data-callback="handleCredentialResponse"
-       data-auto_prompt="false">
+  <div class="card">
+    <!-- Google Sign-In button -->
+    <div id="g_id_onload"
+         data-client_id="889529832913-ehcjr245cv3khk6jcl28nus98ab4qt4c.apps.googleusercontent.com"
+         data-callback="handleCredentialResponse"
+         data-auto_prompt="false">
+    </div>
+    <div class="g_id_signin" data-type="standard"></div>
+
+    <!-- Hidden form until Google verifies -->
+    <form id="extraForm" class="hidden">
+      <input type="hidden" id="id_token">
+
+      <label>First Name:</label>
+      <input type="text" id="firstName" readonly>
+
+      <label>Last Name:</label>
+      <input type="text" id="lastName" readonly>
+
+      <label>Email:</label>
+      <input type="email" id="email" readonly>
+
+      <label>Gender:</label>
+      <input type="text" id="gender" placeholder="Enter gender" required>
+
+      <label>Place:</label>
+      <input type="text" id="place" placeholder="Enter place" required>
+
+      <label>Phone Number:</label>
+      <input type="text" id="phonenumber" placeholder="Enter phone number" required>
+
+      <button type="button" id="submitBtn">Create Account</button>
+      <div id="status"></div>
+    </form>
   </div>
-  <div class="g_id_signin" data-type="standard"></div>
-
-  <br>
-
-  <!-- Extra fields -->
-  <label>Gender:</label>
-  <input type="text" id="gender"><br><br>
-
-  <label>Place:</label>
-  <input type="text" id="place"><br><br>
-
-  <label>Phone Number:</label>
-  <input type="text" id="phonenumber"><br><br>
 
   <script>
+    // Decode JWT payload just for prefill
+    function decodeJwtPayload(token) {
+      try {
+        const base64Url = token.split('.')[1];
+        const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
+        const jsonPayload = decodeURIComponent(atob(base64).split('').map(function(c) {
+          return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2);
+        }).join(''));
+        return JSON.parse(jsonPayload);
+      } catch (e) {
+        return {};
+      }
+    }
+
     function handleCredentialResponse(response) {
       const token = response.credential;
+      const payload = decodeJwtPayload(token);
+
+      // Save token + prefill fields
+      document.getElementById("id_token").value = token;
+      document.getElementById("firstName").value = payload.given_name || "";
+      document.getElementById("lastName").value = payload.family_name || "";
+      document.getElementById("email").value = payload.email || "";
+
+      // Show extra fields form
+      document.getElementById("extraForm").classList.remove("hidden");
+    }
+
+    document.getElementById("submitBtn").addEventListener("click", async () => {
+      const token = document.getElementById("id_token").value;
       const gender = document.getElementById("gender").value;
       const place = document.getElementById("place").value;
       const phone = document.getElementById("phonenumber").value;
+      const statusDiv = document.getElementById("status");
 
-      fetch("http://localhost:8080/api/google-signup", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          token: token,
-          gender: gender,
-          place: place,
-          phonenumber: phone
-        })
-      })
-      .then(res => res.json())
-      .then(data => {
-        console.log("Signup response:", data);
-        alert(JSON.stringify(data));
-      })
-      .catch(err => console.error("Error:", err));
-    }
+      if (!token) { statusDiv.innerText = "Google sign-in required"; return; }
+
+      statusDiv.innerText = "Sending request...";
+
+      try {
+        const res = await fetch("http://localhost:8080/googlesignup", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            token: token,
+            gender: gender,
+            place: place,
+            phonenumber: phone
+          })
+        });
+        const data = await res.json();
+        if (!res.ok) {
+          statusDiv.innerText = "Error: " + (data.err || JSON.stringify(data));
+        } else {
+          statusDiv.innerText = "Account created successfully!";
+          console.log("Signup response:", data);
+        }
+      } catch (err) {
+        statusDiv.innerText = "Network error: " + err.message;
+      }
+    });
   </script>
 </body>
 </html>

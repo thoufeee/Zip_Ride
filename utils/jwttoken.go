@@ -48,7 +48,7 @@ func GenerateAccess(userid uint, email string, role string) (string, error) {
 
 func GenerateRefresh(userid uint, email, role string) (string, error) {
 
-	refreshkey := []byte(os.Getenv("JWT_SECRET"))
+	refreshkey := []byte(os.Getenv("REFRESH_KEY"))
 
 	exp := time.Now().Add(7 * 24 * time.Hour)
 	refreshid := uuid.New().String()
@@ -72,7 +72,7 @@ func GenerateRefresh(userid uint, email, role string) (string, error) {
 	token, err := refresh.SignedString(refreshkey)
 
 	if err != nil {
-		return "invalid refresh token", err
+		return "", err
 	}
 
 	err = database.RDB.Set(database.Ctx, refreshid, token, time.Until(exp)).Err()
