@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"log"
 	"os"
-	"zipride/models"
+	"zipride/internal/models"
 
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
