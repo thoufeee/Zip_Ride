@@ -1,21 +1,20 @@
 package routes
 
 import (
-	"zipride/handlers"
+	"zipride/internal/auth/handlers"
+	"zipride/internal/auth/services"
+	"zipride/internal/constants"
+	"zipride/internal/middleware"
 
 	"github.com/gin-gonic/gin"
 )
 
-// account creating route
+// user routes
+func UserRoutes(c *gin.Engine) {
+	user := c.Group("/user")
 
-func User(c *gin.Engine) {
-	api := c.Group("/")
+	user.Use(middleware.Auth(constants.RoleUser))
 
-	// api.POST("signup-otp", handlers.SendOtpHandler)
-	// api.POST("verify-otp", handlers.VerifyOtpHandler)
-	// api.POST("signup", handlers.RegisterUser)
-
-	api.POST("signup", handlers.GoogleSignup)
-	api.POST("sigin", handlers.GoogleSigin)
-
+	user.GET("/profile", services.UserProfile)
+	user.POST("/logout", handlers.UserLogout)
 }
