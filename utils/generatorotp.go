@@ -27,17 +27,23 @@ func SaveOTP(phone, otp, prefix string) error {
 }
 
 // verify otp
-func VerifyOTP(code, prefix string) string {
-	key := fmt.Sprintf("otp:%s", code)
+func VerifyOTP(phone, code, prefix string) string {
+	key := fmt.Sprintf("%s:%s", prefix, phone)
 
 	stored, err := database.RDB.Get(database.Ctx, key).Result()
-
 	if err != nil {
 		return "invalid or expired token"
 	}
 
+	// Compare stored OTP with provided code
+	if stored != code {
+		return "invalid otp"
+	}
+
+	// Delete after successful verification to prevent reuse
 	database.RDB.Del(database.Ctx, key)
-	return stored
+
+	return "valid"
 }
 
 // mark phonenumber verified
