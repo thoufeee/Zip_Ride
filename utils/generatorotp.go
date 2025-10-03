@@ -21,15 +21,14 @@ func GeneratorOtp() string {
 }
 
 // save otp
-func SaveOTP(phone, otp string) error {
-	key := fmt.Sprintf("otp:%s", phone)
-
+func SaveOTP(phone, otp, prefix string) error {
+	key := fmt.Sprintf("%s:%s", prefix, phone)
 	return database.RDB.Set(database.Ctx, key, otp, 1*time.Minute).Err()
 }
 
 // verify otp
 func VerifyOTP(code string) string {
-	key := fmt.Sprintf("opt:%s", code)
+	key := fmt.Sprintf("otp:%s", code)
 
 	stored, err := database.RDB.Get(database.Ctx, key).Result()
 
