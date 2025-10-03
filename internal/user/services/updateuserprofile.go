@@ -2,8 +2,8 @@ package services
 
 import (
 	"net/http"
-	"strconv"
 	"zipride/database"
+	"zipride/internal/middleware"
 	"zipride/internal/models"
 	"zipride/utils"
 
@@ -13,12 +13,10 @@ import (
 // update user profile
 
 func UpdateUserProfile(c *gin.Context) {
-	id := c.Param("id")
+	user_id := middleware.GetUserID(c)
 
-	user_id, err := strconv.Atoi(id)
-
-	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"err": "invalid id"})
+	if user_id == 0 {
+		c.JSON(http.StatusUnauthorized, gin.H{"err": "unathorized"})
 		return
 	}
 
@@ -58,6 +56,12 @@ func UpdateUserProfile(c *gin.Context) {
 			c.JSON(http.StatusBadRequest, gin.H{"err": "email format not valid"})
 			return
 		}
+
+		if err := database.DB.Where("email = ?", input.Email).First(&user).Error; err == nil {
+			c.JSON(http.StatusConflict, gin.H{"err": "email already registered"})
+			return
+		}
+
 		user.Email = *input.Email
 	}
 

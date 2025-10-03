@@ -12,7 +12,8 @@ import (
 // user signin
 func SignIn(c *gin.Context) {
 	var data struct {
-		PhoneNumber string `json:"phone" binding:"required"`
+		PhoneNumber string `json:"phone"`
+		Email       string `json:"email"`
 		Password    string `json:"password" binding:"required"`
 	}
 
@@ -23,7 +24,7 @@ func SignIn(c *gin.Context) {
 
 	var user models.User
 
-	// check email
+	// check phonenumber
 	if err := database.DB.Where("phone_number = ?", data.PhoneNumber).First(&user).Error; err != nil {
 		c.JSON(http.StatusUnauthorized, gin.H{"err": "invalid phonenumber or password"})
 		return

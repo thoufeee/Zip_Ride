@@ -11,9 +11,9 @@ import (
 func PublicRoutes(c *gin.Engine) {
 	api := c.Group("/")
 
-	api.POST("signup-otp", handlers.SendOtpHandler)
-	api.POST("verify-otp", handlers.VerifyOtpHandler)
-	api.POST("signup", handlers.RegisterUser)
+	// api.POST("signup-otp", handlers.SendOtpHandler)
+	// api.POST("verify-otp", handlers.VerifyOtpHandler)
+	// api.POST("signup", handlers.RegisterUser)
 
 	api.POST("googlesignup", handlers.GoogleSignup)
 	api.POST("googlesigin", handlers.GoogleSigin)
