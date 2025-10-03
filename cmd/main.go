@@ -42,6 +42,7 @@ func main() {
 	// routes connection
 	routes.PublicRoutes(r)
 	routes.UserRoutes(r)
+	routes.DriverRoutes(r)
 
 	r.Run(":8080")
 }
