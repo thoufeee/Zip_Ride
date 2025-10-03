@@ -3,8 +3,8 @@ package handlers
 import (
 	"net/http"
 	"zipride/database"
-	"zipride/internal/domain/auth/services"
 	"zipride/internal/models"
+	"zipride/internal/userauth/services"
 	"zipride/utils"
 
 	"github.com/gin-gonic/gin"
