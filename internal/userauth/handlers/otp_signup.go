@@ -24,7 +24,7 @@ func SendOtpHandler(c *gin.Context) {
 
 	otp := utils.GeneratorOtp()
 	services.SendOtp(data.Phone, "Your OTP Is "+otp)
-	utils.SaveOTP(data.Phone, otp)
+	utils.SaveOTP(data.Phone, otp, "otp:user")
 
 	c.JSON(http.StatusOK, gin.H{"res": "OTP Sent"})
 }
@@ -41,7 +41,7 @@ func VerifyOtpHandler(c *gin.Context) {
 		return
 	}
 
-	phone := utils.VerifyOTP(data.OTP)
+	phone := utils.VerifyOTP(data.OTP, "otp:user")
 
 	if phone == "" {
 		c.JSON(http.StatusBadRequest, gin.H{"err": "invalid or expired otp"})
@@ -49,7 +49,7 @@ func VerifyOtpHandler(c *gin.Context) {
 	}
 
 	//  storing marked verified phone numbers
-	utils.MarkPhoneVerified(phone)
+	utils.MarkPhoneVerified(phone, "otp:user")
 
 	c.JSON(http.StatusOK, gin.H{"res": "PhoneNumber verified"})
 
@@ -103,7 +103,7 @@ func RegisterUser(c *gin.Context) {
 	}
 
 	// getting verified phonenumber from redis
-	phone := utils.GetVerifiedPhone()
+	phone := utils.GetVerifiedPhone("otp:user")
 
 	if phone == "" {
 		c.JSON(http.StatusBadRequest, gin.H{"err": "failed to get verified phonenumber"})
@@ -125,7 +125,7 @@ func RegisterUser(c *gin.Context) {
 		return
 	}
 
-	utils.ClearVerifiedPhone(phone)
+	utils.ClearVerifiedPhone(phone, "otp:user")
 
 	c.JSON(http.StatusOK, gin.H{"res": "Signup Successfuly Completed"})
 }
