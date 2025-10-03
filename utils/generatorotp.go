@@ -27,7 +27,7 @@ func SaveOTP(phone, otp, prefix string) error {
 }
 
 // verify otp
-func VerifyOTP(code string) string {
+func VerifyOTP(code, prefix string) string {
 	key := fmt.Sprintf("otp:%s", code)
 
 	stored, err := database.RDB.Get(database.Ctx, key).Result()
@@ -41,12 +41,12 @@ func VerifyOTP(code string) string {
 }
 
 // mark phonenumber verified
-func MarkPhoneVerified(phone string) {
+func MarkPhoneVerified(phone, prefix string) {
 	database.RDB.Set(database.Ctx, "verified:"+phone, "true", 15*time.Minute)
 }
 
 // get verified phone
-func GetVerifiedPhone() string {
+func GetVerifiedPhone(prefix string) string {
 	keys, _ := database.RDB.Keys(database.Ctx, "verified:*").Result()
 
 	if len(keys) == 0 {
@@ -57,6 +57,6 @@ func GetVerifiedPhone() string {
 }
 
 // clear verified phone
-func ClearVerifiedPhone(phone string) {
+func ClearVerifiedPhone(phone, prefix string) {
 	database.RDB.Del(database.Ctx, "verified:"+phone)
 }
