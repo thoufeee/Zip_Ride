@@ -1,7 +1,7 @@
 package routes
 
 import (
-	"zipride/internal/domain/auth/handlers"
+	"zipride/internal/userauth/handlers"
 
 	"github.com/gin-gonic/gin"
 )
