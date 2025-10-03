@@ -35,7 +35,7 @@ func SendOtpHandler(c *gin.Context) {
 func VerifyOtpHandler(c *gin.Context) {
 	var data struct {
 		OTP   string `json:"code"`
-		phone string `json:"phone"`
+		Phone string `json:"phone"`
 	}
 
 	if err := c.ShouldBindJSON(&data); err != nil || data.OTP == "" {
@@ -43,7 +43,7 @@ func VerifyOtpHandler(c *gin.Context) {
 		return
 	}
 
-	phone := utils.VerifyOTP(data.phone, data.OTP, constants.UserPrefix)
+	phone := utils.VerifyOTP(data.Phone, data.OTP, constants.UserPrefix)
 
 	if phone == "" {
 		c.JSON(http.StatusBadRequest, gin.H{"err": "invalid or expired otp"})
