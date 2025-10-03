@@ -1,10 +1,10 @@
 package routes
 
 import (
-	"zipride/internal/auth/handlers"
 	"zipride/internal/constants"
+	"zipride/internal/domain/auth/handlers"
+	"zipride/internal/domain/user/services"
 	"zipride/internal/middleware"
-	"zipride/internal/user/services"
 
 	"github.com/gin-gonic/gin"
 )
