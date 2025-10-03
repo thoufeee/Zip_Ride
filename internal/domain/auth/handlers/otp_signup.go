@@ -3,7 +3,7 @@ package handlers
 import (
 	"net/http"
 	"zipride/database"
-	"zipride/internal/auth/services"
+	"zipride/internal/domain/auth/services"
 	"zipride/internal/models"
 	"zipride/utils"
 

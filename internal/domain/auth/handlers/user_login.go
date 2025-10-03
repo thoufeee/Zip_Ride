@@ -24,15 +24,33 @@ func SignIn(c *gin.Context) {
 
 	var user models.User
 
-	// check phonenumber
-	if err := database.DB.Where("phone_number = ?", data.PhoneNumber).First(&user).Error; err != nil {
-		c.JSON(http.StatusUnauthorized, gin.H{"err": "invalid phonenumber or password"})
+	// admin login using email
+	if data.Email != "" {
+		// check phonenumber
+		if err := database.DB.Where("email = ?", data.Email).First(&user).Error; err != nil {
+			c.JSON(http.StatusUnauthorized, gin.H{"err": "invalid phonenumber or password"})
+			return
+		}
+		// user login using phone
+	} else if data.PhoneNumber != "" {
+		if err := database.DB.Where("phone_number = ?", data.PhoneNumber).First(&user).Error; err != nil {
+			c.JSON(http.StatusUnauthorized, gin.H{"err": "invalid phonenumber or password"})
+			return
+		}
+	} else {
+		c.JSON(http.StatusBadRequest, gin.H{"err": "email or phonenumber required"})
 		return
 	}
 
 	// check password
 	if !utils.CheckPass(user.Password, data.Password) {
 		c.JSON(http.StatusUnauthorized, gin.H{"err": "invalid phonenumber or password"})
+		return
+	}
+
+	// check user is blocked
+	if user.Block {
+		c.JSON(http.StatusBadRequest, gin.H{"err": "your account is blocked"})
 		return
 	}
 
