@@ -1,21 +1,20 @@
 package main
 
 import (
+	"github.com/gin-contrib/cors"
+	"github.com/gin-gonic/gin"
+	"github.com/joho/godotenv"
 	"log"
 	"time"
 	"zipride/database"
 	"zipride/routes"
 	"zipride/seeders"
-
-	"github.com/gin-contrib/cors"
-	"github.com/gin-gonic/gin"
-	"github.com/joho/godotenv"
 )
 
 func main() {
 
 	// env load
-	err := godotenv.Load("../.env")
+	err := godotenv.Load()
 	if err != nil {
 		log.Fatal("failed to load env")
 	}
@@ -43,6 +42,7 @@ func main() {
 	// routes connection
 	routes.PublicRoutes(r)
 	routes.UserRoutes(r)
+	routes.DriverRoutes(r)
 
 	r.Run(":8080")
 }

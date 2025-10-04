@@ -3,6 +3,7 @@ package handlers
 import (
 	"net/http"
 	"zipride/database"
+	"zipride/internal/constants"
 	"zipride/internal/models"
 	"zipride/internal/userauth/services"
 	"zipride/utils"
@@ -24,7 +25,7 @@ func SendOtpHandler(c *gin.Context) {
 
 	otp := utils.GeneratorOtp()
 	services.SendOtp(data.Phone, "Your OTP Is "+otp)
-	utils.SaveOTP(data.Phone, otp)
+	utils.SaveOTP(data.Phone, otp, constants.UserPrefix)
 
 	c.JSON(http.StatusOK, gin.H{"res": "OTP Sent"})
 }
@@ -33,7 +34,8 @@ func SendOtpHandler(c *gin.Context) {
 
 func VerifyOtpHandler(c *gin.Context) {
 	var data struct {
-		OTP string `json:"code"`
+		OTP   string `json:"code"`
+		Phone string `json:"phone"`
 	}
 
 	if err := c.ShouldBindJSON(&data); err != nil || data.OTP == "" {
@@ -41,7 +43,7 @@ func VerifyOtpHandler(c *gin.Context) {
 		return
 	}
 
-	phone := utils.VerifyOTP(data.OTP)
+	phone := utils.VerifyOTP(data.Phone, data.OTP, constants.UserPrefix)
 
 	if phone == "" {
 		c.JSON(http.StatusBadRequest, gin.H{"err": "invalid or expired otp"})
@@ -49,7 +51,7 @@ func VerifyOtpHandler(c *gin.Context) {
 	}
 
 	//  storing marked verified phone numbers
-	utils.MarkPhoneVerified(phone)
+	utils.MarkPhoneVerified(phone, constants.UserPrefix)
 
 	c.JSON(http.StatusOK, gin.H{"res": "PhoneNumber verified"})
 
@@ -103,7 +105,7 @@ func RegisterUser(c *gin.Context) {
 	}
 
 	// getting verified phonenumber from redis
-	phone := utils.GetVerifiedPhone()
+	phone := utils.GetVerifiedPhone(constants.UserPrefix)
 
 	if phone == "" {
 		c.JSON(http.StatusBadRequest, gin.H{"err": "failed to get verified phonenumber"})
@@ -125,7 +127,7 @@ func RegisterUser(c *gin.Context) {
 		return
 	}
 
-	utils.ClearVerifiedPhone(phone)
+	utils.ClearVerifiedPhone(phone, constants.UserPrefix)
 
 	c.JSON(http.StatusOK, gin.H{"res": "Signup Successfuly Completed"})
 }

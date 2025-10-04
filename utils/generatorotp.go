@@ -21,33 +21,38 @@ func GeneratorOtp() string {
 }
 
 // save otp
-func SaveOTP(phone, otp string) error {
-	key := fmt.Sprintf("otp:%s", phone)
-
+func SaveOTP(phone, otp, prefix string) error {
+	key := fmt.Sprintf("%s:%s", prefix, phone)
 	return database.RDB.Set(database.Ctx, key, otp, 1*time.Minute).Err()
 }
 
 // verify otp
-func VerifyOTP(code string) string {
-	key := fmt.Sprintf("opt:%s", code)
+func VerifyOTP(phone, code, prefix string) string {
+	key := fmt.Sprintf("%s:%s", prefix, phone)
 
 	stored, err := database.RDB.Get(database.Ctx, key).Result()
-
 	if err != nil {
 		return "invalid or expired token"
 	}
 
+	// Compare stored OTP with provided code
+	if stored != code {
+		return "invalid otp"
+	}
+
+	// Delete after successful verification to prevent reuse
 	database.RDB.Del(database.Ctx, key)
-	return stored
+
+	return "valid"
 }
 
 // mark phonenumber verified
-func MarkPhoneVerified(phone string) {
+func MarkPhoneVerified(phone, prefix string) {
 	database.RDB.Set(database.Ctx, "verified:"+phone, "true", 15*time.Minute)
 }
 
 // get verified phone
-func GetVerifiedPhone() string {
+func GetVerifiedPhone(prefix string) string {
 	keys, _ := database.RDB.Keys(database.Ctx, "verified:*").Result()
 
 	if len(keys) == 0 {
@@ -58,6 +63,6 @@ func GetVerifiedPhone() string {
 }
 
 // clear verified phone
-func ClearVerifiedPhone(phone string) {
+func ClearVerifiedPhone(phone, prefix string) {
 	database.RDB.Del(database.Ctx, "verified:"+phone)
 }
