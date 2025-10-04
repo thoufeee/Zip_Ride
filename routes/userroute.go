@@ -4,7 +4,7 @@ import (
 	"zipride/internal/constants"
 	"zipride/internal/domain/user/services"
 	"zipride/internal/middleware"
-	"zipride/internal/userauth/handlers"
+	"zipride/internal/user_Auth/handlers"
 
 	"github.com/gin-gonic/gin"
 )

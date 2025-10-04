@@ -1,10 +1,10 @@
 package handlers
 
 import (
+	"context"
 	"github.com/gin-gonic/gin"
 	"net/http"
 	"strings"
-	"zipride/internal/driverAuth/services"
 )
 
 func DriverSignUp(c *gin.Context) {
@@ -27,18 +27,17 @@ func DriverSignUp(c *gin.Context) {
 	req.Email = strings.TrimSpace(req.Email)
 	req.Phone = strings.TrimSpace(req.Phone)
 
-	token, err := services.RegisterDriver(req.FirstName, req.LastName, req.Email, req.Phone, req.Password)
+	driver, err := authSvc.SignupWithEmail(context.Background(), req.FirstName, req.LastName, req.Email, req.Password, req.Phone)
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"err": err.Error()})
 		return
 	}
-
-	c.JSON(http.StatusOK, gin.H{"res": "signup successful", "token": token})
+	c.JSON(http.StatusOK, gin.H{"res": "signup successful", "driver_id": driver.ID})
 }
 
 func DriverLogin(c *gin.Context) {
 	var req struct {
-		Phone    string `json:"phone" binding:"required"`
+		Email    string `json:"email" binding:"required"`
 		Password string `json:"password" binding:"required"`
 	}
 
@@ -47,7 +46,7 @@ func DriverLogin(c *gin.Context) {
 		return
 	}
 
-	token, err := services.LoginDriver(req.Phone, req.Password)
+	token, err := authSvc.LoginWithEmail(req.Email, req.Password)
 	if err != nil {
 		c.JSON(http.StatusUnauthorized, gin.H{"err": err.Error()})
 		return
