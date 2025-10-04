@@ -31,7 +31,7 @@ func SeedAdmin() {
 	newadmin := &models.User{
 		Email:    adminEmail,
 		Password: hashpass,
-		Role:     constants.RoleAdmin,
+		Role:     constants.RoleSuperAdmin,
 	}
 
 	if err := database.DB.Create(&newadmin).Error; err != nil {
