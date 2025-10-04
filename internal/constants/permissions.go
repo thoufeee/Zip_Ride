@@ -5,26 +5,34 @@ package constants
 const (
 
 	// user managment
-	PermViewUsers  = "VIEW_USERS"
-	PermAddUser    = "ADD_USER"
-	PermEditUser   = "EDIT_USER"
-	PermDeleteUser = "DELETE_USER"
-	PermBlockUser  = "BLOCK_USER"
+	PermissionViewUsers   = "VIEW_USERS"
+	PermissionAddUser     = "ADD_USER"
+	PermissionEditUser    = "EDIT_USER"
+	PermissionDeleteUser  = "DELETE_USER"
+	PermissionBlockUser   = "BLOCK_USER"
+	PermissionUnBlockUser = "UNBLOCK_USER"
 
 	// staff managment
-	PermViewStaff   = "VIEW_STAFFS"
-	PermAddStaff    = "ADD_STAFF"
-	PermEditStaff   = "EDIT_STAFF"
-	PermDeleteSfatt = "DELETE_STAFF"
-	PermBlockStaff  = "BLOCK_STAFF"
+	PermissionViewStaffs   = "VIEW_STAFFS"
+	PermissionAddStaff     = "ADD_STAFF"
+	PermissionEditStaff    = "EDIT_STAFF"
+	PermissionDeleteStaff  = "DELETE_STAFF"
+	PermissionBlockStaff   = "BLOCK_STAFF"
+	PermissionUnBlockStaff = "UNBLOCK_STAFF"
 
 	// manager managment
-	PermViewManager   = "VIEW_MANAGERS"
-	PermAddManager    = "ADD_MANAGER"
-	PermEditManager   = "EDIT_MANAGER"
-	PermDeleteManager = "DELETE_MANAGER"
-	PermBlockManager  = "BLOCK_MANAGER"
+	PermissionViewManagers   = "VIEW_MANAGERS"
+	PermissionAddManager     = "ADD_MANAGER"
+	PermissionEditManager    = "EDIT_MANAGER"
+	PermissionDeleteManager  = "DELETE_MANAGER"
+	PermissionBlockManager   = "BLOCK_MANAGER"
+	PermissionUnBlockManager = "UNBLOCK_MANAGER"
 
 	//  Reports
-	PermViewReports = "VIEW_REPORTS"
+	PermissionViewReports = "VIEW_REPORTS"
+	// view ride && eranings && user analytics
+	PermissionViewAnalytics = "VIEW_ANALYTICS"
+
+	// system settings (pricing rules && commisions && app settings)
+	PermissionSystemSettings = "SYSTEM_SETTINGS"
 )
