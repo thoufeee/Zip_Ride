@@ -1,8 +1,9 @@
 package routes
 
 import (
-	"github.com/gin-gonic/gin"
 	"zipride/internal/driverAuth/handlers"
+
+	"github.com/gin-gonic/gin"
 )
 
 func DriverRoutes(c *gin.Engine) {

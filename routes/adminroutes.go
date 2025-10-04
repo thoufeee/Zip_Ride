@@ -2,7 +2,7 @@ package routes
 
 import (
 	"zipride/internal/constants"
-	"zipride/internal/domain/admin/services"
+	"zipride/internal/domain/user_Admin/services"
 	"zipride/internal/middleware"
 
 	"github.com/gin-gonic/gin"
