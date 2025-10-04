@@ -2,12 +2,10 @@ package models
 
 import (
 	"time"
-
-	"github.com/google/uuid"
 )
 
 type Driver struct {
-	ID              uuid.UUID `gorm:"type:uuid;default:uuid_generate_v4();primaryKey" json:"id"`
+	ID              uint      `gorm:"primaryKey" json:"id"`
 	Name            string    `json:"name"`
 	Email           *string   `gorm:"uniqueIndex;default:null" json:"email,omitempty"`
 	Phone           *string   `gorm:"uniqueIndex;default:null" json:"phone,omitempty"`
