@@ -14,7 +14,7 @@ func AdminRoutes(c *gin.Engine) {
 
 	admin := c.Group("/admin")
 
-	admin.Use(middleware.Auth(constants.RoleAdmin))
+	admin.Use(middleware.Auth(constants.RoleSuperAdmin))
 
 	admin.GET("/allusers", services.GetAllUsers)
 }
