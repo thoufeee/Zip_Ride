@@ -9,7 +9,7 @@ require (
 	github.com/google/uuid v1.6.0
 	github.com/joho/godotenv v1.5.1
 	github.com/redis/go-redis/v9 v9.14.0
-	github.com/twilio/twilio-go v1.28.1
+	github.com/twilio/twilio-go v1.28.3
 	golang.org/x/crypto v0.42.0
 	google.golang.org/api v0.249.0
 	gorm.io/driver/postgres v1.6.0
