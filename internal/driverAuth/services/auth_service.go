@@ -18,11 +18,8 @@ func RegisterDriver(firstName, lastName, email, phone, password string) (string,
 	err := database.DB.Where("email = ?", email).First(&existing).Error
 	if err == nil {
 		return "", errors.New("email already exists")
-	}
-	if err != nil {
-		if !errors.Is(err, gorm.ErrRecordNotFound) {
-			return "", err
-		}
+	} else if !errors.Is(err, gorm.ErrRecordNotFound) {
+		return "", err
 	}
 
 	// Hash password
