@@ -2,10 +2,11 @@ package services
 
 import (
 	"errors"
-	"gorm.io/gorm"
 	"zipride/database"
 	"zipride/internal/models"
 	"zipride/utils"
+
+	"gorm.io/gorm"
 )
 
 func RegisterDriver(firstName, lastName, email, phone, password string) (string, error) {
