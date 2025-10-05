@@ -27,11 +27,16 @@ func Connect() {
 		log.Fatal("failed to connect database")
 	}
 
-	err = DB.AutoMigrate(&models.User{}, &models.Driver{})
+	err = DB.AutoMigrate(&models.User{}, &models.Driver{}, &models.Vehicle{}, &models.DriverDocuments{})
 
 	if err != nil {
 		log.Fatal("failed to automigrate")
 	}
+
+	// Ensure google_id allows NULLs and normalize existing empty strings to NULL
+	// This prevents unique index violations for multiple empty values
+	DB.Exec("UPDATE drivers SET google_id = NULL WHERE google_id = ''")
+	DB.Exec("ALTER TABLE drivers ALTER COLUMN google_id DROP NOT NULL")
 
 	log.Println("database connected successfuly")
 }
