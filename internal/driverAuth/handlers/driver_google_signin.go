@@ -7,22 +7,21 @@ import (
 	"zipride/internal/driverAuth/services"
 )
 
-// EmailLoginHandler logs a driver in using phone and password and returns an access token
-func EmailLoginHandler(c *gin.Context) {
+// GoogleSignIn handles Google id_token sign-in for drivers
+func GoogleSignIn(c *gin.Context) {
 	var req struct {
-		Phone    string `json:"phone" binding:"required"`
-		Password string `json:"password" binding:"required"`
+		IDToken string `json:"id_token" binding:"required"`
 	}
 	if err := c.ShouldBindJSON(&req); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
 
-	token, err := services.LoginDriver(req.Phone, req.Password)
+	token, status, phoneVerified, err := services.GoogleLogin(req.IDToken)
 	if err != nil {
 		c.JSON(http.StatusUnauthorized, gin.H{"error": err.Error()})
 		return
 	}
 
-	c.JSON(http.StatusOK, gin.H{"token": token})
+	c.JSON(http.StatusOK, gin.H{"token": token, "status": status, "phone_verified": phoneVerified})
 }
