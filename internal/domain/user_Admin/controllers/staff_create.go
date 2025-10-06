@@ -13,13 +13,13 @@ import (
 // creating staff || manager
 func CreateStaff(c *gin.Context) {
 
-		var data struct {
-			Name        string `json:"name" binding:"required"`
-			Email       string `json:"email" binding:"required"`
-			PhoneNumber string `json:"phonenumber" binding:"required"`
-			Password    string `json:"password" binding:"required"`
-			Role        string `json:"role" binding:"required"`
-		}
+	var data struct {
+		Name        string `json:"name" binding:"required"`
+		Email       string `json:"email" binding:"required"`
+		PhoneNumber string `json:"phonenumber" binding:"required"`
+		Password    string `json:"password" binding:"required"`
+		Role        string `json:"role" binding:"required"`
+	}
 	//Get Staff details
 	if err := c.ShouldBindJSON(&data); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"err": "fill blanks"})
@@ -62,5 +62,8 @@ func CreateStaff(c *gin.Context) {
 	}
 	//sucess responce
 	c.JSON(http.StatusOK, gin.H{"message": "Staff created sucessfully",
-		"staff": staff})
+		"Name": data.Name,
+		"Email":data.Email,
+		"PhoneNumber":data.PhoneNumber,
+	})
 }

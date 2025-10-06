@@ -4,7 +4,6 @@ import (
 	"net/http"
 	"zipride/database"
 	"zipride/internal/constants"
-	"zipride/internal/middleware"
 	"zipride/internal/models"
 	"zipride/utils"
 
@@ -13,7 +12,11 @@ import (
 
 func UpdateStaff(c *gin.Context) {
 	//Get staff if from param
-	staffid := middleware.GetUserID(c)
+	staffid := c.Param("id")
+	if staffid == "" {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Staff id required"})
+		return
+	}
 	//get staff data from the database
 	var staff models.Admin
 	if err := database.DB.Where("id = ? AND RoleID = ?", staffid, constants.RoleStaff).First(&staff).Error; err != nil {
@@ -56,11 +59,11 @@ func UpdateStaff(c *gin.Context) {
 	if input.Name != "" {
 		staff.Name = input.Name
 	}
-	// update email 
+	// update email
 	if input.Email != "" {
 		staff.Email = input.Email
 	}
-	// update phone number 
+	// update phone number
 	if input.PhoneNumber != "" {
 		staff.PhoneNumber = input.PhoneNumber
 	}
@@ -73,7 +76,9 @@ func UpdateStaff(c *gin.Context) {
 
 	//sucess Responce
 	c.JSON(http.StatusOK, gin.H{
-		"message": "Staff update sucessfully",
-		"staff": staff,
+		"message":     "Staff update sucessfully",
+		"Name":        input.Name,
+		"Email":       input.Email,
+		"PhoneNumber": input.PhoneNumber,
 	})
 }
