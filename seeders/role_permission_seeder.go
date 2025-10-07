@@ -18,13 +18,13 @@ func SeedRolePermissions() {
 	//  giving permission to super admin
 	var SuperAdmin models.Role
 
-	database.DB.Where("name = ?", constants.RoleSuperAdmin).First(SuperAdmin)
+	database.DB.Where("name = ?", constants.RoleSuperAdmin).First(&SuperAdmin)
 	database.DB.Model(&SuperAdmin).Association("Permissions").Replace(allPerms)
 
 	//  giving permission to manager
 	var manager models.Role
 
-	database.DB.Where("name = ?", constants.RoleManager).First(manager)
+	database.DB.Where("name = ?", constants.RoleManager).First(&manager)
 	var managerPermission []models.Permission
 	database.DB.Where("name IN ?", []string{
 		constants.PermissionViewUsers, constants.PermissionViewAnalytics, constants.PermissionViewReports,
