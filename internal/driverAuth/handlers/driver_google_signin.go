@@ -17,11 +17,11 @@ func GoogleSignIn(c *gin.Context) {
 		return
 	}
 
-	token, status, phoneVerified, err := services.GoogleLogin(req.IDToken)
+	accessToken, refreshToken, status, phoneVerified, err := services.GoogleLogin(req.IDToken)
 	if err != nil {
 		c.JSON(http.StatusUnauthorized, gin.H{"error": err.Error()})
 		return
 	}
 
-	c.JSON(http.StatusOK, gin.H{"token": token, "status": status, "phone_verified": phoneVerified})
+	c.JSON(http.StatusOK, gin.H{"access_token": accessToken, "refresh_token": refreshToken, "status": status, "phone_verified": phoneVerified})
 }

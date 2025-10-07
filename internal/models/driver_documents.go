@@ -10,7 +10,7 @@ type DriverDocuments struct {
 	LicenseURL   string    `json:"license_url"`
 	RCURL        string    `json:"rc_url"`
 	InsuranceURL string    `json:"insurance_url"`
-	Status       string    `gorm:"default:pending" json:"status"` // pending, in_review, approved, rejected
+	Status       string    `gorm:"default:pending" json:"status"`
 	CreatedAt    time.Time `json:"created_at"`
 	UpdatedAt    time.Time `json:"updated_at"`
 }

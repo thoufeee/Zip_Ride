@@ -22,13 +22,14 @@ func EmailSignupHandler(c *gin.Context) {
 		return
 	}
 
-	token, err := services.RegisterDriver(req.FirstName, req.LastName, req.Email, req.Phone, req.Password)
+	accessToken, refreshToken, err := services.RegisterDriver(req.FirstName, req.LastName, req.Email, req.Phone, req.Password)
 	if err != nil {
 		c.JSON(http.StatusConflict, gin.H{"error": err.Error()})
 		return
 	}
 
 	c.JSON(http.StatusCreated, gin.H{
-		"token": token,
+		"access_token": accessToken,
+		"refresh_token": refreshToken,
 	})
 }

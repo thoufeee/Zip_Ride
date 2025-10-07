@@ -19,7 +19,6 @@ func GetUserID(c *gin.Context) uint {
 	return 0
 }
 
-// RequireApprovedDriver ensures the authenticated user is an approved, phone-verified driver
 func RequireApprovedDriver() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		val, exists := c.Get("user_id")

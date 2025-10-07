@@ -18,11 +18,11 @@ func EmailLoginHandler(c *gin.Context) {
 		return
 	}
 
-	token, err := services.LoginDriver(req.Phone, req.Password)
+	accessToken, refreshToken, err := services.LoginDriver(req.Phone, req.Password)
 	if err != nil {
 		c.JSON(http.StatusUnauthorized, gin.H{"error": err.Error()})
 		return
 	}
 
-	c.JSON(http.StatusOK, gin.H{"token": token})
+	c.JSON(http.StatusOK, gin.H{"access_token": accessToken, "refresh_token": refreshToken})
 }

@@ -22,13 +22,13 @@ func DriverSignUp(c *gin.Context) {
 		return
 	}
 
-	token, err := services.RegisterDriver(req.FirstName, req.LastName, req.Email, req.Phone, req.Password)
+	accessToken, refreshToken, err := services.RegisterDriver(req.FirstName, req.LastName, req.Email, req.Phone, req.Password)
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
 
-	c.JSON(http.StatusOK, gin.H{"message": "signup successful", "token": token})
+	c.JSON(http.StatusOK, gin.H{"message": "signup successful", "access_token": accessToken, "refresh_token": refreshToken})
 }
 
 // DriverLogin logs a driver in with phone and password and returns an access token
@@ -43,11 +43,11 @@ func DriverLogin(c *gin.Context) {
 		return
 	}
 
-	token, err := services.LoginDriver(req.Phone, req.Password)
+	accessToken, refreshToken, err := services.LoginDriver(req.Phone, req.Password)
 	if err != nil {
 		c.JSON(http.StatusUnauthorized, gin.H{"error": err.Error()})
 		return
 	}
 
-	c.JSON(http.StatusOK, gin.H{"message": "login successful", "token": token})
+	c.JSON(http.StatusOK, gin.H{"message": "login successful", "access_token": accessToken, "refresh_token": refreshToken})
 }

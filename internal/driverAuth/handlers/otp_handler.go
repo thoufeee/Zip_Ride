@@ -42,11 +42,11 @@ func VerifyDriverOtpHandler(c *gin.Context) {
 		return
 	}
 
-	token, status, err := services.EnsureDriverByPhoneAndIssueToken(req.Phone)
+	accessToken, refreshToken, status, err := services.EnsureDriverByPhoneAndIssueToken(req.Phone)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}
 
-	c.JSON(http.StatusOK, gin.H{"token": token, "status": status})
+	c.JSON(http.StatusOK, gin.H{"access_token": accessToken, "refresh_token": refreshToken, "status": status})
 }

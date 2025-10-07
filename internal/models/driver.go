@@ -21,4 +21,7 @@ type Driver struct {
 	DeletedAt     gorm.DeletedAt `gorm:"index" json:"-"`
 	GoogleID      *string        `gorm:"uniqueIndex;default:null" json:"google_id,omitempty"`
 	Avatar        string         `json:"avatar,omitempty"`
+	
+	// Relationships
+	Vehicle Vehicle `gorm:"foreignKey:DriverID" json:"vehicle,omitempty"`
 }
