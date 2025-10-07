@@ -2,6 +2,7 @@ package routes
 
 import (
 	driverHandlers "zipride/internal/domain/driver/handlers"
+	driverServices "zipride/internal/domain/driver/services"
 	"zipride/internal/driverAuth/handlers"
 	"zipride/internal/middleware"
 
@@ -34,12 +35,28 @@ func DriverRoutes(c *gin.Engine) {
 			authd.POST("/profile", driverHandlers.UpdateProfile)
 			authd.POST("/vehicle", driverHandlers.UpsertVehicle)
 			authd.POST("/docs", driverHandlers.UploadDocs)
+			authd.POST("/complete-profile", handlers.CompleteProfileHandler)
 		}
 
-		// Example protected area once approved
-		approved := driverGroup.Group("/protected").Use(middleware.Auth("driver"), middleware.RequireApprovedDriver())
+		// Document upload (multipart/form-data)
+		authd.POST("/upload-document", driverServices.UploadDocument)
+		authd.GET("/document-status", driverServices.GetDocumentStatus)
+
+		// Driver operations - requires approval
+		approved := driverGroup.Group("/ops").Use(middleware.Auth("driver"), middleware.RequireApprovedDriver())
 		{
-			approved.GET("/ping", func(ctx *gin.Context) { ctx.JSON(200, gin.H{"message": "ok"}) })
+			approved.POST("/availability", driverServices.SetDriverAvailability)
+			approved.PATCH("/location", driverServices.UpdateDriverLocation)
+			approved.GET("/status", driverServices.GetDriverStatus)
+		}
+
+		// Public endpoint for finding nearby drivers
+		driverGroup.GET("/nearby", driverServices.GetNearbyDrivers)
+
+		// Example protected area once approved
+		approvedExample := driverGroup.Group("/protected").Use(middleware.Auth("driver"), middleware.RequireApprovedDriver())
+		{
+			approvedExample.GET("/ping", func(ctx *gin.Context) { ctx.JSON(200, gin.H{"message": "ok"}) })
 		}
 	}
 }
