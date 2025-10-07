@@ -65,6 +65,10 @@ func UpdateUserProfile(c *gin.Context) {
 		user.Email = *input.Email
 	}
 
+	if input.PhoneNumber != nil {
+		user.PhoneNumber = *input.PhoneNumber
+	}
+
 	if input.Place != nil {
 		user.Place = *input.Place
 	}
