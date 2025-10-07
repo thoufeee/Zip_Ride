@@ -54,7 +54,7 @@ func JwtValidation() gin.HandlerFunc {
 		if claims.Role != constants.RoleUser {
 			var admin models.Admin
 
-			if err := database.DB.Preload("Role.Permissions").Preload("Permissions").First(&admin, "id = ?", claims.ID).Error; err != nil {
+			if err := database.DB.Preload("Role.Permissions").Preload("Permissions").First(&admin, claims.UserId).Error; err != nil {
 				c.JSON(http.StatusInternalServerError, gin.H{"err": "failed to load permissions"})
 				c.Abort()
 				return
