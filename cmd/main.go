@@ -26,8 +26,9 @@ func main() {
 	// redis connect
 	database.InitRedis()
 
-	// seeder admin
+	// seeders
 	seeders.SeedAdmin()
+	seeders.SeedDriverAdmin()
 
 	r := gin.Default()
 
@@ -44,6 +45,7 @@ func main() {
 	routes.PublicRoutes(r)
 	routes.UserRoutes(r)
 	routes.DriverRoutes(r)
+	routes.DriverAdminRoutes(r)
 
 	r.Run(":8080")
 }
