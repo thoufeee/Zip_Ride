@@ -3,7 +3,6 @@ package controllers
 import (
 	"net/http"
 	"zipride/database"
-	"zipride/internal/constants"
 	"zipride/internal/models"
 	"zipride/utils"
 
@@ -11,59 +10,55 @@ import (
 )
 
 // creating staff || manager
+
 func CreateStaff(c *gin.Context) {
 
 	var data struct {
-		Name        string `json:"name" binding:"required"`
-		Email       string `json:"email" binding:"required"`
-		PhoneNumber string `json:"phonenumber" binding:"required"`
-		Password    string `json:"password" binding:"required"`
-		Role        string `json:"role" binding:"required"`
+		Name        string   `json:"name" binding:"required"`
+		Email       string   `json:"email" binding:"required"`
+		PhoneNumber string   `json:"phonenumber" binding:"required"`
+		Password    string   `json:"password" binding:"required"`
+		Role        string   `json:"role"`
+		ExtraPerms  []string `json:"extra_permissions"`
 	}
-	//Get Staff details
+
 	if err := c.ShouldBindJSON(&data); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"err": "fill blanks"})
+		c.JSON(http.StatusBadRequest, gin.H{"err": "invalid request"})
 		return
 	}
-	//check if staff email alredy exist
-	var existingstaff models.Admin
-	if err := database.DB.Find("email=?", data.Email).First(&existingstaff).Error; err != nil {
-		c.JSON(http.StatusConflict, gin.H{"error": "Email alredy exist"})
+
+	// finding role
+	var role models.Role
+
+	if err := database.DB.Where("name = ?", data.Name).Preload("Permissions").First(&role).Error; err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"err": "role not found"})
 		return
 	}
-	//checking emaail
-	if !utils.EmailCheck(data.Email) {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "invalid email format "})
-		return
+
+	// for extra permissions
+	var Permission []models.Permission
+
+	if len(Permission) > 0 {
+		database.DB.Where("name IN", data.ExtraPerms).Find(&Permission)
 	}
-	//veryfy phone Number
-	if !utils.PhoneNumberCheck(data.PhoneNumber) {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "invalid phone Number"})
-		return
-	}
-	//password Secure
-	hash, err := utils.GenerateHash(data.Password)
-	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "failed while hashing password"})
-		return
-	}
-	// staff details to store on database
-	staff := models.Admin{
+
+	allPermission := append(role.Permissions, Permission...)
+
+	hashpass, _ := utils.GenerateHash(data.Password)
+
+	newStaff := models.Admin{
 		Name:        data.Name,
 		Email:       data.Email,
 		PhoneNumber: data.PhoneNumber,
-		Password:    hash,
-		RoleID:      constants.RoleStaff,
+		Password:    hashpass,
+		RoleID:      &role.ID,
+		Permissions: allPermission,
 	}
-	//Storing new staff data to database
-	if err := database.DB.Create(&staff).Error; err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to create staff"})
+
+	if err := database.DB.Create(&newStaff).Error; err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"err": "creation failed"})
 		return
 	}
-	//sucess responce
-	c.JSON(http.StatusOK, gin.H{"message": "Staff created sucessfully",
-		"Name": data.Name,
-		"Email":data.Email,
-		"PhoneNumber":data.PhoneNumber,
-	})
+
+	c.JSON(http.StatusOK, gin.H{"res": "Successfuly created", "": data.Role})
 }
