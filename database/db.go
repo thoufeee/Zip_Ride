@@ -27,7 +27,8 @@ func Connect() {
 		log.Fatal("failed to connect database")
 	}
 
-	err = DB.AutoMigrate(&models.User{}, &models.Driver{}, &models.Vehicle{}, &models.DriverDocuments{})
+	err = DB.AutoMigrate(&models.User{}, &models.Driver{}, &models.Vehicle{}, &models.DriverDocuments{},
+		&models.DriverAdmin{}, &models.DriverAdminPermission{}, &models.DriverAdminRole{}, &models.DriverAdminRolePermission{}, &models.DriverAdminAccountRole{})
 
 	if err != nil {
 		log.Fatal("failed to automigrate")
