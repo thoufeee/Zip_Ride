@@ -30,7 +30,7 @@ func CreateStaff(c *gin.Context) {
 	// finding role
 	var role models.Role
 
-	if err := database.DB.Where("name = ?", data.Role).Preload("Permissions").First(&role).Error; err != nil {
+	if err := database.DB.Preload("Permissions").Where("name = ?", data.Role).First(&role).Error; err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"err": "role not found"})
 		return
 	}
@@ -38,13 +38,21 @@ func CreateStaff(c *gin.Context) {
 	// for extra permissions
 	var extraPermission []models.Permission
 
-	if len(extraPermission) > 0 {
-		database.DB.Where("name IN ?", data.ExtraPerms).Find(&extraPermission)
+	if len(data.ExtraPerms) > 0 {
+		if err := database.DB.Where("name IN ?", data.ExtraPerms).Find(&extraPermission).Error; err != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{"err": "failed to fetch extra permissions"})
+			return
+		}
 	}
 
 	allPermission := append(role.Permissions, extraPermission...)
 
-	hashpass, _ := utils.GenerateHash(data.Password)
+	hashpass, err := utils.GenerateHash(data.Password)
+
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"err": "failed to hash password"})
+		return
+	}
 
 	newStaff := models.Admin{
 		Name:        data.Name,
@@ -60,5 +68,5 @@ func CreateStaff(c *gin.Context) {
 		return
 	}
 
-	c.JSON(http.StatusOK, gin.H{"res": "Successfuly created", "": data.Role})
+	c.JSON(http.StatusOK, gin.H{"res": "Successfuly created", "role": data.Role})
 }
