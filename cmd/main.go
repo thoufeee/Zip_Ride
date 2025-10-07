@@ -15,7 +15,7 @@ import (
 func main() {
 
 	// env load
-	err := godotenv.Load()
+	err := godotenv.Load("../.env")
 	if err != nil {
 		log.Fatal("failed to load env")
 	}
@@ -26,9 +26,8 @@ func main() {
 	// redis connect
 	database.InitRedis()
 
-	// seeders
+	// seeder admin
 	seeders.SeedAdmin()
-	seeders.SeedDriverAdmin()
 
 	r := gin.Default()
 

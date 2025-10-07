@@ -29,16 +29,5 @@ const (
 	PermissionUnBlockManager = "UNBLOCK_MANAGER"
 
 	//  Reports
-	PermissionViewReports = "VIEW_REPORTS"
-	// view ride && eranings && user analytics
-	PermissionViewAnalytics = "VIEW_ANALYTICS"
-
-	// system settings (pricing rules && commisions && app settings)
-	PermissionSystemSettings = "SYSTEM_SETTINGS"
-
-	// driver admin
-	PermissionDriverView    = "DRIVER_VIEW"
-	PermissionDriverApprove = "DRIVER_APPROVE"
-	PermissionDriverReject  = "DRIVER_REJECT"
-	PermissionDriverSuspend = "DRIVER_SUSPEND"
+	PermViewReports = "VIEW_REPORTS"
 )
