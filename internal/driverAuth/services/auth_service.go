@@ -45,7 +45,7 @@ func RegisterDriver(firstName, lastName, email, phone, password string) (string,
 	}
 
 	// Generate JWT access token
-	token, err := utils.GenerateAccess(newDriver.ID, email, "driver")
+	token, err := utils.GenerateAccess(newDriver.ID, email, "driver", nil)
 	if err != nil {
 		return "", errors.New("failed to generate token")
 	}
@@ -63,5 +63,5 @@ func LoginDriver(phone, password string) (string, error) {
 		return "", errors.New("incorrect password")
 	}
 
-	return utils.GenerateAccess(d.ID, d.Email, "driver")
+	return utils.GenerateAccess(d.ID, d.Email, "driver", nil)
 }

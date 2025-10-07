@@ -32,5 +32,5 @@ func GoogleLogin(token string) (string, error) {
 	} else {
 		email = ""
 	}
-	return utils.GenerateAccess(d.ID, email, "driver")
+	return utils.GenerateAccess(d.ID, email, "driver", nil)
 }
