@@ -36,7 +36,7 @@ func GoogleSigin(c *gin.Context) {
 	}
 
 	// access token
-	token, err := utils.GenerateAccess(user.ID, user.Email, user.Role)
+	token, err := utils.GenerateAccess(user.ID, user.Email, user.Role, nil)
 
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"err": "failed to create access token"})
@@ -44,7 +44,7 @@ func GoogleSigin(c *gin.Context) {
 	}
 
 	// refresh token
-	refresh, err := utils.GenerateRefresh(user.ID, user.Email, user.Role)
+	refresh, err := utils.GenerateRefresh(user.ID, user.Email, user.Role, nil)
 
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"err": "failed to create refresh token"})

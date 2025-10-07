@@ -100,7 +100,7 @@ func ResetPassword(c *gin.Context) {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "failed to update password"})
 		return
 	}
-	//clear status 
+	//clear status
 	utils.ClearVerifiedPhone(input.Phone, "forgot")
 	c.JSON(http.StatusOK, gin.H{"message": "password updated sucessfully"})
 }
