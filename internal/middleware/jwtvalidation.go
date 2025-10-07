@@ -4,15 +4,18 @@ import (
 	"net/http"
 	"os"
 	"strings"
+	"zipride/database"
+	"zipride/internal/constants"
+	"zipride/internal/models"
 	"zipride/utils"
 
 	"github.com/gin-gonic/gin"
 	"github.com/golang-jwt/jwt/v5"
 )
 
-// auth
+// jwt token check
 
-func Auth(roles ...string) gin.HandlerFunc {
+func JwtValidation() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		header := c.GetHeader("Authorization")
 
@@ -42,18 +45,29 @@ func Auth(roles ...string) gin.HandlerFunc {
 			return
 		}
 
-		for _, role := range roles {
-			if claims.Role == role {
-				c.Set("user_id", claims.UserId)
-				c.Set("email", claims.Email)
-				c.Set("role", claims.Role)
-				c.Next()
+		c.Set("user_id", claims.UserId)
+		c.Set("email", claims.Email)
+		c.Set("role", claims.Role)
+
+		// if admin || staff || manager load permissions
+
+		if claims.Role != constants.RoleUser {
+			var admin models.Admin
+
+			if err := database.DB.Preload("Role.Permissions").Preload("Permissions").First(&admin, "id = ?", claims.ID).Error; err != nil {
+				c.JSON(http.StatusInternalServerError, gin.H{"err": "failed to load permissions"})
+				c.Abort()
 				return
 			}
+
+			perms := utils.MergePermissions(utils.PermissionToString(admin.Role.Permissions),
+				utils.PermissionToString(admin.Permissions),
+			)
+
+			c.Set("permissions", perms)
 		}
 
-		c.JSON(http.StatusForbidden, gin.H{"err": "access denied"})
-		c.Abort()
+		c.Next()
 
 	}
 }
