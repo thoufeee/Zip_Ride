@@ -35,4 +35,10 @@ const (
 
 	// system settings (pricing rules && commisions && app settings)
 	PermissionSystemSettings = "SYSTEM_SETTINGS"
+
+	// driver admin
+	PermissionDriverView    = "DRIVER_VIEW"
+	PermissionDriverApprove = "DRIVER_APPROVE"
+	PermissionDriverReject  = "DRIVER_REJECT"
+	PermissionDriverSuspend = "DRIVER_SUSPEND"
 )
