@@ -5,5 +5,5 @@ package models
 type Role struct {
 	ID          uint         `gorm:"primarykey" json:"id"`
 	Name        string       `json:"name"`
-	Permissions []Permission `gorm:"many2many:user_permissions;" json:"permissions"`
+	Permissions []Permission `gorm:"many2many:role_permissions;"`
 }
