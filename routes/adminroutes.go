@@ -2,8 +2,8 @@ package routes
 
 import (
 	"zipride/internal/constants"
-	"zipride/internal/domain/user_Admin/controllers"
-	"zipride/internal/domain/user_Admin/services"
+	"zipride/internal/domain/user_Admin/staffManagment/controllers"
+	services "zipride/internal/domain/user_Admin/userManagment/controllers"
 	"zipride/internal/middleware"
 
 	"github.com/gin-gonic/gin"
@@ -11,23 +11,25 @@ import (
 
 // admin routes
 
-func AdminRoutes(c *gin.Engine) {
+func SuperAdminRoutes(c *gin.Engine) {
 
 	admin := c.Group("/admin")
 
-	admin.Use(middleware.Auth(constants.RoleSuperAdmin))
-
-	admin.GET("/allusers", services.GetAllUsers)
-
-	//Staff management
-	admin.GET("/staffs", controllers.GETAllStaff)
-	admin.POST("/createstaff", controllers.CreateStaff)
-	admin.PUT("/staff/:id", controllers.UpdateStaff)
-	admin.DELETE("/staff/:id", controllers.UpdateStaff)
+	admin.Use(middleware.JwtValidation())
+	admin.Use(middleware.RoleCheck(constants.RoleSuperAdmin))
 
 	//user management
-	admin.GET("/users",services.GetAllUsers)
-	admin.POST("/createuser",services.AddUser)
-	admin.PUT("/user/:id",services.UpdateUser)
-	admin.DELETE("/user/:id",services.DeleteUser)
+	admin.GET("/allusers", middleware.RequirePermission(constants.PermissionViewUsers), services.GetAllUsers)
+	admin.POST("/createuser", middleware.RequirePermission(constants.PermissionAddUser), services.AddUser)
+	admin.PUT("/user/:id", middleware.RequirePermission(constants.PermissionEditUser), services.UpdateUser)
+	admin.DELETE("/user/:id", middleware.RequirePermission(constants.PermissionDeleteUser), services.DeleteUser)
+	admin.PUT("/userblock/:id", middleware.RequirePermission(constants.PermissionBlockUser), services.BlockUser)
+	admin.PUT("/userunblock/:id", middleware.RequirePermission(constants.PermissionUnBlockUser), services.UnBlockUser)
+
+	//Staff management
+	admin.GET("/allstaffs", middleware.RequirePermission(constants.PermissionViewStaffs), controllers.GETAllStaff)
+	admin.POST("/createstaff", middleware.RequirePermission(constants.PermissionAddStaff), controllers.CreateStaff)
+	admin.PUT("/staffupdate/:id", middleware.RequirePermission(constants.PermissionEditStaff), controllers.UpdateStaff)
+	admin.DELETE("/staffdelete/:id", middleware.RequirePermission(constants.PermissionDeleteStaff), controllers.UpdateStaff)
+
 }
