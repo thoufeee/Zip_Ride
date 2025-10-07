@@ -12,25 +12,27 @@ import (
 // claims
 
 type Claims struct {
-	UserId  uint   `json:"userid"`
-	Email   string `json:"email"`
-	Role    string `json:"role"`
-	TokenId string `json:"tokenid"`
+	UserId      uint     `json:"userid"`
+	Email       string   `json:"email"`
+	Role        string   `json:"role"`
+	Permissions []string `json:"permissions"`
+	TokenId     string   `json:"tokenid"`
 	jwt.RegisteredClaims
 }
 
 // generate access token
 
-func GenerateAccess(userid uint, email string, role string) (string, error) {
+func GenerateAccess(userid uint, email string, role string, permissions []string) (string, error) {
 
 	jwtkey := []byte(os.Getenv("JWT_SECRET"))
 
 	expir := time.Now().Add(60 * time.Minute)
 
 	claims := &Claims{
-		UserId: userid,
-		Email:  email,
-		Role:   role,
+		UserId:      userid,
+		Email:       email,
+		Role:        role,
+		Permissions: permissions,
 
 		RegisteredClaims: jwt.RegisteredClaims{
 			ExpiresAt: jwt.NewNumericDate(expir),
@@ -46,7 +48,7 @@ func GenerateAccess(userid uint, email string, role string) (string, error) {
 
 // generate refresh token
 
-func GenerateRefresh(userid uint, email, role string) (string, error) {
+func GenerateRefresh(userid uint, email, role string, permissions []string) (string, error) {
 
 	refreshkey := []byte(os.Getenv("REFRESH_KEY"))
 
@@ -54,10 +56,11 @@ func GenerateRefresh(userid uint, email, role string) (string, error) {
 	refreshid := uuid.New().String()
 
 	claims := &Claims{
-		UserId:  userid,
-		Email:   email,
-		Role:    role,
-		TokenId: refreshid,
+		UserId:      userid,
+		Email:       email,
+		Role:        role,
+		Permissions: permissions,
+		TokenId:     refreshid,
 
 		RegisteredClaims: jwt.RegisteredClaims{
 			ExpiresAt: jwt.NewNumericDate(exp),

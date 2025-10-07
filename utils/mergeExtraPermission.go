@@ -1,26 +1,40 @@
 package utils
 
-import "strings"
+import (
+	"strings"
+	"zipride/internal/models"
+)
+
+// convert slices of permission struct to slice of permission names
+func PermissionToString(perms []models.Permission) []string {
+	var names []string
+
+	for _, p := range perms {
+		names = append(names, p.Name)
+	}
+
+	return names
+}
 
 // merge role and extra permissions
-func MergePermissions(rolePerm []string, extraPerms []string) []string {
-	perMap := make(map[string]bool)
+func MergePermissions(a, b []string) []string {
+	set := make(map[string]struct{})
 
-	for _, p := range rolePerm {
-		perMap[strings.ToUpper(p)] = true
+	for _, p := range a {
+		set[p] = struct{}{}
 	}
 
-	for _, p := range extraPerms {
-		perMap[strings.ToUpper(p)] = true
+	for _, p := range b {
+		set[p] = struct{}{}
 	}
 
-	permissions := make([]string, 0, len(perMap))
+	var merges []string
 
-	for p := range perMap {
-		permissions = append(permissions, p)
+	for k := range set {
+		merges = append(merges, k)
 	}
 
-	return permissions
+	return merges
 }
 
 // check permission exists
