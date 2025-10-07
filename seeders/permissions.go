@@ -1,6 +1,7 @@
 package seeders
 
 import (
+	"log"
 	"zipride/database"
 	"zipride/internal/constants"
 	"zipride/internal/models"
@@ -47,4 +48,5 @@ func SeedPermisiions() {
 		database.DB.FirstOrCreate(&p, models.Permission{Name: p.Name})
 	}
 
+	log.Println("permission seeded successfuly")
 }
