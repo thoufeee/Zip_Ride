@@ -11,41 +11,44 @@ import (
 )
 
 func UpdateStaff(c *gin.Context) {
-	//Get staff if from param
-	staffid := c.Param("id")
-	if staffid == "" {
+	staffID := c.Param("id")
+	if staffID == "" {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "Staff id required"})
 		return
 	}
-	//get staff data from the database
+
 	var staff models.Admin
-	if err := database.DB.Where("id = ? AND RoleID = ?", staffid, constants.RoleStaff).First(&staff).Error; err != nil {
+	if err := database.DB.Where("id = ? AND RoleID = ?", staffID, constants.RoleStaff).First(&staff).Error; err != nil {
 		c.JSON(http.StatusNotFound, gin.H{"error": "Staff not found"})
 		return
 	}
-	//staff update input struct
+
 	var input struct {
 		Name        string `json:"name" binding:"required"`
 		Email       string `json:"email" binding:"required"`
 		PhoneNumber string `json:"phonenumber" binding:"required"`
-		Password    string `json:"password" binding:"required"`
+		Password    string `json:"password"` // optional
 	}
-	//get the input data to update staff details
+
 	if err := c.ShouldBindJSON(&input); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "invalid inputs"})
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid input"})
 		return
 	}
-	//check email to veryfy if it is emty and email check
-	if input.Email != "" && !utils.EmailCheck(input.Email) {
+
+	// Validate email
+	if !utils.EmailCheck(input.Email) {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid email format"})
 		return
 	}
-	//check phone number to verify if it is empty and phone number check function
-	if input.PhoneNumber != "" && !utils.PhoneNumberCheck(input.PhoneNumber) {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "invalid phone number format"})
+
+	// Normalize and validate phone number
+	phone, ok := utils.PhoneNumberCheck(input.PhoneNumber)
+	if !ok {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid phone number format"})
 		return
 	}
-	// password if it is changing if it is empty else to generate hashing to secure
+
+	// Update password if provided
 	if input.Password != "" {
 		hashed, err := utils.GenerateHash(input.Password)
 		if err != nil {
@@ -54,31 +57,21 @@ func UpdateStaff(c *gin.Context) {
 		}
 		staff.Password = hashed
 	}
-	//update field provided
-	//update name
-	if input.Name != "" {
-		staff.Name = input.Name
-	}
-	// update email
-	if input.Email != "" {
-		staff.Email = input.Email
-	}
-	// update phone number
-	if input.PhoneNumber != "" {
-		staff.PhoneNumber = input.PhoneNumber
-	}
 
-	//save to database
+	// Update fields
+	staff.Name = input.Name
+	staff.Email = input.Email
+	staff.PhoneNumber = phone
+
 	if err := database.DB.Save(&staff).Error; err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to update staff"})
 		return
 	}
 
-	//sucess Responce
 	c.JSON(http.StatusOK, gin.H{
-		"message":     "Staff update sucessfully",
-		"Name":        input.Name,
-		"Email":       input.Email,
-		"PhoneNumber": input.PhoneNumber,
+		"message":     "Staff updated successfully",
+		"Name":        staff.Name,
+		"Email":       staff.Email,
+		"PhoneNumber": staff.PhoneNumber,
 	})
 }

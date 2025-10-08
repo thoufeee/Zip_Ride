@@ -38,7 +38,8 @@ func AddUser(c *gin.Context) {
 	}
 
 	// Validate phone number
-	if !utils.PhoneNumberCheck(input.PhoneNumber) {
+	phone, ok := utils.PhoneNumberCheck(input.PhoneNumber)
+	if !ok {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid phone number format"})
 		return
 	}
@@ -60,7 +61,7 @@ func AddUser(c *gin.Context) {
 		LastName:    strings.TrimSpace(input.LastName),
 		Email:       input.Email,
 		Gender:      input.Gender,
-		PhoneNumber: input.PhoneNumber,
+		PhoneNumber: phone,
 		Place:       strings.TrimSpace(input.Place),
 		Password:    hashed,
 		Role: constants.RoleUser,
