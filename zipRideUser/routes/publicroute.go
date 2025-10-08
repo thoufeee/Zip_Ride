@@ -16,11 +16,15 @@ func PublicRoutes(c *gin.Engine) {
 	api.POST("verify-otp", handlers.VerifyOtpHandler)
 	api.POST("otp-signup", handlers.RegisterUser)
 
+	// otp based signin
+	api.POST("signin-otp", handlers.OtpSignin)
+	api.POST("signin-verifyotp", handlers.VerifyOTP)
+
 	// google signup && sigin
 	api.POST("googlesignup", handlers.GoogleSignup)
 	api.POST("googlesigin", handlers.GoogleSigin)
 
-	//
+	// token based authentication
 	api.POST("signup", handlers.SignUp)
 	api.POST("signin", handlers.SignIn)
 
