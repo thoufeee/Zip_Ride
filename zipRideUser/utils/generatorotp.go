@@ -17,7 +17,7 @@ func GeneratorOtp() string {
 		log.Fatal("failed to create otp")
 	}
 
-	return fmt.Sprintf("%04d", otp.Int64())
+	return fmt.Sprintf("%06d", otp.Int64())
 }
 
 // save otp
