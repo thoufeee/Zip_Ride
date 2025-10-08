@@ -44,8 +44,9 @@ func SignUp(c *gin.Context) {
 
 	// phonenumber check
 
-	if !utils.PhoneNumberCheck(user.PhoneNumber) {
-		c.JSON(http.StatusBadRequest, gin.H{"err": "phone number not valid"})
+	phone, ok := utils.PhoneNumberCheck(user.PhoneNumber)
+	if !ok {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid phone number format"})
 		return
 	}
 
@@ -72,7 +73,7 @@ func SignUp(c *gin.Context) {
 	user.FirstName = strings.TrimSpace(user.FirstName)
 	user.LastName = strings.TrimSpace(user.LastName)
 	user.Email = strings.TrimSpace(user.Email)
-	user.PhoneNumber = strings.TrimSpace(user.PhoneNumber)
+	user.PhoneNumber = strings.TrimSpace(phone)
 
 	new := &models.User{
 		FirstName:   user.FirstName,

@@ -3,7 +3,6 @@ package handlers
 import (
 	"net/http"
 	"zipride/database"
-	"zipride/internal/constants"
 	"zipride/internal/models"
 	"zipride/internal/user_Auth/services"
 	"zipride/utils"
@@ -13,33 +12,41 @@ import (
 
 // forget password
 func ForgetPassword(c *gin.Context) {
-	//struct for phone number
 	var input struct {
 		Phone string `json:"phone" binding:"required"`
 	}
-	//get data from json body
+
 	if err := c.ShouldBindJSON(&input); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "invalid credential"})
 		return
 	}
-	//veryfy number format
-	if !utils.PhoneNumberCheck(input.Phone) {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "invalid phone number format"})
-		return
-	}
-	//verufy phone number exist
-	var user models.User
-	if err := database.DB.Where("phone_number= ?", input.Phone).First(&user).Error; err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "Phone number is not registered"})
+
+	// Normalize phone
+	phone, ok := utils.PhoneNumberCheck(input.Phone)
+	if !ok {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid phone number format"})
 		return
 	}
 
-	//otp generation
+	// Verify phone exists
+	var user models.User
+	if err := database.DB.Where("phone_number = ?", phone).First(&user).Error; err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Phone number is not registered"})
+		return
+	}
+
+	// Generate OTP
 	otp := utils.GeneratorOtp()
-	// send otp
-	services.SendOtp(input.Phone, "Your OTP Is "+otp)
-	//save otp
-	utils.SaveOTP(input.Phone, otp, constants.UserPrefix)
+
+	// Send OTP via Twilio in E.164 format
+	twilioPhone := "+91" + phone
+	services.SendOtp(twilioPhone, "Your OTP is "+otp)
+
+	// Save OTP in Redis with prefix "forgot"
+	if err := utils.SaveOTP(phone, otp, "forgot"); err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "failed to save OTP"})
+		return
+	}
 
 	c.JSON(http.StatusOK, gin.H{"res": "OTP Sent"})
 }
@@ -47,60 +54,88 @@ func ForgetPassword(c *gin.Context) {
 // verify forgot password with phone number and otp
 
 func VerifyForgotOTP(c *gin.Context) {
-	//struct to get specific data
+	//struct to get to veryfy with user mobile number for secure
 	var input struct {
 		Phone string `json:"phone" binding:"required"`
 		Otp   string `json:"otp" binding:"required"`
 	}
-	//read json body for struct
+	//getting data from json body
 	if err := c.ShouldBindJSON(&input); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"status": "error", "message": "Invalid input"})
 		return
 	}
-	//veryfy otp
-	result := utils.VerifyOTP(input.Phone, input.Otp, "forgot")
+
+	// Normalize phone
+	phone, ok := utils.PhoneNumberCheck(input.Phone)
+	if !ok {
+		c.JSON(http.StatusBadRequest, gin.H{"status": "error", "message": "Invalid phone number format"})
+		return
+	}
+
+	// Verify OTP
+	result := utils.VerifyOTP(phone, input.Otp, "forgot")
 	if result != "valid" {
 		c.JSON(http.StatusUnauthorized, gin.H{"status": "error", "message": result})
 		return
 	}
 
-	//temporarily verified for password reset
-	utils.MarkPhoneVerified(input.Phone, "forgot")
+	// Temporarily mark phone verified
+	utils.MarkPhoneVerified(phone, "forgot")
 	//sucess responce
 	c.JSON(http.StatusOK, gin.H{"status": "success", "message": "OTP verified successfully"})
 }
 
-//Reset PAssword
-
+// Reset PAssword
 func ResetPassword(c *gin.Context) {
-	//struct to create new password
 	var input struct {
 		Phone       string `json:"phone" binding:"required"`
 		NewPassword string `json:"new_password" binding:"required"`
 	}
-	//Read json body to get data to struct
+
+	// Bind JSON
 	if err := c.ShouldBindJSON(&input); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "invalid credential"})
+		c.JSON(http.StatusBadRequest, gin.H{"error": "invalid input"})
 		return
 	}
-	//veryfy phone number
-	varyfied := utils.GetVerifiedPhone("forgot")
-	if varyfied != input.Phone {
-		c.JSON(http.StatusBadRequest, gin.H{"status": "error", "message": "Phone number is nit veryfied"})
+
+	// Normalize phone
+	phone, ok := utils.PhoneNumberCheck(input.Phone)
+	if !ok {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "invalid phone number format"})
 		return
 	}
-	//Password securing
+
+	// Check if phone is verified in Redis
+	verified := utils.GetVerifiedPhone("forgot")
+	if verified != phone {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "phone number not verified"})
+		return
+	}
+
+	// Check if phone exists in DB
+	var user models.User
+	if err := database.DB.Where("phone_number = ?", phone).First(&user).Error; err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "phone number not found"})
+		return
+	}
+
+	// Hash new password
 	hash, err := utils.GenerateHash(input.NewPassword)
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "failed to secure password"})
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "failed to hash password"})
 		return
 	}
-	//save password on database
-	if err := database.DB.Model(&models.User{}).Where("phone_number =?", input.Phone).Update("password", hash).Error; err != nil {
+
+	// Update password in DB
+	if err := database.DB.Model(&models.User{}).
+		Where("phone_number = ?", phone).
+		Update("password", hash).Error; err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "failed to update password"})
 		return
 	}
-	//clear status
-	utils.ClearVerifiedPhone(input.Phone, "forgot")
-	c.JSON(http.StatusOK, gin.H{"message": "password updated sucessfully"})
+
+	// Clear verified phone in Redis after successful reset
+	utils.ClearVerifiedPhone(phone, "forgot")
+
+	c.JSON(http.StatusOK, gin.H{"status": "success", "message": "Password reset successfully"})
 }

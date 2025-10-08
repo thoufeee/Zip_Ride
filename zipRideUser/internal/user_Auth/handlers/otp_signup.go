@@ -12,7 +12,6 @@ import (
 )
 
 // send otp to user
-
 func SendOtpHandler(c *gin.Context) {
 	var data struct {
 		Phone string `json:"phone"`
@@ -23,39 +22,54 @@ func SendOtpHandler(c *gin.Context) {
 		return
 	}
 
-	otp := utils.GeneratorOtp()
-	services.SendOtp(data.Phone, "Your OTP Is "+otp)
-	utils.SaveOTP(data.Phone, otp, constants.UserPrefix)
+	//phone number check
+	phone, ok := utils.PhoneNumberCheck(data.Phone)
+	if !ok {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "invalid phone number"})
+		return
+	}
 
+	//generate otp
+	otp := utils.GeneratorOtp()
+
+	//add +91 before phone number
+	services.SendOtp("+91"+phone, "Your OTP Is "+otp)
+	utils.SaveOTP(phone, otp, constants.UserPrefix) // <---- HERE
+	// sucess responce
 	c.JSON(http.StatusOK, gin.H{"res": "OTP Sent"})
 }
 
-// Verify OTP
 
+// Verify OTP
 func VerifyOtpHandler(c *gin.Context) {
 	var data struct {
-		OTP   string `json:"code"`
-		Phone string `json:"phone"`
+		Phone string `json:"phone" binding:"required"`
+		OTP   string `json:"otp" binding:"required"`
 	}
 
-	if err := c.ShouldBindJSON(&data); err != nil || data.OTP == "" {
+	if err := c.ShouldBindJSON(&data); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"err": "enter OTP"})
 		return
 	}
 
-	phone := utils.VerifyOTP(data.Phone, data.OTP, constants.UserPrefix)
-
-	if phone == "" {
-		c.JSON(http.StatusBadRequest, gin.H{"err": "invalid or expired otp"})
+	// Normalize phone number (remove +91)
+	phone, ok := utils.PhoneNumberCheck(data.Phone)
+	if !ok {
+		c.JSON(http.StatusBadRequest, gin.H{"err": "invalid phone number"})
 		return
 	}
 
-	//  storing marked verified phone numbers
+	status := utils.VerifyOTP(phone, data.OTP, constants.UserPrefix)
+	if status != "valid" {
+		c.JSON(http.StatusBadRequest, gin.H{"err": status})
+		return
+	}
+
 	utils.MarkPhoneVerified(phone, constants.UserPrefix)
 
 	c.JSON(http.StatusOK, gin.H{"res": "PhoneNumber verified"})
-
 }
+
 
 // register user
 
