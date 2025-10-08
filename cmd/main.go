@@ -44,7 +44,6 @@ func main() {
 	routes.PublicRoutes(r)
 	routes.UserRoutes(r)
 	routes.SuperAdminRoutes(r)
-	routes.DriverRoutes(r)
 
 	r.Run(":8080")
 }
