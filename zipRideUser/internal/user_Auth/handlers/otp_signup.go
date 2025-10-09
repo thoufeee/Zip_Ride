@@ -32,7 +32,7 @@ func SendOtpHandler(c *gin.Context) {
 	//generate otp
 	otp := utils.GeneratorOtp()
 
-	services.SendOtp("+91"+phone, "Your OTP Is "+otp)
+	services.SendOtp(phone, "Your OTP Is "+otp)
 	utils.SaveOTP(phone, otp, constants.UserPrefix)
 	// sucess responce
 	c.JSON(http.StatusOK, gin.H{"res": "OTP Sent"})
