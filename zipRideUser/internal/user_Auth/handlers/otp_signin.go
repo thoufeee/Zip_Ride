@@ -1,7 +1,7 @@
 package handlers
 
 import (
-	"errors"
+	"fmt"
 	"net/http"
 	"zipride/database"
 	"zipride/internal/constants"
@@ -10,7 +10,7 @@ import (
 	"zipride/utils"
 
 	"github.com/gin-gonic/gin"
-	"gorm.io/gorm"
+	"github.com/redis/go-redis/v9"
 )
 
 // otp signin handler
@@ -32,15 +32,9 @@ func OtpSignin(c *gin.Context) {
 
 	var user models.User
 
-	if err := database.DB.Where("phone_number = ?", data.PhoneNumber).Find(&user).Error; err != nil {
-		if errors.Is(err, gorm.ErrRecordNotFound) {
-			c.JSON(http.StatusUnauthorized, gin.H{"err": "Phonenumber not registered"})
-			return
-		}
-
-		c.JSON(http.StatusInternalServerError, gin.H{"err": "databse error"})
+	if err := database.DB.Where("phone_number = ?", phone).First(&user).Error; err != nil {
+		c.JSON(http.StatusUnauthorized, gin.H{"err": "your account not registered"})
 		return
-
 	}
 
 	if user.Block {
@@ -52,7 +46,7 @@ func OtpSignin(c *gin.Context) {
 	otp := utils.GeneratorOtp()
 
 	// saving otp in redis
-	if err := utils.SaveOTP(data.PhoneNumber, otp, constants.UserPrefix); err != nil {
+	if err := utils.SaveOTP(phone, otp, constants.UserPrefix); err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"err": "failed to store otp"})
 		return
 	}
@@ -77,12 +71,21 @@ func VerifyOTP(c *gin.Context) {
 		return
 	}
 
+	phone, ok := utils.PhoneNumberCheck(data.PhoneNumber)
+	if !ok {
+		c.JSON(http.StatusBadRequest, gin.H{"err": "invalid phone number"})
+		return
+	}
+
 	// get otp fro redis
-	key := "otp_" + data.PhoneNumber
+	key := fmt.Sprintf("%s:%s", constants.UserPrefix, phone)
 	storedOtp, err := database.RDB.Get(database.Ctx, key).Result()
 
-	if err != nil {
+	if err == redis.Nil {
 		c.JSON(http.StatusUnauthorized, gin.H{"err": "otp expired or invalid"})
+		return
+	} else if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"err": "redis error"})
 		return
 	}
 
@@ -94,7 +97,7 @@ func VerifyOTP(c *gin.Context) {
 	var user models.User
 
 	// otp is valid fetch user
-	if err := database.DB.Where("phone = ?", data.PhoneNumber).First(&user).Error; err != nil {
+	if err := database.DB.Where("phone_number = ?", phone).First(&user).Error; err != nil {
 		c.JSON(http.StatusUnauthorized, gin.H{"err": "user not found"})
 		return
 	}
@@ -114,6 +117,9 @@ func VerifyOTP(c *gin.Context) {
 			return
 		}
 	}
+
+	// delete token after success
+	database.RDB.Del(database.Ctx, key)
 
 	c.JSON(http.StatusOK, gin.H{"res": "Successfuly Loged in",
 		"access":  access,

@@ -32,13 +32,11 @@ func SendOtpHandler(c *gin.Context) {
 	//generate otp
 	otp := utils.GeneratorOtp()
 
-	//add +91 before phone number
 	services.SendOtp("+91"+phone, "Your OTP Is "+otp)
-	utils.SaveOTP(phone, otp, constants.UserPrefix) // <---- HERE
+	utils.SaveOTP(phone, otp, constants.UserPrefix)
 	// sucess responce
 	c.JSON(http.StatusOK, gin.H{"res": "OTP Sent"})
 }
-
 
 // Verify OTP
 func VerifyOtpHandler(c *gin.Context) {
@@ -52,7 +50,6 @@ func VerifyOtpHandler(c *gin.Context) {
 		return
 	}
 
-	// Normalize phone number (remove +91)
 	phone, ok := utils.PhoneNumberCheck(data.Phone)
 	if !ok {
 		c.JSON(http.StatusBadRequest, gin.H{"err": "invalid phone number"})
@@ -69,7 +66,6 @@ func VerifyOtpHandler(c *gin.Context) {
 
 	c.JSON(http.StatusOK, gin.H{"res": "PhoneNumber verified"})
 }
-
 
 // register user
 
