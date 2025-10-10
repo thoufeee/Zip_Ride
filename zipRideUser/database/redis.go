@@ -2,6 +2,7 @@ package database
 
 import (
 	"context"
+	"fmt"
 	"os"
 	"strconv"
 
@@ -23,4 +24,11 @@ func InitRedis() {
 		Password: pass,
 		DB:       db,
 	})
+
+	_, err := RDB.Ping(Ctx).Result()
+	if err != nil {
+		panic(fmt.Sprintf("Redis connection failed: %v", err))
+	}
+
+	fmt.Println("Redis connected")
 }
