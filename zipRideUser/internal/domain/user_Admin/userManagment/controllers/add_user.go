@@ -48,7 +48,7 @@ func AddUser(c *gin.Context) {
 	if err := database.DB.Where("email = ?", input.Email).First(&existingUser).Error; err == nil {
 		c.JSON(http.StatusConflict, gin.H{"error": "Email already registered"})
 		return
-	} 
+	}
 	//Hash the password
 	hashed, err := utils.GenerateHash(input.Password)
 	if err != nil {
@@ -64,7 +64,7 @@ func AddUser(c *gin.Context) {
 		PhoneNumber: phone,
 		Place:       strings.TrimSpace(input.Place),
 		Password:    hashed,
-		Role: constants.RoleUser,
+		Role:        constants.RoleUser,
 	}
 
 	//Save to database
@@ -77,13 +77,13 @@ func AddUser(c *gin.Context) {
 	c.JSON(http.StatusCreated, gin.H{
 		"message": "User created successfully",
 		"user": gin.H{
-			"id":          newUser.ID,
-			"firstname":   newUser.FirstName,
-			"lastname":    newUser.LastName,
-			"email":       newUser.Email,
-			"phone":       newUser.PhoneNumber,
-			"place":       newUser.Place,
-			"gender":      newUser.Gender,
+			"id":        newUser.ID,
+			"firstname": newUser.FirstName,
+			"lastname":  newUser.LastName,
+			"email":     newUser.Email,
+			"phone":     newUser.PhoneNumber,
+			"place":     newUser.Place,
+			"gender":    newUser.Gender,
 		},
 	})
 }
