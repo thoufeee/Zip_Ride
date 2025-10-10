@@ -2,6 +2,9 @@ package routes
 
 import (
 	"zipride/internal/constants"
+
+	"zipride/internal/domain/user_Admin/allpermission"
+	staffmanagment "zipride/internal/domain/user_Admin/staffManagment"
 	"zipride/internal/domain/user_Admin/staffManagment/controllers"
 	services "zipride/internal/domain/user_Admin/userManagment/controllers"
 	"zipride/internal/middleware"
@@ -18,6 +21,9 @@ func SuperAdminRoutes(c *gin.Engine) {
 	admin.Use(middleware.JwtValidation())
 	admin.Use(middleware.RoleCheck(constants.RoleSuperAdmin))
 
+	// admin || staff || manager profile
+	admin.POST("/profile", staffmanagment.StaffProfile)
+
 	//user management
 	admin.GET("/allusers", middleware.RequirePermission(constants.PermissionViewUsers), services.GetAllUsers)
 	admin.POST("/createuser", middleware.RequirePermission(constants.PermissionAddUser), services.AddUser)
@@ -31,5 +37,9 @@ func SuperAdminRoutes(c *gin.Engine) {
 	admin.POST("/createstaff", middleware.RequirePermission(constants.PermissionAddStaff), controllers.CreateStaff)
 	admin.PUT("/staffupdate/:id", middleware.RequirePermission(constants.PermissionEditStaff), controllers.UpdateStaff)
 	admin.DELETE("/staffdelete/:id", middleware.RequirePermission(constants.PermissionDeleteStaff), controllers.UpdateStaff)
+
+	//route for all permissions && roles
+	admin.GET("/allpermissions", middleware.RequirePermission(constants.ViewAllPermissions), allpermission.Permissions)
+	admin.GET("/allroles", middleware.RequirePermission(constants.PermissionViewAllRoles), allpermission.AllRoles)
 
 }
