@@ -42,6 +42,10 @@ func SeedPermisiions() {
 
 		// system settings
 		{Name: constants.PermissionSystemSettings},
+
+		// all permissions && roles
+		{Name: constants.ViewAllPermissions},
+		{Name: constants.PermissionViewAllRoles},
 	}
 
 	for _, p := range permission {
