@@ -31,3 +31,11 @@ type CreateBookingRequest struct {
 	ScheduleDate string  `json:"schedule_date"` // "2025-10-10"
 	ScheduleTime string  `json:"schedule_time"` // "10:00 AM"
 }
+
+// request for the user service
+type EstimateRequest struct {
+	PickupLat  float64 `json:"pickup_lat"`
+	PickupLong float64 `json:"pickup_long"`
+	DropLat    float64 `json:"drop_lat"`
+	DropLong   float64 `json:"drop_long"`
+}
