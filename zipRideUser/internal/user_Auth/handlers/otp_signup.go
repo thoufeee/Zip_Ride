@@ -17,7 +17,7 @@ func SendOtpHandler(c *gin.Context) {
 		Phone string `json:"phone"`
 	}
 
-	if err := c.ShouldBindJSON(&data); err != nil || data.Phone == "" {
+	if err := c.ShouldBindJSON(&data); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"err": "Phone required"})
 		return
 	}
@@ -29,11 +29,23 @@ func SendOtpHandler(c *gin.Context) {
 		return
 	}
 
+	var user models.User
+
+	if err := database.DB.Where("phone_number", data.Phone).First(&user); err == nil {
+		c.JSON(http.StatusUnauthorized, gin.H{"err": "phone number already registered"})
+		return
+	}
+
 	//generate otp
 	otp := utils.GeneratorOtp()
 
-	services.SendOtp(phone, "Your OTP Is "+otp)
-	utils.SaveOTP(phone, otp, constants.UserPrefix)
+	if err := utils.SaveOTP(phone, otp, constants.UserPrefix); err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"err": "failed to save otp"})
+		return
+	}
+
+	services.SendOtp(data.Phone, "Your OTP Is "+otp)
+
 	// sucess responce
 	c.JSON(http.StatusOK, gin.H{"res": "OTP Sent"})
 }
@@ -86,11 +98,6 @@ func RegisterUser(c *gin.Context) {
 
 	var user models.User
 
-	if !user.Isverified {
-		c.JSON(http.StatusForbidden, gin.H{"err": "phone number not verified"})
-		return
-	}
-
 	// email check
 	if !utils.EmailCheck(data.Email) {
 		c.JSON(http.StatusBadRequest, gin.H{"err": "email format not valid"})
@@ -102,8 +109,11 @@ func RegisterUser(c *gin.Context) {
 		return
 	}
 
-	if err := database.DB.Create(&models.User{}).Error; err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"err": "user not created"})
+	// getting verified phonenumber from redis
+	phone := utils.GetVerifiedPhone(constants.UserPrefix)
+
+	if phone == "" {
+		c.JSON(http.StatusBadRequest, gin.H{"err": "failed to get verified phonenumber"})
 		return
 	}
 
@@ -111,14 +121,6 @@ func RegisterUser(c *gin.Context) {
 	hash, err := utils.GenerateHash(data.Password)
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"err": "password not hashed"})
-		return
-	}
-
-	// getting verified phonenumber from redis
-	phone := utils.GetVerifiedPhone(constants.UserPrefix)
-
-	if phone == "" {
-		c.JSON(http.StatusBadRequest, gin.H{"err": "failed to get verified phonenumber"})
 		return
 	}
 
@@ -130,6 +132,8 @@ func RegisterUser(c *gin.Context) {
 		Email:       data.Email,
 		Gender:      data.Gender,
 		Place:       data.Place,
+		Role:        constants.RoleUser,
+		Isverified:  true,
 	}
 
 	if err := database.DB.Create(&new).Error; err != nil {
