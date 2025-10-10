@@ -2,15 +2,15 @@ package bookingmodule
 
 import (
 	"context"
-	"crypto/rand"
 	"encoding/json"
 	"fmt"
-	"math"
 	"strings"
 	"time"
 	"zipride/database"
+	"zipride/internal/domain/bookingmodule"
 	"zipride/internal/domain/mapservice"
 	"zipride/internal/models"
+	"zipride/utils"
 )
 
 type EstimateResponse struct {
@@ -21,12 +21,6 @@ type EstimateResponse struct {
 	Duration string  `json:"duration"`
 }
 
-// helper: round to given decimal places
-func round(val float64, precision int) float64 {
-	pow := math.Pow(10, float64(precision))
-	return math.Round(val*pow) / pow
-}
-
 // get extimate fare for seperate vehicles
 func GetFareEstimates(pickupLat, pickupLong, dropLat, dropLong float64) ([]EstimateResponse, error) {
 	distance, duration, err := mapservice.GetRouteDistance(pickupLat, pickupLong, dropLat, dropLong)
@@ -35,7 +29,7 @@ func GetFareEstimates(pickupLat, pickupLong, dropLat, dropLong float64) ([]Estim
 	}
 
 	var estimates []EstimateResponse
-	for _, v := range GetAvalableVehicles() {
+	for _, v := range bookingmodule.GetAvalableVehicles() {
 		fare := v.BaseFare + (v.PerKmRate * distance) + (v.PerMinRate * duration)
 		if fare < v.MinFare {
 			fare = v.MinFare
@@ -43,7 +37,7 @@ func GetFareEstimates(pickupLat, pickupLong, dropLat, dropLong float64) ([]Estim
 
 		estimates = append(estimates, EstimateResponse{
 			Type:     v.Type,
-			Fare:     round(fare, 2),
+			Fare:     utils.Round(fare),
 			ETA:      fmt.Sprintf("%.0f mins", duration/5), // dummy ETA
 			Distance: fmt.Sprintf("%.2f km", distance),     // distance in km
 			Duration: fmt.Sprintf("%.1f mins", duration),   // total trip time
@@ -56,7 +50,7 @@ func GetFareEstimates(pickupLat, pickupLong, dropLat, dropLong float64) ([]Estim
 func CreateBooking(userID uint, pickupLat, pickupLong, dropLat, dropLong float64, vehicleType string, scheduleAt *time.Time) (*models.Booking, error) {
 
 	// get vehicle struct
-	v := GetVehicleByType(vehicleType)
+	v := bookingmodule.GetVehicleByType(vehicleType)
 
 	// calculate distance & duration
 	distance, duration, err := mapservice.GetRouteDistance(pickupLat, pickupLong, dropLat, dropLong)
@@ -69,13 +63,9 @@ func CreateBooking(userID uint, pickupLat, pickupLong, dropLat, dropLong float64
 	if fare < v.MinFare {
 		fare = v.MinFare
 	}
-	fare = round(fare, 2)
+	fare = utils.Round(fare)
 	// To generate otp while book a service
-	otp, err := GenerateOTP()
-	if err != nil {
-		return nil, err
-	}
-
+	otp := utils.GeneratorOtp()
 	// create booking struct
 	booking := &models.Booking{
 		UserID:     userID,
@@ -123,14 +113,4 @@ func ParseUserSchedule(dateStr, timeStr string) (time.Time, error) {
 	}
 	return t, nil
 
-}
-
-// OTP Generate to while book a servcie
-func GenerateOTP() (string, error) {
-	b := make([]byte, 2) // 2 bytes = 0-65535
-	_, err := rand.Read(b)
-	if err != nil {
-		return "", err
-	}
-	return fmt.Sprintf("%04d", int(b[0])<<8|int(b[1])%10000), nil
 }
