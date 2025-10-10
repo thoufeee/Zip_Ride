@@ -3,6 +3,7 @@ package allpermission
 import (
 	"net/http"
 	"zipride/database"
+	"zipride/internal/constants"
 	"zipride/internal/models"
 
 	"github.com/gin-gonic/gin"
@@ -14,7 +15,7 @@ func AllRoles(c *gin.Context) {
 
 	var roles []models.Role
 
-	if err := database.DB.Find(&roles).Error; err != nil {
+	if err := database.DB.Where("name != ?", constants.RoleSuperAdmin).Find(&roles).Error; err != nil {
 		c.JSON(http.StatusNotFound, gin.H{"err": "no roles found"})
 		return
 	}
