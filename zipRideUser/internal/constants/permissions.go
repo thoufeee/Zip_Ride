@@ -35,4 +35,8 @@ const (
 
 	// system settings (pricing rules && commisions && app settings)
 	PermissionSystemSettings = "SYSTEM_SETTINGS"
+
+	// all permissions && all roles
+	ViewAllPermissions     = "VIEW_ALLPERMISSIONS"
+	PermissionViewAllRoles = "VIEW_ALLROLES"
 )

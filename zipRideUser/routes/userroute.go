@@ -2,6 +2,7 @@ package routes
 
 import (
 	"zipride/internal/constants"
+	"zipride/internal/domain/bookingmodule/handlers"
 	"zipride/internal/domain/user/services"
 	"zipride/internal/middleware"
 	"zipride/internal/user_Auth/handlers"
@@ -23,6 +24,10 @@ func UserRoutes(c *gin.Engine) {
 	user.PUT("/update", services.UpdateUserProfile)
 	user.DELETE("/delete", services.DeleteUserProfile)
 
+	//Booking module
+	user.POST("/booking/estimate", bookingmodule.EstimateFareHandler)
+	user.POST("/booking/now", bookingmodule.CreateBookingNowHandler)
+	user.POST("/booking/later", bookingmodule.CreateLaterBookingHandler)
 	// logout
 	user.POST("/logout", handlers.UserLogout)
 
