@@ -1,0 +1,26 @@
+/* Footer Styles */
+.footer {
+    background-color: #1f1f1f;
+    color: #fff;
+    padding: 15px 0;
+    text-align: center;
+    position: relative;
+    bottom: 0;
+    width: 100%;
+    font-size: 14px;
+}
+
+.footer a {
+    color: #00aaff;
+    text-decoration: none;
+    margin: 0 5px;
+    transition: color 0.3s;
+}
+
+.footer a:hover {
+    color: #ff9900;
+}
+
+.footer-links {
+    margin-top: 5px;
+}
