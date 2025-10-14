@@ -39,7 +39,9 @@ func SuperAdminRoutes(c *gin.Engine) {
 	admin.GET("/allstaffs", middleware.RequirePermission(constants.PermissionViewStaffs), controllers.GETAllStaff)
 	admin.POST("/createstaff", middleware.RequirePermission(constants.PermissionAddStaff), controllers.CreateStaff)
 	admin.PUT("/staffupdate/:id", middleware.RequirePermission(constants.PermissionEditStaff), controllers.UpdateStaff)
-	admin.DELETE("/staffdelete/:id", middleware.RequirePermission(constants.PermissionDeleteStaff), controllers.UpdateStaff)
+	admin.DELETE("/staffdelete/:id", middleware.RequirePermission(constants.PermissionDeleteStaff), controllers.DeleteStaff)
+	admin.PUT("/staffblock/:id", middleware.RequirePermission(constants.PermissionBlockStaff), controllers.BlockStaff)
+	admin.PUT("/staffunblock/:id", middleware.RequirePermission(constants.PermissionUnBlockStaff), controllers.UnblockStaff)
 
 	//route for all permissions && roles
 	admin.GET("/allpermissions", middleware.RequirePermission(constants.ViewAllPermissions), allpermission.Permissions)
