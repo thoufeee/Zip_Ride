@@ -18,7 +18,7 @@ func UpdateStaff(c *gin.Context) {
 	}
 
 	var staff models.Admin
-	if err := database.DB.Where("id = ? AND RoleID = ?", staffID, constants.RoleStaff).First(&staff).Error; err != nil {
+	if err := database.DB.Where("id = ? AND role_id = ?", staffID, constants.Staff).First(&staff).Error; err != nil {
 		c.JSON(http.StatusNotFound, gin.H{"error": "Staff not found"})
 		return
 	}
@@ -27,7 +27,7 @@ func UpdateStaff(c *gin.Context) {
 		Name        string `json:"name" binding:"required"`
 		Email       string `json:"email" binding:"required"`
 		PhoneNumber string `json:"phonenumber" binding:"required"`
-		Password    string `json:"password"` // optional
+		Password    string `json:"password"`
 	}
 
 	if err := c.ShouldBindJSON(&input); err != nil {
@@ -72,6 +72,6 @@ func UpdateStaff(c *gin.Context) {
 		"message":     "Staff updated successfully",
 		"Name":        staff.Name,
 		"Email":       staff.Email,
-		"PhoneNumber": staff.PhoneNumber,
+		"PhoneNumber": phone,
 	})
 }
