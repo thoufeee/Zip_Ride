@@ -1,23 +1,13 @@
-// Load reusable components: navbar and footer
-async function loadReusableComponents() {
-  try {
-    const navbarRes = await fetch("navbar.html");
-    document.getElementById("navbar").innerHTML = await navbarRes.text();
 
-    const footerRes = await fetch("footer.html");
-    document.getElementById("footer").innerHTML = await footerRes.text();
-  } catch (err) {
-    console.error("Failed to load reusable components:", err);
-  }
-}
+import { loadNavbarFooter, hasPermission, verifyToken, verifyAdminAccess } from "./common.js";
 
-export async function initializeCreateAdmin() {
-  await loadReusableComponents();
+async function initializeCreateAdmin() {
 
   const roleSelect = document.getElementById("role");
   const permissionsList = document.getElementById("permissions-list");
   const addedPermissions = document.getElementById("added-permissions");
   const form = document.getElementById("createAdminForm");
+  const messageContainer = document.getElementById("message-container");
   const result = document.getElementById("result");
 
   const BASE_URL = "http://localhost:8080";
@@ -29,25 +19,38 @@ export async function initializeCreateAdmin() {
     return;
   }
 
+if (!hasPermission("ADD_STAFF")) {
+  const formParent = form.parentElement; 
+  if (formParent) {
+    formParent.innerHTML = "<p style='color:red; text-align:center;'>You don’t have permission to access this page.</p>";
+  } else {
+    form.style.display = "none";
+    console.error("You don’t have permission to access this page.");
+  }
+  return;
+}
   const api = axios.create({
     baseURL: BASE_URL,
-    headers: { 
-      "Authorization": `Bearer ${token}`, 
-      "Content-Type": "application/json" 
+    headers: {
+      Authorization: `Bearer ${token}`,
+      "Content-Type": "application/json"
     }
   });
 
-  // Fetch roles from backend
+ 
   async function fetchRoles() {
     try {
       const res = await api.get("/admin/allroles");
-      const roles = res.data || [];
+      const roles = res.data.res || [];
       roleSelect.innerHTML = `<option value="">-- Select Role --</option>`;
       roles.forEach(role => {
-        const option = document.createElement("option");
-        option.value = role.name || role.role_name;
-        option.textContent = role.name || role.role_name;
-        roleSelect.appendChild(option);
+        const name = role.name || role.role_name || role.Name;
+        if (name) {
+          const option = document.createElement("option");
+          option.value = name;
+          option.textContent = name;
+          roleSelect.appendChild(option);
+        }
       });
     } catch (err) {
       console.error("Failed to fetch roles:", err);
@@ -55,18 +58,26 @@ export async function initializeCreateAdmin() {
     }
   }
 
-  // Fetch permissions from backend
   async function fetchPermissions() {
     try {
       const res = await api.get("/admin/allpermissions");
-      const permissions = res.data || [];
+      const permissions = res.data.permissions || res.data.res || res.data.data || [];
       permissionsList.innerHTML = "";
+
+      if (!permissions.length) {
+        permissionsList.innerHTML = "<p style='color:red;'>No permissions found.</p>";
+        return;
+      }
+
       permissions.forEach(perm => {
-        const div = document.createElement("div");
-        div.classList.add("permission-item");
-        div.textContent = perm.name || perm.permission_name;
-        div.addEventListener("click", () => addPermission(perm.name || perm.permission_name));
-        permissionsList.appendChild(div);
+        const permName = typeof perm === "string" ? perm : (perm.name || perm.permission_name);
+        if (permName) {
+          const div = document.createElement("div");
+          div.classList.add("permission-item");
+          div.textContent = permName;
+          div.addEventListener("click", () => addPermission(permName));
+          permissionsList.appendChild(div);
+        }
       });
     } catch (err) {
       console.error("Failed to fetch permissions:", err);
@@ -74,11 +85,10 @@ export async function initializeCreateAdmin() {
     }
   }
 
-  // Add/remove permission locally
+ 
   function addPermission(name) {
     const placeholder = addedPermissions.querySelector(".placeholder");
     if (placeholder) placeholder.remove();
-
     if ([...addedPermissions.children].some(p => p.textContent === name)) return;
 
     const tag = document.createElement("span");
@@ -86,11 +96,10 @@ export async function initializeCreateAdmin() {
     tag.textContent = name;
     tag.title = "Click to remove";
     tag.addEventListener("click", () => tag.remove());
-
     addedPermissions.appendChild(tag);
   }
 
-  // Submit form to backend
+  
   form.addEventListener("submit", async e => {
     e.preventDefault();
     const selectedPermissions = [...addedPermissions.children].map(p => p.textContent);
@@ -98,30 +107,35 @@ export async function initializeCreateAdmin() {
     const payload = {
       name: form.name.value,
       email: form.email.value,
-      phone: form.phone.value,
+      phonenumber: form.phone.value,
       password: form.password.value,
       role: form.role.value,
-      permissions: selectedPermissions
+      extra_permissions: selectedPermissions
     };
 
     try {
-      await api.post("/admins", payload);
-      result.textContent = "✅ Admin created successfully!";
+      await api.post("/admin/createstaff", payload);
+      result.textContent = " Admin created successfully!";
       result.style.color = "green";
       form.reset();
       addedPermissions.innerHTML = `<p class="placeholder">No permissions selected yet.</p>`;
     } catch (err) {
       console.error(err);
-      result.textContent = err.response?.data?.err || "❌ Failed to create admin.";
+      result.textContent = err.response?.data?.err || " Failed to create admin.";
       result.style.color = "red";
     }
   });
 
-  // Initialize page
+  
   await Promise.all([fetchRoles(), fetchPermissions()]);
 }
 
-// Auto-run on page load
-document.addEventListener("DOMContentLoaded", () => {
+
+document.addEventListener("DOMContentLoaded", async () => {
+  await loadNavbarFooter();
+
+  const tokenExists = verifyToken();
+  if (!tokenExists) return;
+
   initializeCreateAdmin();
 });

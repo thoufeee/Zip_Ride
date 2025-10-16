@@ -1,29 +1,46 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Admin Sign In</title>
-    <link rel="stylesheet" href="signin.css">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin Sign In</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
 </head>
-<body>
-    <div class="container">
-        <h2>SIGN IN</h2>
-        <form id="signinForm">
-            <div class="form-group">
-                <label for="email">Email</label>
-                <input type="email" id="email" placeholder="Enter your email" required>
-            </div>
-            <div class="form-group">
-                <label for="password">Password</label>
-                <input type="password" id="password" placeholder="Enter your password" required>
-            </div>
-            <button type="submit">Sign In</button>
-            <p id="errorMsg" class="error"></p>
-        </form>
-    </div>
+<body class="bg-gray-100 flex items-center justify-center min-h-screen">
 
-    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
-    <script src="signin.js"></script>
+  <div class="bg-white rounded-xl shadow-lg p-8 w-full max-w-md">
+    <h2 class="text-2xl font-bold text-gray-800 text-center mb-6">Sign In</h2>
+    
+    <form id="signinForm" class="space-y-4">
+      
+     
+      <div class="flex flex-col">
+        <label for="email" class="text-gray-700 font-medium mb-1">Email</label>
+        <input type="email" id="email" placeholder="Enter your email" required
+               class="border border-gray-300 rounded-md p-3 focus:outline-none focus:ring-2 focus:ring-blue-500">
+      </div>
+
+      
+      <div class="flex flex-col">
+        <label for="password" class="text-gray-700 font-medium mb-1">Password</label>
+        <input type="password" id="password" placeholder="Enter your password" required
+               class="border border-gray-300 rounded-md p-3 focus:outline-none focus:ring-2 focus:ring-blue-500">
+      </div>
+
+      
+      <p id="errorMsg" class="text-red-600 text-sm text-center"></p>
+
+     
+      <button type="submit"
+              class="w-full bg-green-500 hover:bg-green-600 text-white font-semibold py-2 rounded shadow-md transition-colors
+">
+        Sign In
+      </button>
+
+    </form>
+  </div>
+
+  <script src="signin.js"></script>
 </body>
 </html>

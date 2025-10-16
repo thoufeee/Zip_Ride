@@ -1,19 +1,45 @@
-// === Load Navbar & Footer ===
-async function loadReusableComponents() {
-  try {
-    const navbarRes = await fetch("navbar.html");
-    document.getElementById("navbar").innerHTML = await navbarRes.text();
 
-    const footerRes = await fetch("footer.html");
-    document.getElementById("footer").innerHTML = await footerRes.text();
+import { loadNavbarFooter, verifyToken } from "./common.js";
+
+
+async function verifyAdminAccess() {
+  if (!verifyToken()) return false;
+
+  const token = localStorage.getItem("accessToken");
+
+  try {
+    const res = await axios.get("http://localhost:8080/admin/verify", {
+      headers: { Authorization: `Bearer ${token}` }
+    });
+
+    const role = res.data.role;
+    const permissions = res.data.permissions || [];
+
+    
+    localStorage.setItem("role", role);
+    localStorage.setItem("permissions", JSON.stringify(permissions));
+
+    console.log("Logged-in Role:", role);
+
+    if (["SUPER_ADMIN", "MANAGER", "STAFF"].includes(role)) {
+      return true;
+    } else {
+      alert("Access Denied! Unauthorized Role");
+      window.location.href = "signin.html";
+      return false;
+    }
   } catch (err) {
-    console.error("Failed to load reusable components:", err);
+    console.error("Token verification failed:", err);
+    alert("Session expired or invalid token");
+    window.location.href = "signin.html";
+    return false;
   }
 }
 
-// === Load Dashboard Data ===
 function loadDashboardData() {
-  // Example static demo data — replace with Axios API calls later
+  const role = localStorage.getItem("role");
+
+  
   const dashboardData = {
     users: 152,
     staff: 26,
@@ -26,30 +52,82 @@ function loadDashboardData() {
     ],
   };
 
-  // Set summary counts
-  document.getElementById("user-count").textContent = dashboardData.users;
-  document.getElementById("staff-count").textContent = dashboardData.staff;
-  document.getElementById("manager-count").textContent = dashboardData.managers;
+  const pageTitle = document.getElementById("page-title");
+  const userCountEl = document.getElementById("user-count");
+  const staffCountEl = document.getElementById("staff-count");
+  const managerCountEl = document.getElementById("manager-count");
+  const bookingTableBody = document.getElementById("booking-history-body");
 
-  // Fill booking history table
-  const tbody = document.getElementById("booking-history-body");
-  tbody.innerHTML = "";
-  dashboardData.bookings.forEach(b => {
-    const row = `
+  
+  document.querySelector(".summary-section").style.display = "none";
+  document.querySelector(".table-section").style.display = "none";
+
+  if (role === "SUPER_ADMIN") {
+    pageTitle.textContent = "Welcome, Super Admin";
+    document.querySelector(".summary-section").style.display = "flex";
+    document.querySelector(".table-section").style.display = "block";
+
+    userCountEl.textContent = dashboardData.users;
+    staffCountEl.textContent = dashboardData.staff;
+    managerCountEl.textContent = dashboardData.managers;
+
+
+    bookingTableBody.innerHTML = "";
+    dashboardData.bookings.forEach(b => {
+      bookingTableBody.innerHTML += `
+        <tr>
+          <td>${b.id}</td>
+          <td>${b.user}</td>
+          <td>${b.service}</td>
+          <td>${b.status}</td>
+          <td>${b.date}</td>
+        </tr>
+      `;
+    });
+  } else if (role === "STAFF") {
+    pageTitle.textContent = "Welcome, Staff";
+    document.querySelector(".summary-section").style.display = "flex";
+    document.querySelector(".table-section").style.display = "block";
+
+    userCountEl.textContent = dashboardData.users;
+    staffCountEl.parentElement.style.display = "none";     
+    managerCountEl.parentElement.style.display = "none";   
+
+    bookingTableBody.innerHTML = "";
+    dashboardData.bookings.forEach(b => {
+      bookingTableBody.innerHTML += `
+        <tr>
+          <td>${b.id}</td>
+          <td>${b.user}</td>
+          <td>${b.service}</td>
+          <td>${b.status}</td>
+          <td>${b.date}</td>
+        </tr>
+      `;
+    });
+  } else if (role === "MANAGER") {
+    pageTitle.textContent = "Welcome, Manager";
+    document.querySelector(".summary-section").style.display = "flex";
+    document.querySelector(".table-section").style.display = "block";
+
+    userCountEl.textContent = dashboardData.users;
+    staffCountEl.parentElement.style.display = "none";
+    managerCountEl.parentElement.style.display = "none";
+
+    
+    bookingTableBody.innerHTML = `
       <tr>
-        <td>${b.id}</td>
-        <td>${b.user}</td>
-        <td>${b.service}</td>
-        <td>${b.status}</td>
-        <td>${b.date}</td>
+        <td colspan="5">Total Bookings: ${dashboardData.bookings.length}</td>
       </tr>
     `;
-    tbody.innerHTML += row;
-  });
+  }
 }
 
-// === Initialize Dashboard ===
+
 document.addEventListener("DOMContentLoaded", async () => {
-  await loadReusableComponents();
+  await loadNavbarFooter();
+  const allowed = await verifyAdminAccess();
+  if (!allowed) return;
+
   loadDashboardData();
 });

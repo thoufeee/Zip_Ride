@@ -4,77 +4,93 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Create Admin</title>
-  <link rel="stylesheet" href="createadmin.css">
   <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+  <script src="https://cdn.tailwindcss.com"></script>
 </head>
-<body>
+<body class="bg-gray-100 min-h-screen flex flex-col">
 
-  <!-- Navbar (reusable) -->
+
   <div id="navbar"></div>
 
-  <!-- Main Container -->
-  <div class="createadmin-container">
-    <main class="main-content">
-      <header>
-        <h1>Create New Admin</h1>
-      </header>
+  <main class="flex-grow container mx-auto p-6">
+    <header class="mb-6">
+      <h1 class="text-3xl font-bold text-gray-800">Create New Admin</h1>
+      <p class="text-gray-600 mt-1">Fill in the details below to create a new admin account.</p>
+    </header>
 
-      <section class="create-admin-section">
-        <form id="createAdminForm" class="form-card">
-          <!-- Form Fields -->
-          <div class="form-group">
-            <label for="name">Full Name</label>
-            <input type="text" id="name" placeholder="Enter full name" required>
+    <section class="bg-white p-6 rounded-lg shadow-md max-w-3xl mx-auto">
+      <form id="createAdminForm" class="space-y-6">
+
+        <div class="flex flex-col">
+          <label for="name" class="font-semibold mb-1 text-gray-700">Full Name</label>
+          <input type="text" id="name" placeholder="Enter full name" required
+                 class="border rounded px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-400">
+        </div>
+
+     
+        <div class="flex flex-col">
+          <label for="email" class="font-semibold mb-1 text-gray-700">Email</label>
+          <input type="email" id="email" placeholder="Enter email" required
+                 class="border rounded px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-400">
+        </div>
+
+       
+        <div class="flex flex-col">
+          <label for="phone" class="font-semibold mb-1 text-gray-700">Phone Number</label>
+          <input type="text" id="phone" placeholder="Enter phone number" required
+                 class="border rounded px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-400">
+        </div>
+
+        
+        <div class="flex flex-col">
+          <label for="password" class="font-semibold mb-1 text-gray-700">Password</label>
+          <input type="password" id="password" placeholder="Enter password" required
+                 class="border rounded px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-400">
+        </div>
+
+       
+        <div class="flex flex-col">
+          <label for="role" class="font-semibold mb-1 text-gray-700">Select Role</label>
+          <select id="role" required
+                  class="border rounded px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-400 bg-white">
+            <option value="">Loading roles...</option>
+          </select>
+        </div>
+
+       
+        <div class="mt-4">
+          <h2 class="font-semibold text-gray-800 mb-2">Available Permissions</h2>
+          <div id="permissions-list" class="grid grid-cols-2 gap-2 border rounded p-3 bg-gray-50">
+            <p class="text-gray-500">Loading permissions...</p>
           </div>
+        </div>
 
-          <div class="form-group">
-            <label for="email">Email</label>
-            <input type="email" id="email" placeholder="Enter email" required>
+        
+        <div class="mt-4">
+          <h2 class="font-semibold text-gray-800 mb-2">Selected Permissions</h2>
+          <div id="added-permissions" class="flex flex-wrap gap-2 border rounded p-3 bg-gray-50 min-h-[50px] items-center">
+            <p class="text-gray-400 placeholder">No permissions selected yet.</p>
           </div>
+        </div>
 
-          <div class="form-group">
-            <label for="phone">Phone Number</label>
-            <input type="text" id="phone" placeholder="Enter phone number" required>
-          </div>
+        
+        <p id="result" class="text-center font-medium text-red-600"></p>
 
-          <div class="form-group">
-            <label for="password">Password</label>
-            <input type="password" id="password" placeholder="Enter password" required>
-          </div>
+        
+        <button type="submit"
+                class="w-full bg-green-500 hover:bg-green-600 text-white font-semibold py-2 rounded shadow-md transition-colors">
+          Create Admin
+        </button>
+        
 
-          <div class="form-group">
-            <label for="role">Select Role</label>
-            <select id="role" required>
-              <option value="">Loading roles...</option>
-            </select>
-          </div>
+      </form>
+    </section>
+  </main>
 
-          <!-- Permissions -->
-          <div class="permissions-section">
-            <h2>Available Permissions</h2>
-            <div id="permissions-list" class="permissions-list">
-              <p>Loading permissions...</p>
-            </div>
-          </div>
-
-          <div class="extra-permission">
-            <h3>Selected Permissions</h3>
-            <div id="added-permissions" class="added-permissions">
-              <p class="placeholder">No permissions selected yet.</p>
-            </div>
-          </div>
-
-          <p id="result" class="form-result"></p>
-          <button type="submit" class="create-btn">Create Admin</button>
-        </form>
-      </section>
-    </main>
-  </div>
-
-  <!-- Footer (reusable) -->
+  
   <div id="footer"></div>
 
-  <!-- Scripts -->
-  <script src="createadmin.js" type="module"></script>
+ 
+  <script type="module" src="createadmin.js"></script>
 </body>
 </html>

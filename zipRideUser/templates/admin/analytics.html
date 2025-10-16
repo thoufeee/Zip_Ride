@@ -1,47 +1,146 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Analytics Dashboard</title>
-  <link rel="stylesheet" href="analytics.css">
-   <link rel="stylesheet" href="createadmin.css">
+  <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
-<body>
 
- <!-- Navbar -->
-  <div id="navbar"></div>
+<body class="bg-gray-100 text-gray-900 flex">
 
-  <!-- Page Container -->
-  <div class="main-container">
-    <header>
-      <h1 id="page-title">Analytics Dashboard</h1>
+  <!-- Sidebar -->
+  <aside class="w-64 h-screen bg-gray-800 text-white flex flex-col fixed top-0 left-0 shadow-lg">
+    <div class="p-4 border-b border-gray-700">
+      <h2 class="text-2xl font-semibold">Admin Panel</h2>
+    </div>
+
+    <nav class="flex-1 overflow-y-auto mt-4">
+      <ul class="space-y-2 px-3 text-sm font-medium">
+        <li><a href="admindash.html" class="block px-3 py-2 rounded hover:bg-gray-700 transition">Dashboard</a></li>
+        <li><a href="analytics.html" class="block px-3 py-2 rounded bg-gray-700 transition">Analytics Dashboard</a></li>
+        <li><a href="usermanagment.html" class="block px-3 py-2 rounded hover:bg-gray-700 transition">User Management</a></li>
+        <li><a href="staffmanagment.html" class="block px-3 py-2 rounded hover:bg-gray-700 transition">Staff Management</a></li>
+        <li><a href="managermanagment.html" class="block px-3 py-2 rounded hover:bg-gray-700 transition">Manager Management</a></li>
+        <li><a href="createadmin.html" class="block px-3 py-2 rounded hover:bg-gray-700 transition">Create Admin</a></li>
+        <li><a href="scheduleBooking.html" class="block px-3 py-2 rounded hover:bg-gray-700 transition">Booking Management</a></li>
+        <li><a href="systemSettings.html" class="block px-3 py-2 rounded hover:bg-gray-700 transition">System Settings</a></li>
+      </ul>
+    </nav>
+
+    <div class="p-4 border-t border-gray-700">
+      <button id="logout-btn" class="w-full bg-red-600 hover:bg-red-700 px-4 py-2 rounded font-medium transition">
+        Logout
+      </button>
+    </div>
+  </aside>
+
+  <!-- Main Content -->
+  <main class="ml-64 flex-1 p-8">
+    <header class="mb-10">
+      <h1 class="text-3xl font-bold text-gray-800">Analytics Dashboard</h1>
+      <p class="text-gray-600 mt-1">Overview of bookings and revenue statistics.</p>
     </header>
 
-    <section id="content-area" class="content-area">
-      <!-- Chart containers -->
-      <div class="chart-grid">
-        <div class="chart-box">
-          <canvas id="monthlyBookingsChart"></canvas>
-        </div>
-        <div class="chart-box">
-          <canvas id="weeklyBookingsChart"></canvas>
-        </div>
-        <div class="chart-box">
-          <canvas id="dailyBookingsChart"></canvas>
-        </div>
-        <div class="chart-box">
-          <canvas id="revenueChart"></canvas>
-        </div>
+    <!-- Charts Section -->
+    <section class="grid gap-6 md:grid-cols-2 lg:grid-cols-2">
+      <!-- Monthly Bookings -->
+      <div class="bg-white rounded-xl shadow-md p-6 hover:shadow-lg transition">
+        <h2 class="text-lg font-semibold mb-3 text-gray-700">Monthly Bookings</h2>
+        <canvas id="monthlyBookingsChart" class="w-full h-64"></canvas>
+      </div>
+
+      <!-- Weekly Bookings -->
+      <div class="bg-white rounded-xl shadow-md p-6 hover:shadow-lg transition">
+        <h2 class="text-lg font-semibold mb-3 text-gray-700">Weekly Bookings</h2>
+        <canvas id="weeklyBookingsChart" class="w-full h-64"></canvas>
+      </div>
+
+      <!-- Daily Bookings -->
+      <div class="bg-white rounded-xl shadow-md p-6 hover:shadow-lg transition">
+        <h2 class="text-lg font-semibold mb-3 text-gray-700">Daily Bookings</h2>
+        <canvas id="dailyBookingsChart" class="w-full h-64"></canvas>
+      </div>
+
+      <!-- Revenue -->
+      <div class="bg-white rounded-xl shadow-md p-6 hover:shadow-lg transition">
+        <h2 class="text-lg font-semibold mb-3 text-gray-700">Revenue</h2>
+        <canvas id="revenueChart" class="w-full h-64"></canvas>
       </div>
     </section>
-  </div>
 
-  <!-- Footer -->
- <div id="footer"></div>
+    <footer class="mt-10 text-center text-gray-500 text-sm">
+      &copy; 2025 Admin Panel. All rights reserved.
+    </footer>
+  </main>
 
-  <!-- JavaScript -->
-  <script src="chart.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+
+  <!-- Chart.js Example Setup -->
+  <script>
+    // Logout Function
+    document.getElementById("logout-btn").addEventListener("click", () => {
+      localStorage.removeItem("accessToken");
+      localStorage.removeItem("refreshToken");
+      localStorage.removeItem("role");
+      window.location.href = "signin.html";
+    });
+
+    // Sample Chart.js data
+    const ctx1 = document.getElementById('monthlyBookingsChart');
+    new Chart(ctx1, {
+      type: 'bar',
+      data: {
+        labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May'],
+        datasets: [{
+          label: 'Bookings',
+          data: [30, 45, 28, 60, 50],
+          backgroundColor: '#3b82f6'
+        }]
+      }
+    });
+
+    const ctx2 = document.getElementById('weeklyBookingsChart');
+    new Chart(ctx2, {
+      type: 'line',
+      data: {
+        labels: ['Week 1', 'Week 2', 'Week 3', 'Week 4'],
+        datasets: [{
+          label: 'Bookings',
+          data: [12, 19, 8, 15],
+          borderColor: '#10b981',
+          backgroundColor: 'rgba(16, 185, 129, 0.2)'
+        }]
+      }
+    });
+
+    const ctx3 = document.getElementById('dailyBookingsChart');
+    new Chart(ctx3, {
+      type: 'bar',
+      data: {
+        labels: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
+        datasets: [{
+          label: 'Bookings',
+          data: [5, 8, 6, 10, 9, 7, 12],
+          backgroundColor: '#f59e0b'
+        }]
+      }
+    });
+
+    const ctx4 = document.getElementById('revenueChart');
+    new Chart(ctx4, {
+      type: 'line',
+      data: {
+        labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May'],
+        datasets: [{
+          label: 'Revenue (₹)',
+          data: [1200, 1900, 900, 2500, 2200],
+          borderColor: '#ef4444',
+          backgroundColor: 'rgba(239, 68, 68, 0.2)'
+        }]
+      }
+    });
+  </script>
 </body>
 </html>

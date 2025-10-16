@@ -1,62 +1,95 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Admin Dashboard</title>
-  <link rel="stylesheet" href="admindash.css">
-  <link rel="stylesheet" href="footer.css">
-  <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
   <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
 </head>
-<body>
-  <!-- Navbar -->
-  <div id="navbar"></div>
+
+<body class="bg-gray-100 flex">
+
+  <!-- Sidebar -->
+  <aside class="w-64 bg-gray-800 text-white min-h-screen flex flex-col fixed">
+    <div class="p-4 text-center border-b border-gray-700">
+      <h2 class="text-2xl font-bold">Admin Panel</h2>
+    </div>
+    <nav class="flex-1 p-4 space-y-2">
+      <a href="admindash.html" class="block px-4 py-2 rounded hover:bg-gray-700 bg-gray-700">Dashboard</a>
+      <a href="analytics.html" class="block px-4 py-2 rounded hover:bg-gray-700">Analytics Dashboard</a>
+      <a href="usermanagment.html" class="block px-4 py-2 rounded hover:bg-gray-700">User Management</a>
+      <a href="staffmanagment.html" class="block px-4 py-2 rounded hover:bg-gray-700">Staff Management</a>
+      <a href="managermanagment.html" class="block px-4 py-2 rounded hover:bg-gray-700">Manager Management</a>
+      <a href="createadmin.html" class="block px-4 py-2 rounded hover:bg-gray-700">Create Admin</a>
+      <a href="scheduleBooking.html" class="block px-4 py-2 rounded hover:bg-gray-700">Booking Management</a>
+      <a href="systemSettings.html" class="block px-4 py-2 rounded hover:bg-gray-700">System Settings</a>
+    </nav>
+
+    <div class="p-4 border-t border-gray-700">
+      <button id="logout-btn" class="w-full bg-red-600 hover:bg-red-700 py-2 rounded font-semibold">Logout</button>
+    </div>
+  </aside>
 
   <!-- Main Content -->
-  <main class="main-content">
-    <header>
-      <h1 id="page-title">Welcome, Admin</h1>
+  <div class="flex-1 ml-64 p-8">
+    <header class="mb-10 text-center">
+      <h1 class="text-3xl font-extrabold text-gray-800">Welcome, Admin</h1>
+      <p class="text-gray-500 mt-2">Monitor and manage your platform efficiently</p>
     </header>
 
-    <section id="content-area">
-      <div class="summary-section">
-        <div class="summary-card">
-          <h3>Total Users</h3>
-          <p id="user-count">0</p>
-        </div>
-        <div class="summary-card">
-          <h3>Total Staff</h3>
-          <p id="staff-count">0</p>
-        </div>
-        <div class="summary-card">
-          <h3>Total Managers</h3>
-          <p id="manager-count">0</p>
-        </div>
+    <!-- Stats Section -->
+    <section class="grid gap-6 md:grid-cols-3 mb-10">
+      <div class="bg-white rounded-xl shadow-md p-6 text-center hover:shadow-lg transition">
+        <h3 class="text-gray-500 font-semibold mb-2">Total Users</h3>
+        <p id="user-count" class="text-3xl font-bold text-gray-800">0</p>
       </div>
+      <div class="bg-white rounded-xl shadow-md p-6 text-center hover:shadow-lg transition">
+        <h3 class="text-gray-500 font-semibold mb-2">Total Staff</h3>
+        <p id="staff-count" class="text-3xl font-bold text-gray-800">0</p>
+      </div>
+      <div class="bg-white rounded-xl shadow-md p-6 text-center hover:shadow-lg transition">
+        <h3 class="text-gray-500 font-semibold mb-2">Total Managers</h3>
+        <p id="manager-count" class="text-3xl font-bold text-gray-800">0</p>
+      </div>
+    </section>
 
-      <div class="table-section">
-        <h2>Recent Booking History</h2>
-        <table class="order-table">
-          <thead>
+    <!-- Booking History -->
+    <section class="bg-white rounded-xl shadow-md p-6">
+      <h2 class="text-2xl font-semibold text-gray-800 mb-6 border-b pb-2">Recent Booking History</h2>
+      <div class="overflow-x-auto">
+        <table class="min-w-full divide-y divide-gray-200">
+          <thead class="bg-gray-50">
             <tr>
-              <th>Booking ID</th>
-              <th>User</th>
-              <th>Service</th>
-              <th>Status</th>
-              <th>Date</th>
+              <th class="px-6 py-3 text-left text-sm font-semibold text-gray-600">Booking ID</th>
+              <th class="px-6 py-3 text-left text-sm font-semibold text-gray-600">User</th>
+              <th class="px-6 py-3 text-left text-sm font-semibold text-gray-600">Service</th>
+              <th class="px-6 py-3 text-left text-sm font-semibold text-gray-600">Status</th>
+              <th class="px-6 py-3 text-left text-sm font-semibold text-gray-600">Date</th>
             </tr>
           </thead>
-          <tbody id="booking-history-body"></tbody>
+          <tbody id="booking-history-body" class="bg-white divide-y divide-gray-200 text-sm">
+            <!-- Dynamic rows inserted via JS -->
+          </tbody>
         </table>
       </div>
     </section>
-  </main>
 
-  <!-- Footer -->
-  <footer id="footer"></footer>
+    <footer class="mt-10 text-center text-gray-500 text-sm">
+      &copy; 2025 Admin Panel. All rights reserved.
+    </footer>
+  </div>
 
-  <!-- JS -->
+  <script>
+    // Logout functionality
+    document.getElementById("logout-btn").addEventListener("click", () => {
+      localStorage.removeItem("accessToken");
+      localStorage.removeItem("refreshToken");
+      localStorage.removeItem("role");
+      window.location.href = "signin.html";
+    });
+  </script>
+
   <script type="module" src="admindash.js"></script>
 </body>
 </html>
