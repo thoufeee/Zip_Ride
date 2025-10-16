@@ -3,7 +3,6 @@ package services
 import (
 	"net/http"
 	"zipride/database"
-	"zipride/internal/constants"
 	"zipride/internal/models"
 
 	"github.com/gin-gonic/gin"
@@ -21,7 +20,7 @@ func DeleteUser(c *gin.Context) {
 	var user models.User
 
 	// Check if user exists in database
-	if err := database.DB.Where("id = ? AND RoleID = ?", userid, constants.RoleUser).First(&user).Error; err != nil {
+	if err := database.DB.Where("id = ?", userid).First(&user).Error; err != nil {
 		c.JSON(http.StatusNotFound, gin.H{"error": "User not found"})
 		return
 	}
@@ -35,6 +34,6 @@ func DeleteUser(c *gin.Context) {
 	// Success response
 	c.JSON(http.StatusOK, gin.H{
 		"message": "User deleted successfully",
-		"user":user,
+		"user":    user,
 	})
 }

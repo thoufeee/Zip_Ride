@@ -18,7 +18,7 @@ func DeleteStaff(c *gin.Context) {
 	}
 	//fetch staff from database
 	var staff models.Admin
-	if err := database.DB.First("id = ? AND RoleID = ?", staffid, constants.RoleStaff).Find(&staff).Error; err != nil {
+	if err := database.DB.Where("id = ? AND role_id = ?", staffid, constants.Staff).First(&staff).Error; err != nil {
 		c.JSON(http.StatusNotFound, gin.H{"error": "staff not found"})
 		return
 	}
@@ -28,5 +28,5 @@ func DeleteStaff(c *gin.Context) {
 		return
 	}
 	// sucess messge
-	c.JSON(http.StatusOK, gin.H{"message": "Staff deleted sucessfully",})
+	c.JSON(http.StatusOK, gin.H{"message": "Staff deleted sucessfully"})
 }

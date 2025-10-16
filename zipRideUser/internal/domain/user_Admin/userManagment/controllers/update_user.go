@@ -3,7 +3,6 @@ package services
 import (
 	"net/http"
 	"zipride/database"
-	"zipride/internal/constants"
 	"zipride/internal/models"
 	"zipride/utils"
 
@@ -21,7 +20,7 @@ func UpdateUser(c *gin.Context) {
 
 	// Find the user in the database
 	var user models.User
-	if err := database.DB.Where("id = ? AND RoleID = ?", userid, constants.RoleUser).First(&user).Error; err != nil {
+	if err := database.DB.Where("id = ?", userid).First(&user).Error; err != nil {
 		c.JSON(http.StatusNotFound, gin.H{"error": "User not found"})
 		return
 	}
@@ -66,7 +65,7 @@ func UpdateUser(c *gin.Context) {
 		user.Password = hashed
 	}
 
-	// Update the user 
+	// Update the user
 	if input.FirstName != "" {
 		user.FirstName = input.FirstName
 	}

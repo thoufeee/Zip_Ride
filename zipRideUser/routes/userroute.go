@@ -2,7 +2,7 @@ package routes
 
 import (
 	"zipride/internal/constants"
-	"zipride/internal/domain/bookingmodule"
+	"zipride/internal/domain/bookingmodule/handlers"
 	"zipride/internal/domain/user/services"
 	"zipride/internal/middleware"
 	"zipride/internal/user_Auth/handlers"

@@ -30,7 +30,6 @@ func SeedPermisiions() {
 
 		// manager managment
 		{Name: constants.PermissionViewManagers},
-		{Name: constants.PermissionAddManager},
 		{Name: constants.PermissionEditManager},
 		{Name: constants.PermissionDeleteManager},
 		{Name: constants.PermissionBlockManager},

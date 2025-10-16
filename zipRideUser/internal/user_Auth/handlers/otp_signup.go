@@ -31,8 +31,8 @@ func SendOtpHandler(c *gin.Context) {
 
 	var user models.User
 
-	if err := database.DB.Where("phone_number", data.Phone).First(&user); err == nil {
-		c.JSON(http.StatusUnauthorized, gin.H{"err": "phone number already registered"})
+	if err := database.DB.Where("phone_number = ?", phone).First(&user).Error; err == nil {
+		c.JSON(http.StatusBadRequest, gin.H{"err": "phone number already registered"})
 		return
 	}
 
@@ -40,7 +40,7 @@ func SendOtpHandler(c *gin.Context) {
 	otp := utils.GeneratorOtp()
 
 	if err := utils.SaveOTP(phone, otp, constants.UserPrefix); err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"err": "failed to save otp"})
+		c.JSON(http.StatusInternalServerError, gin.H{"err": "failed to store otp"})
 		return
 	}
 
@@ -96,13 +96,13 @@ func RegisterUser(c *gin.Context) {
 		return
 	}
 
-	var user models.User
-
 	// email check
 	if !utils.EmailCheck(data.Email) {
 		c.JSON(http.StatusBadRequest, gin.H{"err": "email format not valid"})
 		return
 	}
+
+	var user models.User
 
 	if err := database.DB.Where("email = ?", data.Email).First(&user).Error; err == nil {
 		c.JSON(http.StatusBadRequest, gin.H{"err": "email already taken"})

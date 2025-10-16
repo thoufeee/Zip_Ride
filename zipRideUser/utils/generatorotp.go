@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"log"
 	"math/big"
-	"strings"
 	"time"
 	"zipride/database"
 )
@@ -48,21 +47,21 @@ func VerifyOTP(phone, code, prefix string) string {
 
 // mark phonenumber verified
 func MarkPhoneVerified(phone, prefix string) {
-	database.RDB.Set(database.Ctx, "verified:"+phone, "true", 15*time.Minute)
+	database.RDB.Set(database.Ctx, prefix+":verified_phone", phone, 15*time.Minute)
 }
 
 // get verified phone
 func GetVerifiedPhone(prefix string) string {
-	keys, _ := database.RDB.Keys(database.Ctx, "verified:*").Result()
+	phone, err := database.RDB.Get(database.Ctx, prefix+":verified_phone").Result()
 
-	if len(keys) == 0 {
+	if err != nil {
 		return ""
 	}
 
-	return strings.TrimPrefix(keys[0], "verified:")
+	return phone
 }
 
 // clear verified phone
 func ClearVerifiedPhone(phone, prefix string) {
-	database.RDB.Del(database.Ctx, "verified:"+phone)
+	database.RDB.Del(database.Ctx, prefix+":verified_phone")
 }
