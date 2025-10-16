@@ -35,6 +35,9 @@ func SeedPermisiions() {
 		{Name: constants.PermissionBlockManager},
 		{Name: constants.PermissionUnBlockManager},
 
+		// booking managment
+		{Name: constants.PermissionScheduleBooking},
+
 		// reports
 		{Name: constants.PermissionViewReports},
 		{Name: constants.PermissionViewAnalytics},
