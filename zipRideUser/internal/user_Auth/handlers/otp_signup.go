@@ -29,11 +29,23 @@ func SendOtpHandler(c *gin.Context) {
 		return
 	}
 
+	var user models.User
+
+	if err := database.DB.Where("phone_number = ?", phone).First(&user).Error; err == nil {
+		c.JSON(http.StatusBadRequest, gin.H{"err": "phone number already registered"})
+		return
+	}
+
 	//generate otp
 	otp := utils.GeneratorOtp()
 
-	services.SendOtp(phone, "Your OTP Is "+otp)
-	utils.SaveOTP(phone, otp, constants.UserPrefix)
+	if err := utils.SaveOTP(phone, otp, constants.UserPrefix); err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"err": "failed to store otp"})
+		return
+	}
+
+	services.SendOtp(data.Phone, "Your OTP Is "+otp)
+
 	// sucess responce
 	c.JSON(http.StatusOK, gin.H{"res": "OTP Sent"})
 }
@@ -84,33 +96,16 @@ func RegisterUser(c *gin.Context) {
 		return
 	}
 
-	var user models.User
-
-	if !user.Isverified {
-		c.JSON(http.StatusForbidden, gin.H{"err": "phone number not verified"})
-		return
-	}
-
 	// email check
 	if !utils.EmailCheck(data.Email) {
 		c.JSON(http.StatusBadRequest, gin.H{"err": "email format not valid"})
 		return
 	}
 
+	var user models.User
+
 	if err := database.DB.Where("email = ?", data.Email).First(&user).Error; err == nil {
 		c.JSON(http.StatusBadRequest, gin.H{"err": "email already taken"})
-		return
-	}
-
-	if err := database.DB.Create(&models.User{}).Error; err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"err": "user not created"})
-		return
-	}
-
-	// pass check
-	hash, err := utils.GenerateHash(data.Password)
-	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"err": "password not hashed"})
 		return
 	}
 
@@ -122,6 +117,13 @@ func RegisterUser(c *gin.Context) {
 		return
 	}
 
+	// pass check
+	hash, err := utils.GenerateHash(data.Password)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"err": "password not hashed"})
+		return
+	}
+
 	new := &models.User{
 		FirstName:   data.FirstName,
 		LastName:    data.LastName,
@@ -130,6 +132,8 @@ func RegisterUser(c *gin.Context) {
 		Email:       data.Email,
 		Gender:      data.Gender,
 		Place:       data.Place,
+		Role:        constants.RoleUser,
+		Isverified:  true,
 	}
 
 	if err := database.DB.Create(&new).Error; err != nil {
