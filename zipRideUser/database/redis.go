@@ -16,7 +16,7 @@ var Ctx = context.Background()
 // connecting redis
 func InitRedis() {
 
-	addr := os.Getenv("REDIS_REST_URL")
+	addr := os.Getenv("REDIS_URL")
 	pass := os.Getenv("REDIS_REST_TOKEN")
 	db, _ := strconv.Atoi(os.Getenv("REDIS_DB"))
 
