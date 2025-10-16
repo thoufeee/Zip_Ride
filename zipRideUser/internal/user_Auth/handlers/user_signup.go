@@ -84,6 +84,7 @@ func SignUp(c *gin.Context) {
 		Place:       user.Place,
 		Password:    hashedpass,
 		Role:        constants.RoleUser,
+		Isverified:  true,
 	}
 
 	if err := database.DB.Create(&new).Error; err != nil {
