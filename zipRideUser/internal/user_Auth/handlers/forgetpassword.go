@@ -119,6 +119,11 @@ func ResetPassword(c *gin.Context) {
 		return
 	}
 
+	if !utils.PasswordStrength(input.NewPassword) {
+		c.JSON(http.StatusConflict, gin.H{"err": "increase password strength"})
+		return
+	}
+
 	// Hash new password
 	hash, err := utils.GenerateHash(input.NewPassword)
 	if err != nil {
