@@ -19,7 +19,7 @@ func SuperAdminRoutes(c *gin.Engine) {
 	admin := c.Group("/admin")
 
 	admin.Use(middleware.JwtValidation())
-	admin.Use(middleware.RoleCheck(constants.RoleSuperAdmin, constants.RoleManager, constants.RoleStaff))
+	admin.Use(middleware.RoleCheck(constants.RoleSuperAdmin, constants.RoleAdmin))
 
 	// verify route
 	admin.GET("/verify", allpermission.Verify)
@@ -45,6 +45,5 @@ func SuperAdminRoutes(c *gin.Engine) {
 
 	//route for all permissions && roles
 	admin.GET("/allpermissions", middleware.RequirePermission(constants.ViewAllPermissions), allpermission.Permissions)
-	admin.GET("/allroles", middleware.RequirePermission(constants.PermissionViewAllRoles), allpermission.AllRoles)
 
 }
