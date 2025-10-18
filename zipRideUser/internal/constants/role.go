@@ -4,8 +4,7 @@ package constants
 
 const (
 	RoleSuperAdmin = "SUPER_ADMIN"
-	RoleManager    = "MANAGER"
-	RoleStaff      = "STAFF"
+	RoleAdmin      = "Admin"
 	RoleUser       = "USER"
 )
 
