@@ -1,15 +1,17 @@
 package controllers
 
 import (
+	"encoding/json"
 	"net/http"
 	"zipride/database"
+	"zipride/internal/constants"
 	"zipride/internal/models"
 	"zipride/utils"
 
 	"github.com/gin-gonic/gin"
 )
 
-// creating staff || manager
+// creating admin
 
 func CreateStaff(c *gin.Context) {
 
@@ -27,25 +29,10 @@ func CreateStaff(c *gin.Context) {
 		return
 	}
 
-	// finding role
-	var role models.Role
-
-	if err := database.DB.Preload("Permissions").Where("name = ?", data.Role).First(&role).Error; err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"err": "role not found"})
+	if !utils.PasswordStrength(data.Password) {
+		c.JSON(http.StatusConflict, gin.H{"err": "increase password strength"})
 		return
 	}
-
-	// for extra permissions
-	var extraPermission []models.Permission
-
-	if len(data.ExtraPerms) > 0 {
-		if err := database.DB.Where("name IN ?", data.ExtraPerms).Find(&extraPermission).Error; err != nil {
-			c.JSON(http.StatusInternalServerError, gin.H{"err": "failed to fetch extra permissions"})
-			return
-		}
-	}
-
-	allPermission := append(role.Permissions, extraPermission...)
 
 	hashpass, err := utils.GenerateHash(data.Password)
 
@@ -54,13 +41,19 @@ func CreateStaff(c *gin.Context) {
 		return
 	}
 
+	permjson, err := json.Marshal(data.ExtraPerms)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"err": "failed to proccess permissions"})
+		return
+	}
+
 	newStaff := models.Admin{
 		Name:        data.Name,
 		Email:       data.Email,
 		PhoneNumber: data.PhoneNumber,
 		Password:    hashpass,
-		RoleID:      role.ID,
-		Permissions: allPermission,
+		Role:        constants.RoleAdmin,
+		Permissions: permjson,
 	}
 
 	if err := database.DB.Create(&newStaff).Error; err != nil {
