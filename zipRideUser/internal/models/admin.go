@@ -1,6 +1,7 @@
 package models
 
 import (
+	"gorm.io/datatypes"
 	"gorm.io/gorm"
 )
 
@@ -8,12 +9,11 @@ import (
 
 type Admin struct {
 	gorm.Model
-	Name        string       `json:"name"`
-	Email       string       `json:"email"`
-	PhoneNumber string       `json:"phonenumber"`
-	Password    string       `json:"password"`
-	RoleID      uint         `json:"role_id"`
-	Role        Role         `json:"role"`
-	Permissions []Permission `gorm:"many2many:admin_permissions;"`
-	Block       bool         `gorm:"default:false"`
+	Name        string         `json:"name"`
+	Email       string         `json:"email"`
+	PhoneNumber string         `json:"phonenumber"`
+	Password    string         `json:"password"`
+	Role        string         `json:"role"`
+	Permissions datatypes.JSON `json:"permissions" gorm:"type:json"`
+	Block       bool           `gorm:"default:false"`
 }
