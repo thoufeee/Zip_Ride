@@ -44,6 +44,11 @@ func SeedPermisiions() {
 
 		// system settings
 		{Name: constants.PermissionSystemSettings},
+
+		// permissions
+		{Name: constants.PermissionScheduleBooking},
+		{Name: constants.ViewAllPermissions},
+		{Name: constants.PermissionViewAllRoles},
 	}
 
 	for _, p := range permission {
