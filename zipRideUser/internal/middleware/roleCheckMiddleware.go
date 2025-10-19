@@ -1,6 +1,7 @@
 package middleware
 
 import (
+	"fmt"
 	"net/http"
 	"strings"
 
@@ -31,9 +32,13 @@ func RoleCheck(roles ...string) gin.HandlerFunc {
 				c.Next()
 				return
 			}
+
+			fmt.Println("Role from token/context:", role)
+			fmt.Println("Allowed roles:", roles)
+
 		}
 
-		c.JSON(http.StatusForbidden, gin.H{"err": "access denied"})
+		c.JSON(http.StatusForbidden, gin.H{"err": "access deniedddddddddddddddd"})
 		c.Abort()
 	}
 }
