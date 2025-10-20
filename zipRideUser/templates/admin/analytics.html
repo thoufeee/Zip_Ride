@@ -1,146 +1,128 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Analytics Dashboard</title>
-  <script src="https://cdn.tailwindcss.com"></script>
-  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Analytics Dashboard - ZipRide</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@100..900&display=swap" rel="stylesheet">
+<style>
+ body { 
+ font-family: 'Inter', sans-serif; 
+ /* Ensures the main content starts correctly after the fixed sidebar */
+ padding-left: 18rem; 
+}
+
+ /* Media query for responsiveness (mobile layout) */
+ @media (max-width: 1024px) {
+ body {
+ padding-left: 0;
+ }
+ .sidebar-fixed {
+ position: static;
+ width: 100%;
+ min-height: auto;
+ height: auto;
+ }
+ .main-content {
+ margin-left: 0;
+ }
+}
+</style>
 </head>
+<body class="bg-gray-50 text-gray-800">
 
-<body class="bg-gray-100 text-gray-900 flex">
+<!-- Sidebar -->
+<aside class="w-72 bg-cyan-800 text-white min-h-screen flex flex-col fixed top-0 left-0 shadow-2xl sidebar-fixed">
+ <div class="p-6 text-center border-b border-cyan-700">
+ <h2 class="text-2xl font-extrabold tracking-wider">Admin<span class="text-cyan-300">Panel</span></h2>
+ </div>
+ <nav class="flex-1 p-4 space-y-2">
+ <a href="admindash.html" class="flex items-center px-4 py-3 rounded-xl hover:bg-cyan-700 transition duration-150">
+ <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-10v10a1 1 0 001 1h3m-6 0a1 1 0 001-1v-4a1 1 0 00-1-1H9m6 6h2"></path></svg>
+ Dashboard
+ </a>
+ <!-- Active Link Style -->
+ <a href="analytics.html" class="flex items-center px-4 py-3 rounded-xl bg-cyan-600 font-semibold shadow-lg text-white transition duration-150">
+ <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 8v8m-4-8v8m-4-8v8M4 16h16"></path></svg>
+ Analytics Dashboard
+ </a>
+ <a href="usermanagment.html" class="flex items-center px-4 py-3 rounded-xl hover:bg-cyan-700 transition duration-150">
+ <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H9a1 1 0 01-1-1v-1a4 4 0 004-4h.01M21 21h-6.326c-.783-1.428-1.571-2.846-2.355-4.274l-.001-.001C10.748 15.654 9.959 14.234 9.176 12.809M10.772 20.354L10.772 20.354"></path></svg>
+ User Management
+ </a>
+ <a href="adminmanagment.html" class="flex items-center px-4 py-3 rounded-xl hover:bg-cyan-700 transition duration-150">
+ <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5m-5 0a2 2 0 01-2-2V9a2 2 0 012-2h5m-5 0V9a2 2 0 002 2h5m-2-2v5a2 2 0 01-2 2H9a2 2 0 01-2-2V7a2 2 0 012-2h5a2 2 0 012 2v5"></path></svg>
+ Admin Management
+ </a>
+ <a href="createadmin.html" class="flex items-center px-4 py-3 rounded-xl hover:bg-cyan-700 transition duration-150">
+ <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z"></path></svg>
+ Create Access Account
+ </a>
+<a href="bookingmanagment.html" class="flex items-center px-4 py-3 rounded-xl hover:bg-cyan-700 transition duration-150">
+ <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
+ Booking Management
+ </a>
+ <a href="schedulebooking.html" class="flex items-center px-4 py-3 rounded-xl hover:bg-cyan-700 transition duration-150">
+ <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+ Schedule Booking
+ </a>
+ <a href="systemSettings.html" class="flex items-center px-4 py-3 rounded-xl hover:bg-cyan-700 transition duration-150">
+ <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.945 3.31.83 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.945 1.543-.83 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.945-3.31-.83-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.945-1.543.83-3.31 2.37-2.37a1.724 1.724 0 002.572-1.065z"></path></svg>
+ System Settings
+ </a>
+ </nav>
+ <div class="p-6 border-t border-cyan-700">
+ <button id="logout-btn" class="w-full bg-red-600 hover:bg-red-700 py-3 rounded-xl font-bold transition duration-200 shadow-md hover:shadow-lg">
+ Logout
+ </button>
+ </div>
+</aside>
 
-  <!-- Sidebar -->
-  <aside class="w-64 h-screen bg-gray-800 text-white flex flex-col fixed top-0 left-0 shadow-lg">
-    <div class="p-4 border-b border-gray-700">
-      <h2 class="text-2xl font-semibold">Admin Panel</h2>
-    </div>
+<!-- Main Content -->
+<main class="flex-1 p-10 lg:p-12 main-content">
+ <!-- Header -->
+<header class="mb-10 p-6 bg-white rounded-xl shadow-md border-b-4 border-cyan-500">
+ <h1 class="text-3xl font-extrabold text-gray-800 mb-1">Analytics Dashboard</h1>
+ <p class="text-gray-500 text-lg">Overview of bookings and revenue statistics for informed decision-making.</p>
+ </header>
 
-    <nav class="flex-1 overflow-y-auto mt-4">
-      <ul class="space-y-2 px-3 text-sm font-medium">
-        <li><a href="admindash.html" class="block px-3 py-2 rounded hover:bg-gray-700 transition">Dashboard</a></li>
-        <li><a href="analytics.html" class="block px-3 py-2 rounded bg-gray-700 transition">Analytics Dashboard</a></li>
-        <li><a href="usermanagment.html" class="block px-3 py-2 rounded hover:bg-gray-700 transition">User Management</a></li>
-        <li><a href="staffmanagment.html" class="block px-3 py-2 rounded hover:bg-gray-700 transition">Staff Management</a></li>
-        <li><a href="managermanagment.html" class="block px-3 py-2 rounded hover:bg-gray-700 transition">Manager Management</a></li>
-        <li><a href="createadmin.html" class="block px-3 py-2 rounded hover:bg-gray-700 transition">Create Admin</a></li>
-        <li><a href="scheduleBooking.html" class="block px-3 py-2 rounded hover:bg-gray-700 transition">Booking Management</a></li>
-        <li><a href="systemSettings.html" class="block px-3 py-2 rounded hover:bg-gray-700 transition">System Settings</a></li>
-      </ul>
-    </nav>
+ <!-- Charts Section -->
+ <section class="grid gap-8 grid-cols-1 md:grid-cols-2 lg:grid-cols-2">
 
-    <div class="p-4 border-t border-gray-700">
-      <button id="logout-btn" class="w-full bg-red-600 hover:bg-red-700 px-4 py-2 rounded font-medium transition">
-        Logout
-      </button>
-    </div>
-  </aside>
+ <!-- Daily Bookings -->
+ <div class="bg-white rounded-xl shadow-2xl p-6 border border-gray-100 hover:shadow-xl transition duration-300">
+ <h2 class="text-xl font-extrabold mb-4 text-cyan-800 border-b pb-2">Daily Bookings Pattern</h2>
+ <div class="h-64"><canvas id="dailyBookingsChart"></canvas></div>
+ </div>
 
-  <!-- Main Content -->
-  <main class="ml-64 flex-1 p-8">
-    <header class="mb-10">
-      <h1 class="text-3xl font-bold text-gray-800">Analytics Dashboard</h1>
-      <p class="text-gray-600 mt-1">Overview of bookings and revenue statistics.</p>
-    </header>
+ <!-- Weekly Bookings -->
+ <div class="bg-white rounded-xl shadow-2xl p-6 border border-gray-100 hover:shadow-xl transition duration-300">
+ <h2 class="text-xl font-extrabold mb-4 text-cyan-800 border-b pb-2">Weekly Bookings Summary</h2>
+ <div class="h-64"><canvas id="weeklyBookingsChart"></canvas></div>
+ </div>
 
-    <!-- Charts Section -->
-    <section class="grid gap-6 md:grid-cols-2 lg:grid-cols-2">
-      <!-- Monthly Bookings -->
-      <div class="bg-white rounded-xl shadow-md p-6 hover:shadow-lg transition">
-        <h2 class="text-lg font-semibold mb-3 text-gray-700">Monthly Bookings</h2>
-        <canvas id="monthlyBookingsChart" class="w-full h-64"></canvas>
-      </div>
+ <!-- Monthly Bookings -->
+ <div class="bg-white rounded-xl shadow-2xl p-6 border border-gray-100 hover:shadow-xl transition duration-300">
+ <h2 class="text-xl font-extrabold mb-4 text-cyan-800 border-b pb-2">Monthly Bookings Trend</h2>
+ <div class="h-64"><canvas id="monthlyBookingsChart"></canvas></div>
+ </div>
 
-      <!-- Weekly Bookings -->
-      <div class="bg-white rounded-xl shadow-md p-6 hover:shadow-lg transition">
-        <h2 class="text-lg font-semibold mb-3 text-gray-700">Weekly Bookings</h2>
-        <canvas id="weeklyBookingsChart" class="w-full h-64"></canvas>
-      </div>
+ <!-- Monthly Revenue -->
+ <div class="bg-white rounded-xl shadow-2xl p-6 border border-gray-100 hover:shadow-xl transition duration-300">
+ <h2 class="text-xl font-extrabold mb-4 text-cyan-800 border-b pb-2">Monthly Revenue (₹)</h2>
+ <div class="h-64"><canvas id="revenueChart"></canvas></div>
+ </div>
 
-      <!-- Daily Bookings -->
-      <div class="bg-white rounded-xl shadow-md p-6 hover:shadow-lg transition">
-        <h2 class="text-lg font-semibold mb-3 text-gray-700">Daily Bookings</h2>
-        <canvas id="dailyBookingsChart" class="w-full h-64"></canvas>
-      </div>
+ </section>
 
-      <!-- Revenue -->
-      <div class="bg-white rounded-xl shadow-md p-6 hover:shadow-lg transition">
-        <h2 class="text-lg font-semibold mb-3 text-gray-700">Revenue</h2>
-        <canvas id="revenueChart" class="w-full h-64"></canvas>
-      </div>
-    </section>
+ <footer class="mt-16 text-center text-gray-400 text-sm">
+ &copy; 2025 Admin Panel. All rights reserved.
+ </footer>
+</main>
 
-    <footer class="mt-10 text-center text-gray-500 text-sm">
-      &copy; 2025 Admin Panel. All rights reserved.
-    </footer>
-  </main>
-
-  <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
-
-  <!-- Chart.js Example Setup -->
-  <script>
-    // Logout Function
-    document.getElementById("logout-btn").addEventListener("click", () => {
-      localStorage.removeItem("accessToken");
-      localStorage.removeItem("refreshToken");
-      localStorage.removeItem("role");
-      window.location.href = "signin.html";
-    });
-
-    // Sample Chart.js data
-    const ctx1 = document.getElementById('monthlyBookingsChart');
-    new Chart(ctx1, {
-      type: 'bar',
-      data: {
-        labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May'],
-        datasets: [{
-          label: 'Bookings',
-          data: [30, 45, 28, 60, 50],
-          backgroundColor: '#3b82f6'
-        }]
-      }
-    });
-
-    const ctx2 = document.getElementById('weeklyBookingsChart');
-    new Chart(ctx2, {
-      type: 'line',
-      data: {
-        labels: ['Week 1', 'Week 2', 'Week 3', 'Week 4'],
-        datasets: [{
-          label: 'Bookings',
-          data: [12, 19, 8, 15],
-          borderColor: '#10b981',
-          backgroundColor: 'rgba(16, 185, 129, 0.2)'
-        }]
-      }
-    });
-
-    const ctx3 = document.getElementById('dailyBookingsChart');
-    new Chart(ctx3, {
-      type: 'bar',
-      data: {
-        labels: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
-        datasets: [{
-          label: 'Bookings',
-          data: [5, 8, 6, 10, 9, 7, 12],
-          backgroundColor: '#f59e0b'
-        }]
-      }
-    });
-
-    const ctx4 = document.getElementById('revenueChart');
-    new Chart(ctx4, {
-      type: 'line',
-      data: {
-        labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May'],
-        datasets: [{
-          label: 'Revenue (₹)',
-          data: [1200, 1900, 900, 2500, 2200],
-          borderColor: '#ef4444',
-          backgroundColor: 'rgba(239, 68, 68, 0.2)'
-        }]
-      }
-    });
-  </script>
+<!-- Link to the external JavaScript file -->
+<script type="module" src="chart.js"></script>
 </body>
 </html>
