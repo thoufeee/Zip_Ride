@@ -1,0 +1,35 @@
+{{ define "base" }}
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>{{ block "title" . }}ZipRide Admin{{ end }}</title>
+  <link rel="stylesheet" href="/static/css/style.css" />
+</head>
+<body>
+  <div class="layout">
+    <aside class="sidebar">
+      <div class="brand">ZipRide</div>
+      <nav>
+        <a href="/admin/panel/dashboard">Dashboard</a>
+        <a href="/admin/panel/drivers">Drivers</a>
+        <a href="/admin/panel/vehicles">Vehicles</a>
+        <a href="/admin/panel/rides">Rides</a>
+        <a href="/admin/panel/earnings">Earnings</a>
+        <a href="/admin/panel/withdrawals">Withdrawals</a>
+        <a href="/admin/panel/users">Users</a>
+        <a href="/admin/panel/help">Help</a>
+        <a href="/admin/panel/settings">Settings</a>
+        <a href="/admin/panel/admins">Admins</a>
+        <a href="/admin/panel/roles">Roles</a>
+        <a href="/admin/panel/logout">Logout</a>
+      </nav>
+    </aside>
+    <main class="content">
+      {{ block "content" . }}{{ end }}
+    </main>
+  </div>
+</body>
+</html>
+{{ end }}

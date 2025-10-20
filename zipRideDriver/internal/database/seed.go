@@ -4,6 +4,7 @@ import (
 	"strings"
 
 	"zipRideDriver/internal/config"
+	adminservices "zipRideDriver/internal/admin/services"
 	"zipRideDriver/internal/models"
 	"zipRideDriver/internal/utils"
 
@@ -24,11 +25,16 @@ func SeedDefaults(db *gorm.DB, cfg *config.Config, log *zap.Logger) error {
 			if herr != nil {
 				return herr
 			}
-			admin = models.AdminUser{Name: "ZipRide Admin", Email: adminEmail, PasswordHash: hash}
+			admin = models.AdminUser{Name: "ZipRide Admin", Email: adminEmail, PasswordHash: hash, Role: "super_admin"}
 			if err := db.Create(&admin).Error; err != nil {
 				return err
 			}
 			log.Info("seeded default admin", zap.String("email", adminEmail))
+		}
+	} else {
+		// ensure role field on existing default admin
+		if admin.Role == "" {
+			_ = db.Model(&admin).Update("role", "super_admin").Error
 		}
 	}
 	// ensure admin role exists and map to user
@@ -47,6 +53,24 @@ func SeedDefaults(db *gorm.DB, cfg *config.Config, log *zap.Logger) error {
 			ur = models.UserRole{UserID: admin.ID, RoleID: role.ID}
 			if err := db.Create(&ur).Error; err != nil {
 				return err
+			}
+		}
+	}
+
+	// Ensure default permissions exist and grant all to admin role
+	if err := adminservices.EnsurePermissions(db, adminservices.DefaultPermissions); err != nil {
+		return err
+	}
+	// grant all permissions to admin role
+	for _, pname := range adminservices.DefaultPermissions {
+		var perm models.Permission
+		if err := db.Where("name = ?", strings.TrimSpace(pname)).First(&perm).Error; err == nil {
+			var rp models.RolePermission
+			if err := db.Where("role_id = ? AND permission_id = ?", role.ID, perm.ID).First(&rp).Error; err != nil {
+				if err == gorm.ErrRecordNotFound {
+					rp = models.RolePermission{RoleID: role.ID, PermissionID: perm.ID}
+					_ = db.Create(&rp).Error
+				}
 			}
 		}
 	}

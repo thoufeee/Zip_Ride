@@ -1,0 +1,21 @@
+{{ define "admin/settings/index.html" }}
+{{ template "base" . }}
+{{ end }}
+{{ define "title" }}Settings{{ end }}
+{{ define "content" }}
+<h1>Settings</h1>
+{{ if .Error }}<div class="alert">{{ .Error }}</div>{{ end }}
+{{ if .Success }}<div class="alert" style="background:#dcfce7;color:#14532d">{{ .Success }}</div>{{ end }}
+<div class="card" style="padding:16px;max-width:480px">
+  <h3>Update Password</h3>
+  <form method="POST" action="/admin/panel/settings/password">
+    <label>Current Password</label>
+    <input type="password" name="current_password" required />
+    <label>New Password</label>
+    <input type="password" name="new_password" required />
+    <label>Confirm Password</label>
+    <input type="password" name="confirm_password" required />
+    <button type="submit">Update</button>
+  </form>
+</div>
+{{ end }}

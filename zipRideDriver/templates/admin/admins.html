@@ -1,0 +1,46 @@
+{{ define "admin/admins.html" }}
+{{ template "base" . }}
+{{ end }}
+{{ define "title" }}Admins{{ end }}
+{{ define "content" }}
+<h1>Admins</h1>
+<table class="table">
+  <thead><tr><th>ID</th><th>Name</th><th>Email</th><th>Role</th><th>Actions</th></tr></thead>
+  <tbody>
+  {{ range .Admins }}
+    <tr>
+      <td>{{ .Admin.ID }}</td>
+      <td>{{ .Admin.Name }}</td>
+      <td>{{ .Admin.Email }}</td>
+      <td>{{ .Role }}</td>
+      <td>
+        <form method="POST" action="/admin/panel/admins/{{ .Admin.ID }}">
+          <input type="text" name="name" placeholder="Name" value="{{ .Admin.Name }}" />
+          <input type="email" name="email" placeholder="Email" value="{{ .Admin.Email }}" />
+          <input type="password" name="password" placeholder="New Password" />
+          <select name="role_id">
+            {{ range $.Roles }}
+              <option value="{{ .ID }}" {{ if eq .Name $.Role }}selected{{ end }}>{{ .Name }}</option>
+            {{ end }}
+          </select>
+          <button>Save</button>
+        </form>
+        <form method="POST" action="/admin/panel/admins/{{ .Admin.ID }}/delete"><button class="danger">Delete</button></form>
+      </td>
+    </tr>
+  {{ end }}
+  </tbody>
+</table>
+<h2>Create New Admin</h2>
+<form method="POST" action="/admin/panel/admins">
+  <input type="text" name="name" placeholder="Name" required />
+  <input type="email" name="email" placeholder="Email" required />
+  <input type="password" name="password" placeholder="Password" required />
+  <select name="role_id">
+    {{ range .Roles }}
+      <option value="{{ .ID }}">{{ .Name }}</option>
+    {{ end }}
+  </select>
+  <button type="submit">Create</button>
+</form>
+{{ end }}

@@ -1,0 +1,21 @@
+{{ define "admin/help/index.html" }}
+{{ template "base" . }}
+{{ end }}
+{{ define "title" }}Help Center{{ end }}
+{{ define "content" }}
+<h1>Help Center</h1>
+<table class="table">
+  <thead><tr><th>ID</th><th>DriverID</th><th>Subject</th><th>Status</th><th>Actions</th></tr></thead>
+  <tbody>
+  {{ range .Tickets }}
+    <tr>
+      <td>{{ .ID }}</td>
+      <td>{{ .DriverID }}</td>
+      <td>{{ .Subject }}</td>
+      <td>{{ .Status }}</td>
+      <td><a href="/admin/panel/help/{{ .ID }}">Open</a></td>
+    </tr>
+  {{ end }}
+  </tbody>
+</table>
+{{ end }}

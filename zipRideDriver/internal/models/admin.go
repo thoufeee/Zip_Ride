@@ -7,6 +7,7 @@ type AdminUser struct {
 	Name         string    `gorm:"size:100;not null"`
 	Email        string    `gorm:"size:120;uniqueIndex;not null"`
 	PasswordHash string    `gorm:"size:255;not null"`
+	Role         string    `gorm:"size:40;default:'support';index"`
 	CreatedAt    time.Time
 	UpdatedAt    time.Time
 }

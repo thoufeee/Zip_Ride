@@ -1,0 +1,26 @@
+* { box-sizing: border-box; }
+body { margin: 0; font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif; color: #111; }
+.layout { display: grid; grid-template-columns: 240px 1fr; min-height: 100vh; }
+.sidebar { background: #0f172a; color: #fff; padding: 20px; }
+.sidebar .brand { font-weight: 700; margin-bottom: 16px; }
+.sidebar nav a { display: block; color: #cbd5e1; text-decoration: none; padding: 8px 0; }
+.sidebar nav a:hover { color: #fff; }
+.content { padding: 24px; background: #f8fafc; }
+.cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px,1fr)); gap: 16px; }
+.card { background: #fff; border: 1px solid #e2e8f0; border-radius: 8px; padding: 16px; }
+.card-title { color: #475569; font-size: 12px; text-transform: uppercase; letter-spacing: .04em; }
+.card-value { font-size: 24px; font-weight: 700; }
+.table { width: 100%; border-collapse: collapse; background: #fff; border: 1px solid #e2e8f0; }
+.table th, .table td { padding: 10px 12px; border-bottom: 1px solid #e2e8f0; }
+.table th { text-align: left; color: #475569; font-size: 12px; text-transform: uppercase; }
+.toolbar { display: flex; gap: 8px; margin-bottom: 12px; }
+.row-actions form { display: inline; margin-right: 6px; }
+.button, button { background: #2563eb; color: #fff; border: 0; border-radius: 6px; padding: 8px 12px; cursor: pointer; }
+button.danger { background: #dc2626; }
+.auth { display: grid; place-items: center; min-height: 100vh; background: #0f172a; }
+.auth-card { background: #fff; padding: 24px; border-radius: 10px; min-width: 320px; }
+.auth-card h1 { margin-top: 0; }
+.auth-card input, .auth-card select { width: 100%; padding: 10px; margin: 6px 0 12px; border: 1px solid #e2e8f0; border-radius: 6px; }
+.auth-card .alert { background: #fee2e2; color: #7f1d1d; padding: 8px 10px; border-radius: 6px; margin-bottom: 10px; }
+.grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+.check { display: flex; gap: 8px; align-items: center; padding: 6px 0; }

@@ -1,0 +1,33 @@
+{{ define "admin/rides/index.html" }}
+{{ template "base" . }}
+{{ end }}
+{{ define "title" }}Rides{{ end }}
+{{ define "content" }}
+<h1>Rides</h1>
+<form class="toolbar" method="GET" action="/admin/panel/rides">
+  <select name="status">
+    <option value="" {{ if eq .FilterStatus ""}}selected{{ end }}>All</option>
+    <option value="pending" {{ if eq .FilterStatus "pending"}}selected{{ end }}>Pending</option>
+    <option value="accepted" {{ if eq .FilterStatus "accepted"}}selected{{ end }}>Accepted</option>
+    <option value="completed" {{ if eq .FilterStatus "completed"}}selected{{ end }}>Completed</option>
+    <option value="cancelled" {{ if eq .FilterStatus "cancelled"}}selected{{ end }}>Cancelled</option>
+  </select>
+  <button type="submit">Filter</button>
+</form>
+<table class="table">
+  <thead><tr><th>ID</th><th>DriverID</th><th>Pickup</th><th>Dropoff</th><th>Status</th><th>Fare</th><th>Actions</th></tr></thead>
+  <tbody>
+  {{ range .Rides }}
+    <tr>
+      <td>{{ .ID }}</td>
+      <td>{{ .DriverID }}</td>
+      <td>{{ .Pickup }}</td>
+      <td>{{ .Dropoff }}</td>
+      <td>{{ .Status }}</td>
+      <td>{{ .Fare }}</td>
+      <td><a href="/admin/panel/rides/{{ .ID }}">Open</a></td>
+    </tr>
+  {{ end }}
+  </tbody>
+</table>
+{{ end }}

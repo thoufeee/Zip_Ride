@@ -1,0 +1,14 @@
+{{ define "admin/dashboard.html" }}
+{{ template "base" . }}
+{{ end }}
+{{ define "title" }}Dashboard{{ end }}
+{{ define "content" }}
+<h1>Dashboard</h1>
+<div class="cards">
+  <div class="card"><div class="card-title">Total Drivers</div><div class="card-value">{{ .Totals.TotalDrivers }}</div></div>
+  <div class="card"><div class="card-title">Active Drivers</div><div class="card-value">{{ .Totals.ActiveDrivers }}</div></div>
+  <div class="card"><div class="card-title">Pending Verifications</div><div class="card-value">{{ .Totals.PendingDrivers }}</div></div>
+  <div class="card"><div class="card-title">Total Rides</div><div class="card-value">{{ .Totals.TotalRides }}</div></div>
+  <div class="card"><div class="card-title">Total Earnings</div><div class="card-value">₹ {{ .Totals.TotalEarnings }}</div></div>
+</div>
+{{ end }}

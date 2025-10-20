@@ -43,6 +43,7 @@ func InitPostgres(cfg *config.Config, log *zap.Logger) (*gorm.DB, error) {
 		&models.Permission{},
 		&models.RolePermission{},
 		&models.UserRole{},
+		&models.Rider{},
 	); err != nil {
 		return nil, err
 	}
