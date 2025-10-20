@@ -28,10 +28,11 @@ func VehicleFareCreation(c *gin.Context) {
 	}
 
 	// Basic validation
-	if fare.VehicleType == "" || fare.BaseFare <= 0 || fare.PerKmRate <= 0 || fare.PerMinRate <= 0 || fare.PeopleCount <=0{
-		c.JSON(http.StatusBadRequest, gin.H{"error": "All fare fields are required and must be valid"})
-		return
-	}
+	if fare.VehicleType == "" || fare.BaseFare <= 0 || fare.PerKmRate <= 0 || fare.PeopleCount <= 0 {
+    c.JSON(http.StatusBadRequest, gin.H{"error": "All fare fields are required and must be valid"})
+    return
+}
+
 
 	// Save to database
 	if err := database.DB.Create(&fare).Error; err != nil {
