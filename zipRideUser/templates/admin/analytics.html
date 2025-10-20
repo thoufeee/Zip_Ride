@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Analytics Dashboard</title>
+  <link rel="stylesheet" href="analytics.css">
+   <link rel="stylesheet" href="createadmin.css">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+
+ <!-- Navbar -->
+  <div id="navbar"></div>
+
+  <!-- Page Container -->
+  <div class="main-container">
+    <header>
+      <h1 id="page-title">Analytics Dashboard</h1>
+    </header>
+
+    <section id="content-area" class="content-area">
+      <!-- Chart containers -->
+      <div class="chart-grid">
+        <div class="chart-box">
+          <canvas id="monthlyBookingsChart"></canvas>
+        </div>
+        <div class="chart-box">
+          <canvas id="weeklyBookingsChart"></canvas>
+        </div>
+        <div class="chart-box">
+          <canvas id="dailyBookingsChart"></canvas>
+        </div>
+        <div class="chart-box">
+          <canvas id="revenueChart"></canvas>
+        </div>
+      </div>
+    </section>
+  </div>
+
+  <!-- Footer -->
+ <div id="footer"></div>
+
+  <!-- JavaScript -->
+  <script src="chart.js"></script>
+</body>
+</html>

@@ -7,6 +7,7 @@ import (
 	staffmanagment "zipride/internal/domain/user_Admin/staffManagment"
 	"zipride/internal/domain/user_Admin/staffManagment/controllers"
 	services "zipride/internal/domain/user_Admin/userManagment/controllers"
+	vehiclemanagement "zipride/internal/domain/user_Admin/vehicleManagement"
 	"zipride/internal/middleware"
 
 	"github.com/gin-gonic/gin"
@@ -19,10 +20,13 @@ func SuperAdminRoutes(c *gin.Engine) {
 	admin := c.Group("/admin")
 
 	admin.Use(middleware.JwtValidation())
-	admin.Use(middleware.RoleCheck(constants.RoleSuperAdmin))
+	admin.Use(middleware.RoleCheck(constants.RoleSuperAdmin, constants.RoleManager, constants.RoleStaff))
+
+	// verify route
+	admin.GET("/verify", allpermission.Verify)
 
 	// admin || staff || manager profile
-	admin.POST("/profile", staffmanagment.StaffProfile)
+	admin.GET("/profile", staffmanagment.StaffProfile)
 
 	//user management
 	admin.GET("/allusers", middleware.RequirePermission(constants.PermissionViewUsers), services.GetAllUsers)
@@ -36,10 +40,21 @@ func SuperAdminRoutes(c *gin.Engine) {
 	admin.GET("/allstaffs", middleware.RequirePermission(constants.PermissionViewStaffs), controllers.GETAllStaff)
 	admin.POST("/createstaff", middleware.RequirePermission(constants.PermissionAddStaff), controllers.CreateStaff)
 	admin.PUT("/staffupdate/:id", middleware.RequirePermission(constants.PermissionEditStaff), controllers.UpdateStaff)
-	admin.DELETE("/staffdelete/:id", middleware.RequirePermission(constants.PermissionDeleteStaff), controllers.UpdateStaff)
+	admin.DELETE("/staffdelete/:id", middleware.RequirePermission(constants.PermissionDeleteStaff), controllers.DeleteStaff)
+	admin.PUT("/staffblock/:id", middleware.RequirePermission(constants.PermissionBlockStaff), controllers.BlockStaff)
+	// admin.PUT("/staffunblock/:id", middleware.RequirePermission(constants.PermissionUnBlockStaff), controllers.UnblockStaff)
 
 	//route for all permissions && roles
 	admin.GET("/allpermissions", middleware.RequirePermission(constants.ViewAllPermissions), allpermission.Permissions)
 	admin.GET("/allroles", middleware.RequirePermission(constants.PermissionViewAllRoles), allpermission.AllRoles)
 
+	// Vehicle Fare Management (SuperAdmin / Manager)
+	vehicleFare := admin.Group("/vehiclefare")
+	{
+		vehicleFare.POST("/", middleware.RequirePermission(constants.ViewAllPermissions), vehiclemanagement.VehicleFareCreation)
+		vehicleFare.GET("/", middleware.RequirePermission(constants.ViewAllPermissions), vehiclemanagement.GetAllVehicleFares)
+		vehicleFare.GET("/:id", middleware.RequirePermission(constants.ViewAllPermissions), vehiclemanagement.GetVehicleFareByID)
+		vehicleFare.PUT("/:id", middleware.RequirePermission(constants.ViewAllPermissions), vehiclemanagement.UpdateVehicleFare)
+		vehicleFare.DELETE("/:id", middleware.RequirePermission(constants.ViewAllPermissions), vehiclemanagement.DeleteVehicleFare)
+	}
 }

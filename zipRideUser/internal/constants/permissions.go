@@ -3,7 +3,7 @@ package constants
 // permission for admins
 
 const (
-
+	 PermissionAddManager = "add_manager"
 	// user managment
 	PermissionViewUsers   = "VIEW_USERS"
 	PermissionAddUser     = "ADD_USER"
@@ -22,11 +22,13 @@ const (
 
 	// manager managment
 	PermissionViewManagers   = "VIEW_MANAGERS"
-	PermissionAddManager     = "ADD_MANAGER"
 	PermissionEditManager    = "EDIT_MANAGER"
 	PermissionDeleteManager  = "DELETE_MANAGER"
 	PermissionBlockManager   = "BLOCK_MANAGER"
 	PermissionUnBlockManager = "UNBLOCK_MANAGER"
+
+	// booking managment
+	PermissionScheduleBooking = "SCHEDULED_BOOKINGS_VIEW"
 
 	//  Reports
 	PermissionViewReports = "VIEW_REPORTS"

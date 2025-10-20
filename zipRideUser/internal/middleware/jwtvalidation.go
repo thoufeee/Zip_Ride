@@ -65,6 +65,7 @@ func JwtValidation() gin.HandlerFunc {
 			)
 
 			c.Set("permissions", perms)
+			c.Set("admin", admin)
 		}
 
 		c.Next()

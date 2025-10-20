@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin Dashboard</title>
+  <link rel="stylesheet" href="admindash.css">
+  <link rel="stylesheet" href="footer.css">
+  <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body>
+  <!-- Navbar -->
+  <div id="navbar"></div>
+
+  <!-- Main Content -->
+  <main class="main-content">
+    <header>
+      <h1 id="page-title">Welcome, Admin</h1>
+    </header>
+
+    <section id="content-area">
+      <div class="summary-section">
+        <div class="summary-card">
+          <h3>Total Users</h3>
+          <p id="user-count">0</p>
+        </div>
+        <div class="summary-card">
+          <h3>Total Staff</h3>
+          <p id="staff-count">0</p>
+        </div>
+        <div class="summary-card">
+          <h3>Total Managers</h3>
+          <p id="manager-count">0</p>
+        </div>
+      </div>
+
+      <div class="table-section">
+        <h2>Recent Booking History</h2>
+        <table class="order-table">
+          <thead>
+            <tr>
+              <th>Booking ID</th>
+              <th>User</th>
+              <th>Service</th>
+              <th>Status</th>
+              <th>Date</th>
+            </tr>
+          </thead>
+          <tbody id="booking-history-body"></tbody>
+        </table>
+      </div>
+    </section>
+  </main>
+
+  <!-- Footer -->
+  <footer id="footer"></footer>
+
+  <!-- JS -->
+  <script type="module" src="admindash.js"></script>
+</body>
+</html>
