@@ -14,11 +14,6 @@ import (
 func UnblockStaff(c *gin.Context) {
 	idstr := c.Param("id")
 
-	if idstr == "" {
-		c.JSON(http.StatusBadRequest, gin.H{"err": "staff id required"})
-		return
-	}
-
 	id, err := strconv.ParseUint(idstr, 10, 64)
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"err": "invalid staff id"})
@@ -27,7 +22,7 @@ func UnblockStaff(c *gin.Context) {
 
 	var staff models.Admin
 
-	if err := database.DB.Where("id = ? AND role_id = ?", uint(id), constants.Staff).First(&staff).Error; err != nil {
+	if err := database.DB.Where("id = ? AND role = ?", id, constants.RoleAdmin).First(&staff).Error; err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"err": "staff not found"})
 		return
 	}
