@@ -6,89 +6,132 @@
   <title>Admin Dashboard</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@100..900&display=swap" rel="stylesheet">
+  <style>
+    body {
+      font-family: 'Inter', sans-serif;
+    }
+  </style>
 </head>
 
-<body class="bg-gray-100 flex">
+<body class="bg-gray-50 text-gray-800 flex">
 
-  <!-- Sidebar -->
-  <aside class="w-64 bg-gray-800 text-white min-h-screen flex flex-col fixed">
-    <div class="p-4 text-center border-b border-gray-700">
-      <h2 class="text-2xl font-bold">Admin Panel</h2>
+  <aside class="w-72 bg-cyan-800 text-white min-h-screen flex flex-col fixed shadow-2xl">
+    <div class="p-6 text-center border-b border-cyan-700">
+      <h2 class="text-2xl font-extrabold tracking-wider">Admin<span class="text-cyan-300">Panel</span></h2>
     </div>
+
     <nav class="flex-1 p-4 space-y-2">
-      <a href="admindash.html" class="block px-4 py-2 rounded hover:bg-gray-700 bg-gray-700">Dashboard</a>
-      <a href="analytics.html" class="block px-4 py-2 rounded hover:bg-gray-700">Analytics Dashboard</a>
-      <a href="usermanagment.html" class="block px-4 py-2 rounded hover:bg-gray-700">User Management</a>
-      <a href="staffmanagment.html" class="block px-4 py-2 rounded hover:bg-gray-700">Staff Management</a>
-      <a href="managermanagment.html" class="block px-4 py-2 rounded hover:bg-gray-700">Manager Management</a>
-      <a href="createadmin.html" class="block px-4 py-2 rounded hover:bg-gray-700">Create Admin</a>
-      <a href="scheduleBooking.html" class="block px-4 py-2 rounded hover:bg-gray-700">Booking Management</a>
-      <a href="systemSettings.html" class="block px-4 py-2 rounded hover:bg-gray-700">System Settings</a>
+      <a href="admindash.html" class="flex items-center px-4 py-3 rounded-xl bg-cyan-600 font-semibold shadow-lg text-white transition duration-150">
+        <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-10v10a1 1 0 001 1h3m-6 0a1 1 0 001-1v-4a1 1 0 00-1-1H9m6 6h2"></path></svg>
+        Dashboard
+      </a>
+      <a href="analytics.html" class="flex items-center px-4 py-3 rounded-xl hover:bg-cyan-700 transition duration-150">
+        <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 8v8m-4-8v8m-4-8v8M4 16h16"></path></svg>
+        Analytics Dashboard
+      </a>
+      <a href="usermanagment.html" class="flex items-center px-4 py-3 rounded-xl hover:bg-cyan-700 transition duration-150">
+        <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H9a1 1 0 01-1-1v-1a4 4 0 004-4h.01M21 21h-6.326c-.783-1.428-1.571-2.846-2.355-4.274l-.001-.001C10.748 15.654 9.959 14.234 9.176 12.809M10.772 20.354L10.772 20.354"></path></svg>
+        User Management
+      </a>
+      <a href="adminmanagment.html" class="flex items-center px-4 py-3 rounded-xl hover:bg-cyan-700 transition duration-150">
+        <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5m-5 0a2 2 0 01-2-2V9a2 2 0 012-2h5m-5 0V9a2 2 0 002 2h5m-2-2v5a2 2 0 01-2 2H9a2 2 0 01-2-2V7a2 2 0 012-2h5a2 2 0 012 2v5"></path></svg>
+        Admin Management
+      </a>
+      <a href="createadmin.html" class="flex items-center px-4 py-3 rounded-xl hover:bg-cyan-700 transition duration-150">
+        <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z"></path></svg>
+        Create Access Account
+      </a>
+      <a href="bookingmanagment.html" class="flex items-center px-4 py-3 rounded-xl hover:bg-cyan-700 transition duration-150">
+        <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
+        Booking Management
+      </a>
+     <a href="schedulebooking.html" class="flex items-center px-4 py-3 rounded-xl hover:bg-cyan-700 transition duration-150">
+      <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+         Schedule Booking
+          </a>
+      <a href="systemSettings.html" class="flex items-center px-4 py-3 rounded-xl hover:bg-cyan-700 transition duration-150">
+        <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.945 3.31.83 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.945 1.543-.83 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.945-3.31-.83-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.945-1.543.83-3.31 2.37-2.37a1.724 1.724 0 002.572-1.065z"></path></svg>
+        System Settings
+      </a>
     </nav>
 
-    <div class="p-4 border-t border-gray-700">
-      <button id="logout-btn" class="w-full bg-red-600 hover:bg-red-700 py-2 rounded font-semibold">Logout</button>
+    <div class="p-6 border-t border-cyan-700">
+      <button id="logout-btn" class="w-full bg-red-600 hover:bg-red-700 py-3 rounded-xl font-bold transition duration-200 shadow-md hover:shadow-lg">
+        Logout
+      </button>
     </div>
   </aside>
 
-  <!-- Main Content -->
-  <div class="flex-1 ml-64 p-8">
-    <header class="mb-10 text-center">
-      <h1 class="text-3xl font-extrabold text-gray-800">Welcome, Admin</h1>
-      <p class="text-gray-500 mt-2">Monitor and manage your platform efficiently</p>
+  <div class="flex-1 ml-72 p-10 lg:p-12">
+    <header class="mb-10">
+     
     </header>
 
-    <!-- Stats Section -->
-    <section class="grid gap-6 md:grid-cols-3 mb-10">
-      <div class="bg-white rounded-xl shadow-md p-6 text-center hover:shadow-lg transition">
-        <h3 class="text-gray-500 font-semibold mb-2">Total Users</h3>
-        <p id="user-count" class="text-3xl font-bold text-gray-800">0</p>
+    <section class="grid gap-8 md:grid-cols-3 mb-12">
+      <div class="bg-white rounded-xl shadow-xl p-8 text-left border-t-4 border-cyan-500 hover:shadow-2xl transition duration-300">
+        <h3 class="text-gray-500 font-bold mb-2 uppercase text-sm tracking-wider">Total Users</h3>
+        <p id="user-count" class="text-4xl font-extrabold text-cyan-600">0</p>
       </div>
-      <div class="bg-white rounded-xl shadow-md p-6 text-center hover:shadow-lg transition">
-        <h3 class="text-gray-500 font-semibold mb-2">Total Staff</h3>
-        <p id="staff-count" class="text-3xl font-bold text-gray-800">0</p>
+      <div class="bg-white rounded-xl shadow-xl p-8 text-left border-t-4 border-cyan-500 hover:shadow-2xl transition duration-300">
+        <h3 class="text-gray-500 font-bold mb-2 uppercase text-sm tracking-wider">Total Lastest Users</h3>
+        <p id="staff-count" class="text-4xl font-extrabold text-cyan-600">0</p>
       </div>
-      <div class="bg-white rounded-xl shadow-md p-6 text-center hover:shadow-lg transition">
-        <h3 class="text-gray-500 font-semibold mb-2">Total Managers</h3>
-        <p id="manager-count" class="text-3xl font-bold text-gray-800">0</p>
+      <div class="bg-white rounded-xl shadow-xl p-8 text-left border-t-4 border-cyan-500 hover:shadow-2xl transition duration-300">
+        <h3 class="text-gray-500 font-bold mb-2 uppercase text-sm tracking-wider">TODAYS Total BOOKINGS</h3>
+        <p id="manager-count" class="text-4xl font-extrabold text-cyan-600">0</p>
       </div>
     </section>
 
-    <!-- Booking History -->
-    <section class="bg-white rounded-xl shadow-md p-6">
-      <h2 class="text-2xl font-semibold text-gray-800 mb-6 border-b pb-2">Recent Booking History</h2>
+    <section class="bg-white rounded-xl shadow-2xl p-8 border border-gray-100">
+      <h2 class="text-2xl font-bold text-gray-800 mb-6 border-b pb-3">Recent Booking History</h2>
       <div class="overflow-x-auto">
         <table class="min-w-full divide-y divide-gray-200">
-          <thead class="bg-gray-50">
-            <tr>
-              <th class="px-6 py-3 text-left text-sm font-semibold text-gray-600">Booking ID</th>
-              <th class="px-6 py-3 text-left text-sm font-semibold text-gray-600">User</th>
-              <th class="px-6 py-3 text-left text-sm font-semibold text-gray-600">Service</th>
-              <th class="px-6 py-3 text-left text-sm font-semibold text-gray-600">Status</th>
-              <th class="px-6 py-3 text-left text-sm font-semibold text-gray-600">Date</th>
+          <thead class="bg-cyan-50"> <tr>
+              <th class="px-6 py-4 text-left text-xs font-bold text-cyan-800 uppercase tracking-wider">Booking ID</th>
+              <th class="px-6 py-4 text-left text-xs font-bold text-cyan-800 uppercase tracking-wider">User</th>
+              <th class="px-6 py-4 text-left text-xs font-bold text-cyan-800 uppercase tracking-wider">Service</th>
+              <th class="px-6 py-4 text-left text-xs font-bold text-cyan-800 uppercase tracking-wider">Status</th>
+              <th class="px-6 py-4 text-left text-xs font-bold text-cyan-800 uppercase tracking-wider">Date</th>
             </tr>
           </thead>
-          <tbody id="booking-history-body" class="bg-white divide-y divide-gray-200 text-sm">
-            <!-- Dynamic rows inserted via JS -->
-          </tbody>
+          <tbody id="booking-history-body" class="bg-white divide-y divide-gray-100 text-sm">
+            <tr class="hover:bg-gray-50 transition duration-150">
+              <td class="px-6 py-4 whitespace-nowrap font-medium text-gray-900">#BK-9021</td>
+              <td class="px-6 py-4 whitespace-nowrap text-gray-600">Alice Smith</td>
+              <td class="px-6 py-4 whitespace-nowrap text-gray-600">Deep Cleaning</td>
+              <td class="px-6 py-4 whitespace-nowrap">
+                  <span class="px-3 py-1 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">Completed</span>
+              </td>
+              <td class="px-6 py-4 whitespace-nowrap text-gray-500">2025-10-15</td>
+            </tr>
+            <tr class="hover:bg-gray-50 transition duration-150">
+              <td class="px-6 py-4 whitespace-nowrap font-medium text-gray-900">#BK-9022</td>
+              <td class="px-6 py-4 whitespace-nowrap text-gray-600">John Brown</td>
+              <td class="px-6 py-4 whitespace-nowrap text-gray-600">Car Wash</td>
+              <td class="px-6 py-4 whitespace-nowrap">
+                  <span class="px-3 py-1 inline-flex text-xs leading-5 font-semibold rounded-full bg-yellow-100 text-yellow-800">Pending</span>
+              </td>
+              <td class="px-6 py-4 whitespace-nowrap text-gray-500">2025-10-16</td>
+            </tr>
+            <tr class="hover:bg-gray-50 transition duration-150">
+              <td class="px-6 py-4 whitespace-nowrap font-medium text-gray-900">#BK-9023</td>
+              <td class="px-6 py-4 whitespace-nowrap text-gray-600">Sarah Lee</td>
+              <td class="px-6 py-4 whitespace-nowrap text-gray-600">Oil Change</td>
+              <td class="px-6 py-4 whitespace-nowrap">
+                  <span class="px-3 py-1 inline-flex text-xs leading-5 font-semibold rounded-full bg-blue-100 text-blue-800">Scheduled</span>
+              </td>
+              <td class="px-6 py-4 whitespace-nowrap text-gray-500">2025-10-17</td>
+            </tr>
+            </tbody>
         </table>
       </div>
     </section>
 
-    <footer class="mt-10 text-center text-gray-500 text-sm">
+    <footer class="mt-16 text-center text-gray-400 text-sm">
       &copy; 2025 Admin Panel. All rights reserved.
     </footer>
   </div>
-
-  <script>
-    // Logout functionality
-    document.getElementById("logout-btn").addEventListener("click", () => {
-      localStorage.removeItem("accessToken");
-      localStorage.removeItem("refreshToken");
-      localStorage.removeItem("role");
-      window.location.href = "signin.html";
-    });
-  </script>
 
   <script type="module" src="admindash.js"></script>
 </body>
