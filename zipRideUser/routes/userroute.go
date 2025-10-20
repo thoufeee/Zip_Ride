@@ -2,10 +2,11 @@ package routes
 
 import (
 	"zipride/internal/constants"
-	"zipride/internal/domain/bookingmodule/handlers"
+	"zipride/internal/domain/booking_module/handlers"
+	chathandler "zipride/internal/domain/chat/Chathandler"
 	"zipride/internal/domain/user/services"
 	"zipride/internal/middleware"
-	"zipride/internal/user_Auth/handlers"
+	authHandlers "zipride/internal/user_Auth/handlers"
 
 	"github.com/gin-gonic/gin"
 )
@@ -24,11 +25,17 @@ func UserRoutes(c *gin.Engine) {
 	user.PUT("/update", services.UpdateUserProfile)
 	user.DELETE("/delete", services.DeleteUserProfile)
 
-	//Booking module
-	user.POST("/booking/estimate", bookingmodule.EstimateFareHandler)
-	user.POST("/booking/now", bookingmodule.CreateBookingNowHandler)
-	user.POST("/booking/later", bookingmodule.CreateLaterBookingHandler)
+	//booking module
+	user.POST("/estimate", handlers.EstimateBooking)
+	user.POST("/now", handlers.CreateBookingNow)
+	user.POST("/later", handlers.CreateBookingLater)
+	user.POST("/cancel", handlers.CancelBookingHandler)
+	user.GET("/history", handlers.GetBookingHistoryHandler)
+
+	//Chat
+	user.GET("/chat/:id",chathandler.ChatWebSocket)
+
 	// logout
-	user.POST("/logout", handlers.UserLogout)
+	user.POST("/logout", authHandlers.UserLogout)
 
 }

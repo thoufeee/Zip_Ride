@@ -33,4 +33,7 @@ func PublicRoutes(c *gin.Engine) {
 	api.POST("/veryfy-otp", handlers.VerifyForgotOTP)
 	api.POST("/reset-password", handlers.ResetPassword)
 
+
+	
+
 }
