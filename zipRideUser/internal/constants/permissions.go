@@ -3,7 +3,7 @@ package constants
 // permission for admins
 
 const (
-
+	 PermissionAddManager = "add_manager"
 	// user managment
 	PermissionViewUsers   = "VIEW_USERS"
 	PermissionAddUser     = "ADD_USER"
