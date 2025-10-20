@@ -1,141 +1,167 @@
 
-import { loadNavbarFooter, hasPermission, verifyToken, verifyAdminAccess } from "./common.js";
+const BASE_URL = "http://localhost:8080/admin";
 
-async function initializeCreateAdmin() {
 
-  const roleSelect = document.getElementById("role");
-  const permissionsList = document.getElementById("permissions-list");
-  const addedPermissions = document.getElementById("added-permissions");
-  const form = document.getElementById("createAdminForm");
-  const messageContainer = document.getElementById("message-container");
-  const result = document.getElementById("result");
+const logoutBtn = document.getElementById("logout-btn");
+const form = document.getElementById("createAdminForm");
+const permissionsList = document.getElementById("permissions-list");
+const addedPermissions = document.getElementById("added-permissions");
+const result = document.getElementById("result");
 
-  const BASE_URL = "http://localhost:8080";
-  const token = localStorage.getItem("accessToken");
 
-  if (!token) {
-    alert("Unauthorized! Please log in.");
-    window.location.href = "signin.html";
+const accessToken = localStorage.getItem("accessToken");
+const userPermissions = JSON.parse(localStorage.getItem("permissions")) || [];
+
+
+if (!accessToken) {
+  window.location.href = "signin.html";
+}
+
+
+function hasPermission(requiredPermission) {
+  if (!userPermissions || userPermissions.length === 0) return false;
+  return userPermissions.some(
+    (p) => p.toUpperCase() === requiredPermission.toUpperCase()
+  );
+}
+
+
+if (!hasPermission("ADD_STAFF")) {
+  document.body.innerHTML = `
+    <div class="flex items-center justify-center h-screen">
+      <h2 class="text-xl font-semibold text-red-500">
+        Access Denied: You don't have permission to view this page.
+      </h2>
+    </div>
+  `;
+  throw new Error("Permission denied");
+}
+
+
+logoutBtn.addEventListener("click", () => {
+  localStorage.clear();
+  window.location.href = "signin.html";
+});
+
+
+axios.interceptors.response.use(
+  (response) => response,
+  (error) => {
+    if (error.response?.status === 401) {
+      
+      localStorage.clear();
+      window.location.href = "signin.html";
+    }
+    return Promise.reject(error);
+  }
+);
+
+
+async function fetchPermissions() {
+  try {
+    const res = await axios.get(`${BASE_URL}/allpermissions`, {
+      headers: { Authorization: `Bearer ${accessToken}` },
+    });
+
+    const permissions = res.data.res || [];
+    if (permissions.length === 0) {
+      permissionsList.innerHTML =
+        `<p class="text-gray-400 text-sm italic">No permissions available.</p>`;
+      return;
+    }
+
+    renderPermissions(permissions);
+  } catch (err) {
+    console.error("Error loading permissions:", err);
+    permissionsList.innerHTML =
+      `<p class="text-red-500 text-sm">Failed to load permissions.</p>`;
+  }
+}
+
+
+function renderPermissions(permissions) {
+  permissionsList.innerHTML = ""; 
+  permissions.forEach((perm) => {
+    const tag = document.createElement("span");
+    tag.textContent = perm.name.replace(/_/g, " "); 
+    tag.className =
+      "cursor-pointer bg-cyan-100 text-cyan-800 text-sm px-3 py-1 rounded-full font-medium hover:bg-cyan-200 transition";
+    tag.addEventListener("click", () => addPermission(perm.name));
+    permissionsList.appendChild(tag);
+  });
+}
+
+
+function addPermission(permissionName) {
+
+  if (
+    [...addedPermissions.children].some(
+      (el) => el.textContent.replace(/\s/g, "_") === permissionName
+    )
+  )
+    return;
+
+  const tag = document.createElement("span");
+  tag.textContent = permissionName.replace(/_/g, " "); 
+  tag.className =
+    "bg-cyan-600 text-white text-sm px-3 py-1 rounded-full font-medium cursor-pointer hover:bg-cyan-700 transition";
+  tag.addEventListener("click", () => tag.remove());
+  addedPermissions.appendChild(tag);
+}
+
+
+form.addEventListener("submit", async (e) => {
+  e.preventDefault();
+  result.textContent = "";
+  result.className = "";
+
+  const name = document.getElementById("name").value.trim();
+  const email = document.getElementById("email").value.trim();
+  const phone = document.getElementById("phone").value.trim();
+  const password = document.getElementById("password").value.trim();
+  const permissions = [...addedPermissions.children].map((el) =>
+    el.textContent.replace(/\s/g, "_")
+  );
+
+  if (!name || !email || !phone || !password) {
+    result.textContent = "Please fill all fields.";
+    result.className = "text-red-600 text-sm";
     return;
   }
 
-if (!hasPermission("ADD_STAFF")) {
-  const formParent = form.parentElement; 
-  if (formParent) {
-    formParent.innerHTML = "<p style='color:red; text-align:center;'>You don’t have permission to access this page.</p>";
-  } else {
-    form.style.display = "none";
-    console.error("You don’t have permission to access this page.");
-  }
-  return;
-}
-  const api = axios.create({
-    baseURL: BASE_URL,
-    headers: {
-      Authorization: `Bearer ${token}`,
-      "Content-Type": "application/json"
-    }
-  });
-
- 
-  async function fetchRoles() {
-    try {
-      const res = await api.get("/admin/allroles");
-      const roles = res.data.res || [];
-      roleSelect.innerHTML = `<option value="">-- Select Role --</option>`;
-      roles.forEach(role => {
-        const name = role.name || role.role_name || role.Name;
-        if (name) {
-          const option = document.createElement("option");
-          option.value = name;
-          option.textContent = name;
-          roleSelect.appendChild(option);
-        }
-      });
-    } catch (err) {
-      console.error("Failed to fetch roles:", err);
-      roleSelect.innerHTML = `<option value="">Error loading roles</option>`;
-    }
+  if (permissions.length === 0) {
+    result.textContent = "Select at least one permission.";
+    result.className = "text-red-600 text-sm";
+    return;
   }
 
-  async function fetchPermissions() {
-    try {
-      const res = await api.get("/admin/allpermissions");
-      const permissions = res.data.permissions || res.data.res || res.data.data || [];
-      permissionsList.innerHTML = "";
+  const payload = {
+    name,
+    email,
+    phonenumber: phone,
+    password,
+    extra_permissions: permissions,
+  };
 
-      if (!permissions.length) {
-        permissionsList.innerHTML = "<p style='color:red;'>No permissions found.</p>";
-        return;
-      }
+  try {
+    const res = await axios.post(`${BASE_URL}/createstaff`, payload, {
+      headers: { Authorization: `Bearer ${accessToken}` },
+    });
 
-      permissions.forEach(perm => {
-        const permName = typeof perm === "string" ? perm : (perm.name || perm.permission_name);
-        if (permName) {
-          const div = document.createElement("div");
-          div.classList.add("permission-item");
-          div.textContent = permName;
-          div.addEventListener("click", () => addPermission(permName));
-          permissionsList.appendChild(div);
-        }
-      });
-    } catch (err) {
-      console.error("Failed to fetch permissions:", err);
-      permissionsList.innerHTML = "<p style='color:red;'>Failed to load permissions.</p>";
-    }
+    result.textContent = res.data.message || "Account created successfully!";
+    result.className = "text-green-600 font-semibold text-center pt-4";
+
+    form.reset();
+    addedPermissions.innerHTML = `<p class="text-gray-400 text-sm italic">
+      Click an available permission to add it.
+    </p>`;
+  } catch (err) {
+    console.error("Error creating account:", err);
+    result.textContent =
+      err.response?.data?.error || "Failed to create account.";
+    result.className = "text-red-600 text-sm";
   }
-
- 
-  function addPermission(name) {
-    const placeholder = addedPermissions.querySelector(".placeholder");
-    if (placeholder) placeholder.remove();
-    if ([...addedPermissions.children].some(p => p.textContent === name)) return;
-
-    const tag = document.createElement("span");
-    tag.classList.add("perm-tag");
-    tag.textContent = name;
-    tag.title = "Click to remove";
-    tag.addEventListener("click", () => tag.remove());
-    addedPermissions.appendChild(tag);
-  }
-
-  
-  form.addEventListener("submit", async e => {
-    e.preventDefault();
-    const selectedPermissions = [...addedPermissions.children].map(p => p.textContent);
-
-    const payload = {
-      name: form.name.value,
-      email: form.email.value,
-      phonenumber: form.phone.value,
-      password: form.password.value,
-      role: form.role.value,
-      extra_permissions: selectedPermissions
-    };
-
-    try {
-      await api.post("/admin/createstaff", payload);
-      result.textContent = " Admin created successfully!";
-      result.style.color = "green";
-      form.reset();
-      addedPermissions.innerHTML = `<p class="placeholder">No permissions selected yet.</p>`;
-    } catch (err) {
-      console.error(err);
-      result.textContent = err.response?.data?.err || " Failed to create admin.";
-      result.style.color = "red";
-    }
-  });
-
-  
-  await Promise.all([fetchRoles(), fetchPermissions()]);
-}
-
-
-document.addEventListener("DOMContentLoaded", async () => {
-  await loadNavbarFooter();
-
-  const tokenExists = verifyToken();
-  if (!tokenExists) return;
-
-  initializeCreateAdmin();
 });
+
+
+fetchPermissions();
