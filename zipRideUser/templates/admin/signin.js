@@ -5,7 +5,6 @@ document.getElementById("signinForm").addEventListener("submit", async function 
     const password = document.getElementById("password").value.trim();
     const errorMsg = document.getElementById("errorMsg");
 
-   
     errorMsg.textContent = "";
 
     if (!email || !password) {
@@ -16,53 +15,36 @@ document.getElementById("signinForm").addEventListener("submit", async function 
     try {
         const response = await axios.post("http://localhost:8080/signin", { email, password });
 
-        console.log("Signin Response:", response.data); 
+        console.log("Signin Response:", response.data);
 
-       
         const access = response.data.access;
         const refresh = response.data.refresh;
         const role = response.data.role ? response.data.role.toUpperCase() : null;
+        const permissions = response.data.permissions || []; // default to empty array if null
 
-        if (!access || !refresh || !role) {
-            errorMsg.textContent = "Login failed: tokens or role not received.";
+        if (!access || !refresh) {
+            errorMsg.textContent = "Login failed: tokens not received.";
             return;
         }
 
-        
+        // Save to localStorage
         localStorage.setItem("accessToken", access);
         localStorage.setItem("refreshToken", refresh);
-        localStorage.setItem("role", role);
-        localStorage.setItem("permissions", JSON.stringify(response.data.permissions || []));
+        localStorage.setItem("role", role || ""); // role can be empty
+        localStorage.setItem("permissions", JSON.stringify(permissions));
 
-        
-        switch (role) {
-            case "SUPER_ADMIN":
-                window.location.href = "admindash.html";
-                return;
-            case "MANAGER":
-                window.location.href = "admindash.html";
-                return;
-            case "STAFF":
-                window.location.href = "admindash.html";
-                return;
-            default:
-                errorMsg.textContent = "Unknown role. Contact system admin.";
-                return;
-        }
+        // Redirect all users to ACL-based dashboard
+        window.location.href = "admindash.html";
 
     } catch (err) {
         console.error("Signin Error:", err);
 
-       
         if (err.response) {
-            
             const data = err.response.data;
             errorMsg.textContent = data.err || data.res || "Login failed";
         } else if (err.request) {
-           
             errorMsg.textContent = "No response from server. Try again later.";
         } else {
-            
             errorMsg.textContent = "An unexpected error occurred.";
         }
     }
