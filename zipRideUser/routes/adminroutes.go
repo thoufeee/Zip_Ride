@@ -51,10 +51,10 @@ func SuperAdminRoutes(c *gin.Engine) {
 	// Vehicle Fare Management (SuperAdmin / Manager)
 	vehicleFare := admin.Group("/vehiclefare")
 	{
-		vehicleFare.POST("/", middleware.RequirePermission(constants.ViewAllPermissions), vehiclemanagement.VehicleFareCreation)
-		vehicleFare.GET("/", middleware.RequirePermission(constants.ViewAllPermissions), vehiclemanagement.GetAllVehicleFares)
-		vehicleFare.GET("/:id", middleware.RequirePermission(constants.ViewAllPermissions), vehiclemanagement.GetVehicleFareByID)
-		vehicleFare.PUT("/:id", middleware.RequirePermission(constants.ViewAllPermissions), vehiclemanagement.UpdateVehicleFare)
-		vehicleFare.DELETE("/:id", middleware.RequirePermission(constants.ViewAllPermissions), vehiclemanagement.DeleteVehicleFare)
+		vehicleFare.POST("/",  vehiclemanagement.VehicleFareCreation)
+		vehicleFare.GET("/",  vehiclemanagement.GetAllVehicleFares)
+		vehicleFare.PUT("/:id",vehiclemanagement.UpdateVehicleFare)
+		vehicleFare.DELETE("/:id",vehiclemanagement.DeleteVehicleFare)
+
 	}
 }
