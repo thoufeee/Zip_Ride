@@ -15,7 +15,6 @@ import (
 )
 
 // ptrTime → returns a pointer to a time.Time
-// Useful when we want to assign a time value to a struct field that expects *time.Time
 func ptrTime(t time.Time) *time.Time {
 	return &t
 }
@@ -23,10 +22,7 @@ func ptrTime(t time.Time) *time.Time {
 // -------------------- Helper Functions --------------------
 
 // createBooking → handles both instant and scheduled bookings
-// @params:
-//   c          → Gin context to handle HTTP request/response
-//   req        → user booking request payload
-//   scheduleAt → if user schedules a ride later, pointer to scheduled time, else nil
+
 func createBooking(c *gin.Context, req models.CreateBookingRequest, scheduleAt *time.Time) {
 	userID := middleware.GetUserID(c) // get current logged-in user's ID from JWT/session
 
@@ -109,7 +105,6 @@ func createBooking(c *gin.Context, req models.CreateBookingRequest, scheduleAt *
 // -------------------- Handlers --------------------
 
 // EstimateBooking → estimates distance, duration, and fares for vehicles
-// Mimics Uber's production-style response
 func EstimateBooking(c *gin.Context) {
 	var req models.EstimateRequest
 	if err := c.ShouldBindJSON(&req); err != nil {
