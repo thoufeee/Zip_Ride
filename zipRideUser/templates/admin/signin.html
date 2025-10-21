@@ -1,29 +1,53 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Admin Sign In</title>
-    <link rel="stylesheet" href="signin.css">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin Sign In</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
 </head>
-<body>
-    <div class="container">
-        <h2>SIGN IN</h2>
-        <form id="signinForm">
-            <div class="form-group">
-                <label for="email">Email</label>
-                <input type="email" id="email" placeholder="Enter your email" required>
+<body class="bg-gray-100 flex items-center justify-center min-h-screen p-4">
+
+   
+    <div class="bg-white rounded-2xl shadow-xl p-8 w-full max-w-sm md:max-w-md transition-all duration-300 transform hover-shadow-3xl border border-gray-200">
+        
+        <h2 class="text-3xl font-extrabold text-gray-800 text-center mb-10 tracking-tight">
+            Admin Sign In
+        </h2>
+        
+        
+        <form id="signinForm" class="space-y-6">
+            
+
+            <div class="flex flex-col">
+                <label for="email" class="text-gray-700 font-medium mb-2 text-sm">Email Address</label>
+              
+                <input type="email" id="email" placeholder="admin@example.com" required
+                       class="border border-gray-300 rounded-lg p-3 focus:outline-none focus:ring-4 focus:ring-cyan-200 transition duration-150 ease-in-out hover:border-cyan-400">
             </div>
-            <div class="form-group">
-                <label for="password">Password</label>
-                <input type="password" id="password" placeholder="Enter your password" required>
+
+     
+            <div class="flex flex-col">
+                <label for="password" class="text-gray-700 font-medium mb-2 text-sm">Password</label>
+                
+                <input type="password" id="password" placeholder="••••••••" required
+                       class="border border-gray-300 rounded-lg p-3 focus:outline-none focus:ring-4 focus:ring-cyan-200 transition duration-150 ease-in-out hover:border-cyan-400">
             </div>
-            <button type="submit">Sign In</button>
-            <p id="errorMsg" class="error"></p>
+
+       
+            <p id="errorMsg" class="text-red-600 text-sm font-medium text-center h-5"></p>
+
+          
+            <button type="submit" id="submitButton"
+                    class="w-full bg-cyan-600 hover:bg-cyan-700 text-white font-semibold py-3 rounded-xl shadow-lg transition duration-200 ease-in-out transform active:scale-95 focus:outline-none focus:ring-4 focus:ring-cyan-300 focus:ring-opacity-70">
+                Sign In
+            </button>
+
         </form>
     </div>
 
-    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
-    <script src="signin.js"></script>
+         <script type="module" src="signin.js"></script>
+
 </body>
 </html>

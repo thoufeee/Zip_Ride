@@ -1,12 +1,15 @@
 package seeders
 
 import (
+	"encoding/json"
 	"log"
 	"os"
 	"zipride/database"
 	"zipride/internal/constants"
 	"zipride/internal/models"
 	"zipride/utils"
+
+	"gorm.io/datatypes"
 )
 
 // adding admin
@@ -23,18 +26,21 @@ func SeedAdmin() {
 		return
 	}
 
-	// super admin role
-	var supreRole models.Role
-	if err := database.DB.Where("name = ?", constants.RoleSuperAdmin).First(&supreRole).Error; err != nil {
-		log.Fatal("super admin role not found")
-		return
-	}
-
-	// permissions
 	var permissions []models.Permission
 	if err := database.DB.Find(&permissions).Error; err != nil {
 		log.Fatal("failed to fetch permissions")
 		return
+	}
+
+	var perms []string
+	for _, p := range permissions {
+		perms = append(perms, p.Name)
+	}
+
+	permsjson, err := json.Marshal(perms)
+
+	if err != nil {
+		log.Fatal("failed to marshal permissions")
 	}
 
 	hashpass, err := utils.GenerateHash(adminPassword)
@@ -45,11 +51,11 @@ func SeedAdmin() {
 	newadmin := &models.Admin{
 		Email:       adminEmail,
 		Password:    hashpass,
-		Permissions: permissions,
-		RoleID:      supreRole.ID,
+		Permissions: datatypes.JSON(permsjson),
+		Role:        constants.RoleSuperAdmin,
 	}
 
-	if err := database.DB.Create(&newadmin).Error; err != nil {
+	if err := database.DB.Create(newadmin).Error; err != nil {
 		log.Fatal("failed to create admin account")
 	}
 

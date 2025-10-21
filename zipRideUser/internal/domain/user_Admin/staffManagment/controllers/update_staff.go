@@ -1,6 +1,7 @@
 package controllers
 
 import (
+	"encoding/json"
 	"net/http"
 	"zipride/database"
 	"zipride/internal/constants"
@@ -10,6 +11,7 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
+// update admin profile
 func UpdateStaff(c *gin.Context) {
 	staffID := c.Param("id")
 	if staffID == "" {
@@ -18,16 +20,17 @@ func UpdateStaff(c *gin.Context) {
 	}
 
 	var staff models.Admin
-	if err := database.DB.Where("id = ? AND RoleID = ?", staffID, constants.RoleStaff).First(&staff).Error; err != nil {
+	if err := database.DB.Where("id = ? AND role = ?", staffID, constants.RoleAdmin).First(&staff).Error; err != nil {
 		c.JSON(http.StatusNotFound, gin.H{"error": "Staff not found"})
 		return
 	}
 
 	var input struct {
-		Name        string `json:"name" binding:"required"`
-		Email       string `json:"email" binding:"required"`
-		PhoneNumber string `json:"phonenumber" binding:"required"`
-		Password    string `json:"password"` // optional
+		Name        string   `json:"name"`
+		Email       string   `json:"email"`
+		PhoneNumber string   `json:"phonenumber"`
+		Password    string   `json:"password"`
+		ExtraPerms  []string `json:"extra_permissions"`
 	}
 
 	if err := c.ShouldBindJSON(&input); err != nil {
@@ -36,16 +39,18 @@ func UpdateStaff(c *gin.Context) {
 	}
 
 	// Validate email
-	if !utils.EmailCheck(input.Email) {
+	if input.Email != "" && !utils.EmailCheck(input.Email) {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid email format"})
 		return
 	}
 
-	// Normalize and validate phone number
-	phone, ok := utils.PhoneNumberCheck(input.PhoneNumber)
-	if !ok {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid phone number format"})
-		return
+	if input.PhoneNumber != "" {
+		phone, ok := utils.PhoneNumberCheck(input.PhoneNumber)
+		if !ok {
+			c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid phone number format"})
+			return
+		}
+		staff.PhoneNumber = phone
 	}
 
 	// Update password if provided
@@ -58,10 +63,43 @@ func UpdateStaff(c *gin.Context) {
 		staff.Password = hashed
 	}
 
-	// Update fields
-	staff.Name = input.Name
-	staff.Email = input.Email
-	staff.PhoneNumber = phone
+	if input.Name != "" {
+		staff.Name = input.Name
+	}
+
+	if len(input.ExtraPerms) > 0 {
+		var existing []string
+
+		if err := json.Unmarshal([]byte(staff.Permissions), &existing); err != nil {
+			existing = []string{}
+		}
+
+		perMap := make(map[string]bool)
+		for _, p := range existing {
+			{
+				perMap[p] = true
+			}
+		}
+
+		for _, p := range input.ExtraPerms {
+			if p != "Click an available permission to add it." {
+				perMap[p] = true
+			}
+		}
+
+		merged := []string{}
+		for p := range perMap {
+			merged = append(merged, p)
+		}
+
+		permjson, err := json.Marshal(merged)
+		if err != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{"err": "Failed to process permissions"})
+			return
+		}
+
+		staff.Permissions = permjson
+	}
 
 	if err := database.DB.Save(&staff).Error; err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to update staff"})
@@ -69,9 +107,8 @@ func UpdateStaff(c *gin.Context) {
 	}
 
 	c.JSON(http.StatusOK, gin.H{
-		"message":     "Staff updated successfully",
-		"Name":        staff.Name,
-		"Email":       staff.Email,
-		"PhoneNumber": staff.PhoneNumber,
+		"message": "Staff updated successfully",
+		"Name":    staff.Name,
+		"Email":   staff.Email,
 	})
 }

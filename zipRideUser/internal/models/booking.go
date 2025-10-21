@@ -25,7 +25,7 @@ type Booking struct {
 	CancelReason string     `json:"cancel_reason,omitempty"`
 	OTP          string     `json:"otp,omitempty"`
 	CreatedAt    time.Time  `json:"created_at"`
-	ScheduleAt  *time.Time `json:"schedule_at,omitempty"`
+	ScheduleAt   *time.Time `json:"schedule_at,omitempty"`
 	ScheduleDate string     `json:"schedule_date,omitempty"`
 	ScheduleTime string     `json:"schedule_time,omitempty"`
 
@@ -37,21 +37,23 @@ type Booking struct {
 	DriverLong  float64 `json:"driver_long,omitempty"`
 
 	// Ratings & feedback
-	Rating   *int    `json:"rating,omitempty"`   // 1–5
-	Feedback *string `json:"feedback,omitempty"` 
+	Rating   *int    `json:"rating,omitempty"`
+	Feedback *string `json:"feedback,omitempty"`
 }
 
 // CreateBookingRequest used in API requests
 type CreateBookingRequest struct {
-    PickupLat     float64    `json:"pickup_lat"`
-    PickupLong    float64    `json:"pickup_long"`
-    DropLat       float64    `json:"drop_lat"`
-    DropLong      float64    `json:"drop_long"`
-    VehicleType   string     `json:"vehicle_type"`
-    OTP           string     `json:"otp"`
-    ScheduleAt    *time.Time `json:"schedule_at"`
-    ScheduleDate  string     `json:"schedule_date"`
-    ScheduleTime  string     `json:"schedule_time"`
+	PickupLat    float64    `json:"pickup_lat"`
+	PickupLong   float64    `json:"pickup_long"`
+	DropLat      float64    `json:"drop_lat"`
+	DropLong     float64    `json:"drop_long"`
+	VehicleType  string     `json:"vehicle_type"`
+	Fare         float64    `json:"fare"`
+	OTP          string     `json:"otp"`
+	ScheduleAt   *time.Time `json:"schedule_at"`
+	ScheduleDate string     `json:"schedule_date"` // "2025-10-10"
+	ScheduleTime string     `json:"schedule_time"` // "10:00 AM"
+
 }
 
 // EstimateRequest used for distance/fare estimation

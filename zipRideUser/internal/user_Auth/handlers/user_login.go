@@ -1,6 +1,7 @@
 package handlers
 
 import (
+	"encoding/json"
 	"net/http"
 	"zipride/database"
 	"zipride/internal/models"
@@ -24,7 +25,7 @@ func SignIn(c *gin.Context) {
 	//    find admin
 	var admin models.Admin
 
-	if err := database.DB.Preload("Role").Preload("Permissions").Where("email = ?", data.Email).First(&admin).Error; err == nil {
+	if err := database.DB.Where("email = ?", data.Email).First(&admin).Error; err == nil {
 
 		if !utils.CheckPass(admin.Password, data.Password) {
 			c.JSON(http.StatusUnauthorized, gin.H{"err": "invalid email or password"})
@@ -36,10 +37,16 @@ func SignIn(c *gin.Context) {
 			return
 		}
 
-		perms := utils.PermissionToString(admin.Permissions)
+		var perms []string
+		if len(admin.Permissions) > 0 {
+			if err := json.Unmarshal(admin.Permissions, &perms); err != nil {
+				c.JSON(http.StatusInternalServerError, gin.H{"err": "failed to parse permissions"})
+				return
+			}
 
+		}
 		// generate access token
-		access, err := utils.GenerateAccess(admin.ID, admin.Email, admin.Role.Name, perms)
+		access, err := utils.GenerateAccess(admin.ID, admin.Email, admin.Role, perms)
 
 		if err != nil {
 			c.JSON(http.StatusInternalServerError, gin.H{"err": "failed to create access token"})
@@ -47,7 +54,7 @@ func SignIn(c *gin.Context) {
 		}
 
 		// generate access token
-		refresh, err := utils.GenerateAccess(admin.ID, admin.Email, admin.Role.Name, perms)
+		refresh, err := utils.GenerateAccess(admin.ID, admin.Email, admin.Role, perms)
 
 		if err != nil {
 			c.JSON(http.StatusInternalServerError, gin.H{"err": "failed to create refresh token"})
@@ -56,7 +63,7 @@ func SignIn(c *gin.Context) {
 
 		c.JSON(http.StatusOK, gin.H{
 			"res":         "Successfuly Logged",
-			"role":        admin.Role.Name,
+			"role":        admin.Role,
 			"access":      access,
 			"refresh":     refresh,
 			"permissions": perms,

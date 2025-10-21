@@ -10,9 +10,8 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-// block staff
-
-func BlockStaff(c *gin.Context) {
+// unblock staff
+func UnblockStaff(c *gin.Context) {
 	idstr := c.Param("id")
 
 	id, err := strconv.ParseUint(idstr, 10, 64)
@@ -23,17 +22,17 @@ func BlockStaff(c *gin.Context) {
 
 	var staff models.Admin
 
-	if err := database.DB.Where("id = ? AND role = ?", uint(id), constants.RoleAdmin).First(&staff).Error; err != nil {
+	if err := database.DB.Where("id = ? AND role = ?", id, constants.RoleAdmin).First(&staff).Error; err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"err": "staff not found"})
 		return
 	}
 
-	staff.Block = true
+	staff.Block = false
 
 	if err := database.DB.Save(&staff).Error; err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"err": "failed to save changes"})
 		return
 	}
 
-	c.JSON(http.StatusOK, gin.H{"res": "user blocked successfuly"})
+	c.JSON(http.StatusOK, gin.H{"res": "user unblocked successfuly"})
 }

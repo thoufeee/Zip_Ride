@@ -38,7 +38,7 @@ func createBooking(c *gin.Context, req models.CreateBookingRequest, scheduleAt *
 		return
 	}
 
-	// Calculate distance & duration using map service 
+	// Calculate distance & duration using map service
 	distance, durationSec, err := mapservice.GetRouteDistance(req.PickupLat, req.PickupLong, req.DropLat, req.DropLong)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
@@ -59,16 +59,16 @@ func createBooking(c *gin.Context, req models.CreateBookingRequest, scheduleAt *
 
 	now := time.Now()
 	booking := models.Booking{
-		UserID:      userID,
-		PickupLat:   req.PickupLat,
-		PickupLong:  req.PickupLong,
-		DropLat:     req.DropLat,
-		DropLong:    req.DropLong,
-		Vehicle:     req.VehicleType,
-		Fare:        math.Round(totalFare*100) / 100, // round to 2 decimals
-		Status:      models.StatusPending,            // initial booking status
-		CreatedAt:   now,
-		ScheduleAt:  scheduleAt,
+		UserID:     userID,
+		PickupLat:  req.PickupLat,
+		PickupLong: req.PickupLong,
+		DropLat:    req.DropLat,
+		DropLong:   req.DropLong,
+		Vehicle:    req.VehicleType,
+		Fare:       math.Round(totalFare*100) / 100, // round to 2 decimals
+		Status:     models.StatusPending,            // initial booking status
+		CreatedAt:  now,
+		ScheduleAt: scheduleAt,
 		ScheduleDate: func() string { // store date for easy querying/display
 			if scheduleAt != nil {
 				return scheduleAt.Format("2006-01-02")
@@ -133,17 +133,17 @@ func EstimateBooking(c *gin.Context) {
 		totalFare := fare.BaseFare + (fare.PerKmRate * distance) + (fare.PerMinRate * durationMin)
 
 		c.JSON(http.StatusOK, gin.H{
-			"distance":      fmt.Sprintf("%.2f km", distance),
-			"duration":      fmt.Sprintf("%d min %d sec", minutes, int(durationSec)%60),
-			"vehicle_type":  fare.VehicleType,
-			"base_fare":     fare.BaseFare,
-			"people_count":  fare.PeopleCount,
-			"per_km_rate":   fare.PerKmRate,
-			"per_min_rate":  fare.PerMinRate,
-			"total_fare":    math.Round(totalFare*100) / 100,
-			"currency":      "INR",
+			"distance":         fmt.Sprintf("%.2f km", distance),
+			"duration":         fmt.Sprintf("%d min %d sec", minutes, int(durationSec)%60),
+			"vehicle_type":     fare.VehicleType,
+			"base_fare":        fare.BaseFare,
+			"people_count":     fare.PeopleCount,
+			"per_km_rate":      fare.PerKmRate,
+			"per_min_rate":     fare.PerMinRate,
+			"total_fare":       math.Round(totalFare*100) / 100,
+			"currency":         "INR",
 			"surge_multiplier": 1.0,
-			"eta": 5, // dummy ETA (minutes for nearest driver)
+			"eta":              5, // dummy ETA (minutes for nearest driver)
 		})
 		return
 	}
@@ -157,26 +157,26 @@ func EstimateBooking(c *gin.Context) {
 
 	// Construct response array
 	type VehicleEstimate struct {
-		VehicleType     string  `json:"vehicle_type"`
-		TotalFare       float64 `json:"total_fare"`
-		BaseFare        float64 `json:"base_fare"`
-		PerKmRate       float64 `json:"per_km_rate"`
-		PerMinRate      float64 `json:"per_min_rate"`
-		Capacity        int     `json:"capacity"`
-		ETA             int     `json:"eta"` // minutes
+		VehicleType string  `json:"vehicle_type"`
+		TotalFare   float64 `json:"total_fare"`
+		BaseFare    float64 `json:"base_fare"`
+		PerKmRate   float64 `json:"per_km_rate"`
+		PerMinRate  float64 `json:"per_min_rate"`
+		Capacity    int     `json:"capacity"`
+		ETA         int     `json:"eta"` // minutes
 	}
 
 	results := make([]VehicleEstimate, 0, len(fares))
 	for _, f := range fares {
 		total := f.BaseFare + (f.PerKmRate * distance) + (f.PerMinRate * durationMin)
 		results = append(results, VehicleEstimate{
-			VehicleType:     f.VehicleType,
-			TotalFare:       math.Round(total*100) / 100,
-			BaseFare:        f.BaseFare,
-			PerKmRate:       f.PerKmRate,
-			PerMinRate:      f.PerMinRate,
-			Capacity:        f.PeopleCount,
-			ETA:             5, // dummy value, can calculate from driver location
+			VehicleType: f.VehicleType,
+			TotalFare:   math.Round(total*100) / 100,
+			BaseFare:    f.BaseFare,
+			PerKmRate:   f.PerKmRate,
+			PerMinRate:  f.PerMinRate,
+			Capacity:    f.PeopleCount,
+			ETA:         5, // dummy value, can calculate from driver location
 		})
 	}
 

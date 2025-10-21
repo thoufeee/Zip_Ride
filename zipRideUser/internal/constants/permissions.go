@@ -3,7 +3,8 @@ package constants
 // permission for admins
 
 const (
-	PermissionAddManager = "add_manager"
+	PermissionAccessAdminDash = "ACCESS_ADMINDASH"
+
 	// user managment
 	PermissionViewUsers   = "VIEW_USERS"
 	PermissionAddUser     = "ADD_USER"
@@ -20,26 +21,16 @@ const (
 	PermissionBlockStaff   = "BLOCK_STAFF"
 	PermissionUnBlockStaff = "UNBLOCK_STAFF"
 
-	// manager managment
-	PermissionViewManagers   = "VIEW_MANAGERS"
-	PermissionEditManager    = "EDIT_MANAGER"
-	PermissionDeleteManager  = "DELETE_MANAGER"
-	PermissionBlockManager   = "BLOCK_MANAGER"
-	PermissionUnBlockManager = "UNBLOCK_MANAGER"
-
 	// booking managment
-	PermissionScheduleBooking = "SCHEDULED_BOOKINGS_VIEW"
+	PermissionBookingManagment = "BOOKING_MANAGEMENT"
+	PermissionScheduleBooking  = "SCHEDULED_BOOKINGS"
 
-	//  Reports
-	PermissionViewReports = "VIEW_REPORTS"
 	// view ride && eranings && user analytics
 	PermissionViewAnalytics = "VIEW_ANALYTICS"
 
 	// system settings (pricing rules && commisions && app settings)
 	PermissionSystemSettings = "SYSTEM_SETTINGS"
 
-	// all permissions && all roles
-	ViewAllPermissions     = "VIEW_ALLPERMISSIONS"
-	PermissionViewAllRoles = "VIEW_ALLROLES"
-
+	// all permissions
+	ViewAllPermissions = "VIEW_ALLPERMISSIONS"
 )

@@ -12,6 +12,8 @@ import (
 func SeedPermisiions() {
 	permission := []models.Permission{
 
+		{Name: constants.PermissionAccessAdminDash},
+
 		//  user managmnet
 		{Name: constants.PermissionViewUsers},
 		{Name: constants.PermissionAddUser},
@@ -28,23 +30,18 @@ func SeedPermisiions() {
 		{Name: constants.PermissionBlockStaff},
 		{Name: constants.PermissionUnBlockStaff},
 
-		// manager managment
-		{Name: constants.PermissionViewManagers},
-		{Name: constants.PermissionEditManager},
-		{Name: constants.PermissionDeleteManager},
-		{Name: constants.PermissionBlockManager},
-		{Name: constants.PermissionUnBlockManager},
+		// booking managment
+		{Name: constants.PermissionScheduleBooking},
+		{Name: constants.PermissionBookingManagment},
 
 		// reports
-		{Name: constants.PermissionViewReports},
 		{Name: constants.PermissionViewAnalytics},
 
 		// system settings
 		{Name: constants.PermissionSystemSettings},
 
-		// all permissions && roles
+		// permissions
 		{Name: constants.ViewAllPermissions},
-		{Name: constants.PermissionViewAllRoles},
 	}
 
 	for _, p := range permission {

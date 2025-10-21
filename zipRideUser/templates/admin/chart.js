@@ -1,107 +1,142 @@
-document.addEventListener("DOMContentLoaded", async () => {
-  // 1️⃣ Load Navbar
-  try {
-    const navbarRes = await fetch("navbar.html");
-    document.getElementById("navbar").innerHTML = await navbarRes.text();
-
-    const footerRes = await fetch("footer.html");
-    document.getElementById("footer").innerHTML = await footerRes.text();
-  } catch (err) {
-    console.error("Failed to load reusable components:", err);
-  }
-
-  // 2️⃣ Initialize Charts
-  initializeCharts();
+// ==================== LOGOUT ====================
+document.getElementById("logout-btn").addEventListener("click", () => {
+  localStorage.removeItem("accessToken");
+  localStorage.removeItem("refreshToken");
+  localStorage.removeItem("role");
+  localStorage.removeItem("permissions"); // optional if you store permissions
+  window.location.href = "signin.html";
 });
 
-function initializeCharts() {
-  // Monthly Bookings Chart
-  const monthlyCtx = document.getElementById("monthlyBookingsChart")?.getContext("2d");
-  if (monthlyCtx) {
-    new Chart(monthlyCtx, {
-      type: "bar",
-      data: {
-        labels: ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct"],
-        datasets:[{
-          label:"Monthly Bookings",
-          data:[120,180,150,200,250,300,270,320,310,400],
-          backgroundColor:"rgba(54,162,235,0.7)",
-          borderColor:"rgba(54,162,235,1)",
-          borderWidth:1
-        }]
-      },
-      options:{
-        responsive:true,
-        plugins:{legend:{display:true}, title:{display:true,text:"Monthly Bookings"}},
-        scales:{y:{beginAtZero:true}}
-      }
-    });
-  }
+// ==================== HELPER: PERMISSION CHECK ====================
+function getPermissions() {
+  try {
+    // if you store permissions in localStorage
+    const perms = JSON.parse(localStorage.getItem("permissions"));
+    if (Array.isArray(perms)) return perms;
 
-  // Weekly Bookings Chart
-  const weeklyCtx = document.getElementById("weeklyBookingsChart")?.getContext("2d");
-  if (weeklyCtx) {
-    new Chart(weeklyCtx, {
-      type: "line",
-      data: {
-        labels:["Mon","Tue","Wed","Thu","Fri","Sat","Sun"],
-        datasets:[{
-          label:"Weekly Bookings",
-          data:[20,30,25,40,35,50,45],
-          borderColor:"rgba(255,159,64,1)",
-          backgroundColor:"rgba(255,159,64,0.3)",
-          fill:true,
-          tension:0.4
-        }]
-      },
-      options:{
-        responsive:true,
-        plugins:{legend:{display:true}, title:{display:true,text:"Weekly Bookings"}},
-        scales:{y:{beginAtZero:true}}
-      }
-    });
-  }
-
-  // Daily Bookings Chart
-  const dailyCtx = document.getElementById("dailyBookingsChart")?.getContext("2d");
-  if (dailyCtx) {
-    new Chart(dailyCtx, {
-      type: "doughnut",
-      data:{
-        labels:["Completed","Pending","Cancelled"],
-        datasets:[{
-          data:[65,25,10],
-          backgroundColor:["rgba(75,192,192,0.8)","rgba(255,206,86,0.8)","rgba(255,99,132,0.8)"],
-          borderWidth:1
-        }]
-      },
-      options:{
-        responsive:true,
-        plugins:{title:{display:true,text:"Daily Booking Status"}, legend:{position:"bottom"}}
-      }
-    });
-  }
-
-  // Revenue Chart
-  const revenueCtx = document.getElementById("revenueChart")?.getContext("2d");
-  if (revenueCtx) {
-    new Chart(revenueCtx, {
-      type:"bar",
-      data:{
-        labels:["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct"],
-        datasets:[{
-          label:"Revenue (₹ in thousands)",
-          data:[25,30,28,35,40,45,50,55,60,75],
-          backgroundColor:"rgba(153,102,255,0.7)",
-          borderColor:"rgba(153,102,255,1)",
-          borderWidth:1
-        }]
-      },
-      options:{
-        responsive:true,
-        plugins:{legend:{display:true},title:{display:true,text:"Monthly Revenue Growth"}},
-        scales:{y:{beginAtZero:true}}
-      }
-    });
+    // else if you store permissions inside JWT token, decode it
+    const token = localStorage.getItem("accessToken");
+    if (!token) return [];
+    const payload = JSON.parse(atob(token.split(".")[1]));
+    return payload.permissions || [];
+  } catch {
+    return [];
   }
 }
+
+function hasPermission(permission) {
+  const perms = getPermissions();
+  return perms.includes(permission);
+}
+
+// ==================== ACCESS CONTROL (ACL) ====================
+if (!hasPermission("VIEW_ANALYTICS")) {
+  document.body.innerHTML = `
+    <div class="flex flex-col items-center justify-center min-h-screen bg-gray-50 text-center">
+      <h1 class="text-3xl font-bold text-red-600 mb-3">Access Denied</h1>
+      <p class="text-gray-600 mb-6">You don't have permission to view this page.</p>
+      <button onclick="window.location.href='admindash.html'" 
+        class="bg-cyan-600 hover:bg-cyan-700 text-white px-5 py-2.5 rounded-xl font-semibold shadow-md">
+        Go to Dashboard
+      </button>
+    </div>
+  `;
+  throw new Error("Unauthorized access to Analytics page");
+}
+
+// ==================== CHARTS CONFIG ====================
+const PRIMARY_COLOR = '#06b6d4'; 
+const SECONDARY_COLOR = '#3b82f6'; 
+const ACCENT_COLOR = '#ef4444'; 
+
+const chartOptions = {
+  responsive: true,
+  maintainAspectRatio: false,
+  plugins: {
+    legend: {
+      position: 'top',
+      labels: { color: '#4b5563' }
+    },
+    tooltip: {
+      backgroundColor: 'rgba(30,41,59,0.8)',
+      titleColor: '#fff',
+      bodyColor: '#fff'
+    }
+  },
+  scales: {
+    y: {
+      beginAtZero: true,
+      ticks: { color: '#6b7280' },
+      grid: { color: '#f3f4f6' }
+    },
+    x: {
+      ticks: { color: '#6b7280' },
+      grid: { display: false }
+    }
+  }
+};
+
+// ==================== CHART CREATION ====================
+new Chart(document.getElementById('dailyBookingsChart').getContext('2d'), {
+  type: 'bar',
+  data: {
+    labels: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
+    datasets: [{
+      label: 'Bookings',
+      data: [5, 8, 6, 10, 9, 7, 12],
+      backgroundColor: PRIMARY_COLOR,
+      borderRadius: 4
+    }]
+  },
+  options: chartOptions
+});
+
+new Chart(document.getElementById('weeklyBookingsChart').getContext('2d'), {
+  type: 'line',
+  data: {
+    labels: ['Week 1', 'Week 2', 'Week 3', 'Week 4'],
+    datasets: [{
+      label: 'Bookings',
+      data: [12, 19, 8, 15],
+      borderColor: SECONDARY_COLOR,
+      backgroundColor: 'rgba(59,130,246,0.3)',
+      tension: 0.4,
+      fill: true,
+      pointRadius: 5,
+      pointHoverRadius: 7
+    }]
+  },
+  options: chartOptions
+});
+
+new Chart(document.getElementById('monthlyBookingsChart').getContext('2d'), {
+  type: 'bar',
+  data: {
+    labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May'],
+    datasets: [{
+      label: 'Total Bookings',
+      data: [30, 45, 28, 60, 50],
+      backgroundColor: PRIMARY_COLOR,
+      borderRadius: 4
+    }]
+  },
+  options: chartOptions
+});
+
+new Chart(document.getElementById('revenueChart').getContext('2d'), {
+  type: 'line',
+  data: {
+    labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May'],
+    datasets: [{
+      label: 'Revenue (₹)',
+      data: [1200, 1900, 900, 2500, 2200],
+      borderColor: ACCENT_COLOR,
+      backgroundColor: 'rgba(239,68,68,0.3)',
+      tension: 0.4,
+      fill: true,
+      pointRadius: 5,
+      pointHoverRadius: 7
+    }]
+  },
+  options: chartOptions
+});

@@ -117,6 +117,11 @@ func RegisterUser(c *gin.Context) {
 		return
 	}
 
+	if !utils.PasswordStrength(data.Password) {
+		c.JSON(http.StatusConflict, gin.H{"err": "increase password strength"})
+		return
+	}
+
 	// pass check
 	hash, err := utils.GenerateHash(data.Password)
 	if err != nil {

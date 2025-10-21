@@ -40,11 +40,11 @@ func MergePermissions(a, b []string) []string {
 // check permission exists
 
 func CheckPermission(permissions []string, perm string) bool {
-	perm = strings.ToUpper(perm)
+	perm = strings.TrimSpace(strings.ToLower(perm))
 
 	for _, p := range permissions {
 
-		if p == perm {
+		if strings.ToLower(strings.TrimSpace(p)) == perm {
 			return true
 		}
 	}

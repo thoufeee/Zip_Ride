@@ -5,7 +5,6 @@ import (
 	"os"
 	"strings"
 	"zipride/database"
-	"zipride/internal/constants"
 	"zipride/internal/models"
 	"zipride/utils"
 
@@ -49,22 +48,16 @@ func JwtValidation() gin.HandlerFunc {
 		c.Set("email", claims.Email)
 		c.Set("role", claims.Role)
 
-		// if admin || staff || manager load permissions
-
-		if claims.Role != constants.RoleUser {
+		if len(claims.Permissions) > 0 {
 			var admin models.Admin
 
-			if err := database.DB.Preload("Role.Permissions").Preload("Permissions").First(&admin, claims.UserId).Error; err != nil {
-				c.JSON(http.StatusInternalServerError, gin.H{"err": "failed to load permissions"})
+			if err := database.DB.First(&admin, claims.UserId).Error; err != nil {
+				c.JSON(http.StatusInternalServerError, gin.H{"err": "failed to load admin"})
 				c.Abort()
 				return
 			}
 
-			perms := utils.MergePermissions(utils.PermissionToString(admin.Role.Permissions),
-				utils.PermissionToString(admin.Permissions),
-			)
-
-			c.Set("permissions", perms)
+			c.Set("permissions", claims.Permissions)
 			c.Set("admin", admin)
 		}
 
