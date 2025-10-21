@@ -35,6 +35,10 @@ type Booking struct {
 	VehicleNo   string  `json:"vehicle_no,omitempty"`
 	DriverLat   float64 `json:"driver_lat,omitempty"`
 	DriverLong  float64 `json:"driver_long,omitempty"`
+
+	// Ratings & feedback
+	Rating   *int    `json:"rating,omitempty"`   // 1–5
+	Feedback *string `json:"feedback,omitempty"` 
 }
 
 // CreateBookingRequest used in API requests
