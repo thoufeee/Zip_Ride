@@ -3,8 +3,8 @@ package database
 import (
 	"strings"
 
-	"zipRideDriver/internal/config"
 	adminservices "zipRideDriver/internal/admin/services"
+	"zipRideDriver/internal/config"
 	"zipRideDriver/internal/models"
 	"zipRideDriver/internal/utils"
 
@@ -37,6 +37,9 @@ func SeedDefaults(db *gorm.DB, cfg *config.Config, log *zap.Logger) error {
 			_ = db.Model(&admin).Update("role", "super_admin").Error
 		}
 	}
+	// Normalize any incorrectly stored role values
+	_ = db.Model(&models.AdminUser{}).Where("role = ?", "superadmin").Update("role", "super_admin").Error
+
 	// ensure admin role exists and map to user
 	var role models.Role
 	if err := db.Where("name = ?", "admin").First(&role).Error; err != nil {
@@ -74,5 +77,44 @@ func SeedDefaults(db *gorm.DB, cfg *config.Config, log *zap.Logger) error {
 			}
 		}
 	}
+
+	// Create a test admin user for simple cookie-based login
+	var testAdmin models.AdminUser
+	if err := db.Where("email = ?", "admin@zipride.com").First(&testAdmin).Error; err != nil {
+		if err == gorm.ErrRecordNotFound {
+			hash, herr := utils.HashPassword("admin123")
+			if herr != nil {
+				log.Error("failed to hash test admin password", zap.Error(herr))
+			} else {
+				testAdmin = models.AdminUser{Name: "Test Admin", Email: "admin@zipride.com", PasswordHash: hash, Role: "super_admin"}
+				if err := db.Create(&testAdmin).Error; err != nil {
+					log.Error("failed to create test admin", zap.Error(err))
+				} else {
+					log.Info("test admin created", zap.String("email", "admin@zipride.com"), zap.String("password", "admin123"))
+				}
+			}
+		}
+	}
+
+	// Create sample riders for testing user management
+	sampleRiders := []models.Rider{
+		{Name: "Alice Johnson", Email: "alice.johnson@example.com", Phone: "+1234567800", IsBlocked: false},
+		{Name: "Bob Smith", Email: "bob.smith@example.com", Phone: "+1234567801", IsBlocked: false},
+		{Name: "Carol Davis", Email: "carol.davis@example.com", Phone: "+1234567802", IsBlocked: true},
+		{Name: "David Wilson", Email: "david.wilson@example.com", Phone: "+1234567803", IsBlocked: false},
+		{Name: "Eve Brown", Email: "eve.brown@example.com", Phone: "+1234567804", IsBlocked: false},
+	}
+
+	for _, rider := range sampleRiders {
+		var existingRider models.Rider
+		if err := db.Where("email = ?", rider.Email).First(&existingRider).Error; err != nil {
+			if err == gorm.ErrRecordNotFound {
+				if err := db.Create(&rider).Error; err != nil {
+					log.Error("failed to create sample rider", zap.Error(err), zap.String("email", rider.Email))
+				}
+			}
+		}
+	}
+
 	return nil
 }

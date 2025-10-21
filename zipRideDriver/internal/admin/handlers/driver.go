@@ -54,22 +54,69 @@ func (h *DriverHandler) DriverDetailPage(c *gin.Context) {
 	})
 }
 
+// PendingApprovals shows drivers waiting for approval
+func (h *DriverHandler) PendingApprovals(c *gin.Context) {
+	var drivers []models.Driver
+	_ = h.db.Where("status = ?", "Pending").Order("created_at asc").Find(&drivers).Error
+	
+	// Count statistics
+	var pendingCount, approvedCount, rejectedCount int64
+	h.db.Model(&models.Driver{}).Where("status = ?", "Pending").Count(&pendingCount)
+	h.db.Model(&models.Driver{}).Where("status = ?", "Approved").Count(&approvedCount)
+	h.db.Model(&models.Driver{}).Where("status = ?", "Rejected").Count(&rejectedCount)
+	
+	c.HTML(http.StatusOK, "admin/drivers/pending.html", gin.H{
+		"Drivers": drivers,
+		"PendingCount": pendingCount,
+		"ApprovedCount": approvedCount,
+		"RejectedCount": rejectedCount,
+	})
+}
+
 func (h *DriverHandler) ApproveDriver(c *gin.Context) {
 	id := strings.TrimSpace(c.Param("id"))
-	if err := h.db.Model(&models.Driver{}).Where("id = ?", id).Update("status", "Approved").Error; err != nil {
+	
+	// Update status and mark as verified
+	updates := map[string]interface{}{
+		"status": "Approved",
+		"is_verified": true,
+	}
+	
+	if err := h.db.Model(&models.Driver{}).Where("id = ?", id).Updates(updates).Error; err != nil {
 		c.String(http.StatusInternalServerError, "Failed to approve")
 		return
 	}
-	c.Redirect(http.StatusSeeOther, "/admin/panel/drivers")
+	
+	// Log the approval
+	h.log.Info("Driver approved", zap.String("driver_id", id))
+	
+	// Check if this is an AJAX request
+	if c.GetHeader("X-Requested-With") == "XMLHttpRequest" {
+		c.JSON(http.StatusOK, gin.H{"message": "Driver approved successfully"})
+		return
+	}
+	
+	c.Redirect(http.StatusSeeOther, "/admin/panel/drivers/pending")
 }
 
 func (h *DriverHandler) RejectDriver(c *gin.Context) {
 	id := strings.TrimSpace(c.Param("id"))
+	
 	if err := h.db.Model(&models.Driver{}).Where("id = ?", id).Update("status", "Rejected").Error; err != nil {
 		c.String(http.StatusInternalServerError, "Failed to reject")
 		return
 	}
-	c.Redirect(http.StatusSeeOther, "/admin/panel/drivers")
+	
+	// Log the rejection
+	h.log.Info("Driver rejected", zap.String("driver_id", id))
+	
+	// Check if this is an AJAX request
+	if c.GetHeader("X-Requested-With") == "XMLHttpRequest" {
+		c.JSON(http.StatusOK, gin.H{"message": "Driver rejected"})
+		return
+	}
+	
+	c.Redirect(http.StatusSeeOther, "/admin/panel/drivers/pending")
 }
 
 func (h *DriverHandler) SuspendDriver(c *gin.Context) {

@@ -1,14 +1,220 @@
 {{ define "admin/dashboard.html" }}
-{{ template "base" . }}
-{{ end }}
-{{ define "title" }}Dashboard{{ end }}
-{{ define "content" }}
-<h1>Dashboard</h1>
-<div class="cards">
-  <div class="card"><div class="card-title">Total Drivers</div><div class="card-value">{{ .Totals.TotalDrivers }}</div></div>
-  <div class="card"><div class="card-title">Active Drivers</div><div class="card-value">{{ .Totals.ActiveDrivers }}</div></div>
-  <div class="card"><div class="card-title">Pending Verifications</div><div class="card-value">{{ .Totals.PendingDrivers }}</div></div>
-  <div class="card"><div class="card-title">Total Rides</div><div class="card-value">{{ .Totals.TotalRides }}</div></div>
-  <div class="card"><div class="card-title">Total Earnings</div><div class="card-value">₹ {{ .Totals.TotalEarnings }}</div></div>
-</div>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Driver Admin Dashboard</title>
+    <link rel="stylesheet" href="/static/css/style.css">
+</head>
+<body>
+    <div class="admin-layout">
+        <!-- Sidebar -->
+        <div class="sidebar">
+            <div class="sidebar-header">
+                <h2>🚗 ZipRide Admin</h2>
+            </div>
+            
+            <ul class="sidebar-nav">
+                <li><a href="/admin/panel/dashboard" class="active">
+                    <span class="icon">📊</span>
+                    Dashboard
+                </a></li>
+                <li><a href="/admin/panel/drivers">
+                    <span class="icon">👨‍✈️</span>
+                    Manage Drivers
+                </a></li>
+                <li><a href="/admin/panel/rides">
+                    <span class="icon">🚙</span>
+                    Manage Rides
+                </a></li>
+                <li><a href="/admin/panel/earnings">
+                    <span class="icon">💰</span>
+                    Earnings & Payments
+                </a></li>
+                <!-- <li><a href="/admin/panel/users">
+                    <span class="icon">👥</span>
+                    Manage Users
+                </a></li> -->
+                <li><a href="/admin/panel/reports">
+                    <span class="icon">📈</span>
+                    Reports & Analytics
+                </a></li>
+                <li><a href="/admin/panel/settings">
+                    <span class="icon">⚙️</span>
+                    Settings
+                </a></li>
+            </ul>
+            
+            <div class="sidebar-footer">
+                <a href="/admin/panel/logout" class="logout-btn">
+                    <span class="icon">🚪</span>
+                    Logout
+                </a>
+            </div>
+        </div>
+        
+        <!-- Main Content -->
+        <div class="main-content">
+            <div class="content-header">
+                <h1>Dashboard Overview</h1>
+                <div style="color: #6b7280; font-size: 14px;">
+                    Welcome back, Admin! Here's your business overview.
+                </div>
+            </div>
+            
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-card-title">Total Drivers</div>
+                    <div class="stat-card-value">{{.Totals.TotalDrivers}}</div>
+                    <div class="stat-card-change">↗ All registered drivers</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-card-title">Active Drivers</div>
+                    <div class="stat-card-value">{{.Totals.ActiveDrivers}}</div>
+                    <div class="stat-card-change">↗ Currently approved</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-card-title">Total Rides</div>
+                    <div class="stat-card-value">{{.Totals.TotalRides}}</div>
+                    <div class="stat-card-change">↗ All time rides</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-card-title">Pending Drivers</div>
+                    <div class="stat-card-value">{{.Totals.PendingDrivers}}</div>
+                    <div class="stat-card-change">↗ Awaiting approval</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-card-title">Total Earnings</div>
+                    <div class="stat-card-value">₹{{printf "%.0f" .Totals.TotalEarnings}}</div>
+                    <div class="stat-card-change">↗ Platform revenue</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-card-title">Pending Withdrawals</div>
+                    <div class="stat-card-value">{{.PendingWithdrawals}}</div>
+                    <div class="stat-card-change"><a href="/admin/panel/withdrawals" style="text-decoration:none; color:#3b82f6;">Review withdrawals →</a></div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-card-title">Open Support Tickets</div>
+                    <div class="stat-card-value">{{.OpenTickets}}</div>
+                    <div class="stat-card-change"><a href="/admin/panel/help" style="text-decoration:none; color:#3b82f6;">View tickets →</a></div>
+                </div>
+            </div>
+
+            <div class="cards-grid">
+                <div class="chart-card">
+                    <h3>Weekly Rides</h3>
+                    <canvas id="weeklyRideChart" data-labels='{{.WeeklyTrendLabelsJSON}}' data-values='{{.WeeklyTrendCountsJSON}}'></canvas>
+                </div>
+            </div>
+
+            <!-- Quick Actions -->
+            <div class="panel">
+                <h3>Quick Actions</h3>
+                <div class="actions-row">
+                    <a href="/admin/panel/drivers?status=Pending" class="button btn-amber">Review Pending Drivers</a>
+                    <a href="/admin/panel/drivers" class="button">Manage All Drivers</a>
+                    <a href="/admin/panel/rides?status=ongoing" class="button btn-teal">Monitor Active Rides</a>
+                    <a href="/admin/panel/earnings" class="button btn-emerald">View Earnings Report</a>
+                </div>
+            </div>
+
+            <!-- Recent Drivers -->
+            {{if .RecentDrivers}}
+            <div class="panel" style="margin-top: 24px;">
+                <h3>Recent Drivers</h3>
+                <table>
+                    <thead>
+                        <tr>
+                            <th style="text-align:left; padding: 8px; border-bottom: 1px solid #e5e7eb;">Name</th>
+                            <th style="text-align:left; padding: 8px; border-bottom: 1px solid #e5e7eb;">Phone</th>
+                            <th style="text-align:left; padding: 8px; border-bottom: 1px solid #e5e7eb;">Status</th>
+                            <th style="text-align:left; padding: 8px; border-bottom: 1px solid #e5e7eb;">Joined</th>
+                            <th style="text-align:left; padding: 8px; border-bottom: 1px solid #e5e7eb;">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {{range .RecentDrivers}}
+                        <tr>
+                            <td style="padding: 8px;">{{.Name}}</td>
+                            <td style="padding: 8px;">{{.Phone}}</td>
+                            <td style="padding: 8px;">{{.Status}}</td>
+                            <td style="padding: 8px;">{{.CreatedAt.Format "2006-01-02"}}</td>
+                            <td style="padding: 8px;"><a href="/admin/panel/driver/{{.ID}}" style="color:#3b82f6; text-decoration:none;">View</a></td>
+                        </tr>
+                        {{end}}
+                    </tbody>
+                </table>
+            </div>
+            {{end}}
+
+            <!-- Recent Rides -->
+            {{if .RecentRides}}
+            <div class="panel" style="margin-top: 24px;">
+                <h3>Recent Rides</h3>
+                <table>
+                    <thead>
+                        <tr>
+                            <th style="text-align:left; padding: 8px; border-bottom: 1px solid #e5e7eb;">Ride ID</th>
+                            <th style="text-align:left; padding: 8px; border-bottom: 1px solid #e5e7eb;">Pickup</th>
+                            <th style="text-align:left; padding: 8px; border-bottom: 1px solid #e5e7eb;">Dropoff</th>
+                            <th style="text-align:left; padding: 8px; border-bottom: 1px solid #e5e7eb;">Status</th>
+                            <th style="text-align:left; padding: 8px; border-bottom: 1px solid #e5e7eb;">Date</th>
+                            <th style="text-align:left; padding: 8px; border-bottom: 1px solid #e5e7eb;">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {{range .RecentRides}}
+                        <tr>
+                            <td style="padding: 8px;">#{{.ID}}</td>
+                            <td style="padding: 8px;">{{.Pickup}}</td>
+                            <td style="padding: 8px;">{{.Dropoff}}</td>
+                            <td style="padding: 8px;">{{.Status}}</td>
+                            <td style="padding: 8px;">{{.CreatedAt.Format "2006-01-02 15:04"}}</td>
+                            <td style="padding: 8px;"><a href="/admin/panel/rides/{{.ID}}" style="color:#3b82f6; text-decoration:none;">View</a></td>
+                        </tr>
+                        {{end}}
+                    </tbody>
+                </table>
+            </div>
+            {{end}}
+        </div>
+    </div>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+    (function(){
+        const el = document.getElementById('weeklyRideChart');
+        if (!el || typeof Chart === 'undefined') return;
+        const labels = JSON.parse(el.dataset.labels || '[]');
+        const values = JSON.parse(el.dataset.values || '[]');
+        const dataLabels = labels.length ? labels : ["Mon","Tue","Wed","Thu","Fri","Sat","Sun"];
+        const dataValues = values.length ? values : [0,0,0,0,0,0,0];
+        const chart = new Chart(el.getContext('2d'), {
+            type: 'line',
+            data: {
+                labels: dataLabels,
+                datasets: [{
+                    label: 'Rides',
+                    data: dataValues,
+                    borderColor: '#2563eb',
+                    backgroundColor: 'rgba(37,99,235,0.15)',
+                    tension: 0.35,
+                    fill: true,
+                    pointRadius: 3
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                scales: {
+                    y: { beginAtZero: true, grid: { color: 'rgba(17,24,39,0.08)' } },
+                    x: { grid: { display: false } }
+                },
+                plugins: { legend: { display: false } }
+            }
+        });
+        el.parentElement.style.height = '260px';
+    })();
+    </script>
+</body>
+</html>
 {{ end }}

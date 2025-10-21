@@ -1,0 +1,300 @@
+{{ define "admin-sidebar" }}
+<!-- Mobile Hamburger Menu -->
+<div class="mobile-menu-toggle" onclick="toggleSidebar()">
+    <span></span>
+    <span></span>
+    <span></span>
+</div>
+
+<!-- Sidebar Overlay for Mobile -->
+<div class="sidebar-overlay" onclick="closeSidebar()"></div>
+
+<!-- Sidebar -->
+<div class="sidebar" id="sidebar">
+    <div class="sidebar-header">
+        <h2>ZipRide Admin</h2>
+    </div>
+    
+    <nav class="sidebar-nav">
+        <ul>
+            <li>
+                <a href="/admin/dashboard" {{if eq .CurrentPage "dashboard"}}class="active"{{end}}>
+                    <span class="icon">📊</span>
+                    <span class="text">Dashboard</span>
+                </a>
+            </li>
+            <li>
+                <a href="/admin/drivers" {{if eq .CurrentPage "drivers"}}class="active"{{end}}>
+                    <span class="icon">🚗</span>
+                    <span class="text">Drivers</span>
+                </a>
+            </li>
+            <li>
+                <a href="/admin/rides" {{if eq .CurrentPage "rides"}}class="active"{{end}}>
+                    <span class="icon">🧾</span>
+                    <span class="text">Rides</span>
+                </a>
+            </li>
+            <li>
+                <a href="/admin/earnings" {{if eq .CurrentPage "earnings"}}class="active"{{end}}>
+                    <span class="icon">💰</span>
+                    <span class="text">Earnings</span>
+                </a>
+            </li>
+            <li>
+                <a href="/admin/reports" {{if eq .CurrentPage "reports"}}class="active"{{end}}>
+                    <span class="icon">📈</span>
+                    <span class="text">Reports</span>
+                </a>
+            </li>
+            <li>
+                <a href="/admin/settings" {{if eq .CurrentPage "settings"}}class="active"{{end}}>
+                    <span class="icon">⚙️</span>
+                    <span class="text">Settings</span>
+                </a>
+            </li>
+        </ul>
+    </nav>
+    
+    <div class="sidebar-footer">
+        <a href="/admin/logout" class="logout-btn">
+            <span class="icon">🚪</span>
+            <span class="text">Logout</span>
+        </a>
+    </div>
+</div>
+
+<style>
+/* Sidebar Styles */
+.sidebar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 220px;
+    height: 100vh;
+    background: #1E90FF;
+    color: white;
+    z-index: 1000;
+    display: flex;
+    flex-direction: column;
+    transition: transform 0.3s ease;
+}
+
+.sidebar-header {
+    padding: 20px 15px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    background: rgba(0, 0, 0, 0.1);
+}
+
+.sidebar-header h2 {
+    margin: 0;
+    font-size: 18px;
+    font-weight: 600;
+    text-align: center;
+    color: white;
+}
+
+.sidebar-nav {
+    flex: 1;
+    padding: 20px 0;
+    overflow-y: auto;
+}
+
+.sidebar-nav ul {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+}
+
+.sidebar-nav li {
+    margin: 0;
+}
+
+.sidebar-nav a {
+    display: flex;
+    align-items: center;
+    padding: 12px 20px;
+    color: white;
+    text-decoration: none;
+    transition: all 0.3s ease;
+    border-radius: 8px;
+    margin: 2px 10px;
+    position: relative;
+}
+
+.sidebar-nav a:hover {
+    background: rgba(0, 0, 0, 0.2);
+    transform: translateX(5px);
+}
+
+.sidebar-nav a.active {
+    background: rgba(255, 255, 255, 0.2);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+}
+
+.sidebar-nav .icon {
+    font-size: 16px;
+    width: 24px;
+    text-align: center;
+    margin-right: 12px;
+}
+
+.sidebar-nav .text {
+    font-size: 14px;
+    font-weight: 500;
+}
+
+.sidebar-footer {
+    padding: 20px;
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.logout-btn {
+    display: flex;
+    align-items: center;
+    width: 100%;
+    padding: 12px 15px;
+    background: rgba(220, 38, 38, 0.8);
+    color: white;
+    text-decoration: none;
+    border-radius: 8px;
+    transition: all 0.3s ease;
+    font-weight: 500;
+}
+
+.logout-btn:hover {
+    background: rgba(220, 38, 38, 1);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(220, 38, 38, 0.3);
+}
+
+.logout-btn .icon {
+    font-size: 16px;
+    margin-right: 10px;
+}
+
+/* Main Content Adjustment */
+.main-content {
+    margin-left: 220px;
+    min-height: 100vh;
+    transition: margin-left 0.3s ease;
+}
+
+/* Mobile Hamburger Menu */
+.mobile-menu-toggle {
+    display: none;
+    position: fixed;
+    top: 15px;
+    left: 15px;
+    z-index: 1001;
+    cursor: pointer;
+    flex-direction: column;
+    width: 30px;
+    height: 25px;
+    justify-content: space-between;
+}
+
+.mobile-menu-toggle span {
+    width: 100%;
+    height: 3px;
+    background: #1E90FF;
+    border-radius: 2px;
+    transition: all 0.3s ease;
+}
+
+.sidebar-overlay {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.5);
+    z-index: 999;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .sidebar {
+        transform: translateX(-100%);
+    }
+    
+    .sidebar.open {
+        transform: translateX(0);
+    }
+    
+    .main-content {
+        margin-left: 0;
+    }
+    
+    .mobile-menu-toggle {
+        display: flex;
+    }
+    
+    .sidebar-overlay.show {
+        display: block;
+    }
+    
+    /* Hamburger Animation */
+    .mobile-menu-toggle.active span:nth-child(1) {
+        transform: rotate(45deg) translate(5px, 5px);
+    }
+    
+    .mobile-menu-toggle.active span:nth-child(2) {
+        opacity: 0;
+    }
+    
+    .mobile-menu-toggle.active span:nth-child(3) {
+        transform: rotate(-45deg) translate(7px, -6px);
+    }
+}
+
+@media (max-width: 480px) {
+    .sidebar {
+        width: 280px;
+    }
+    
+    .sidebar-nav .text {
+        font-size: 16px;
+    }
+    
+    .sidebar-header h2 {
+        font-size: 20px;
+    }
+}
+</style>
+
+<script>
+function toggleSidebar() {
+    const sidebar = document.getElementById('sidebar');
+    const overlay = document.querySelector('.sidebar-overlay');
+    const toggle = document.querySelector('.mobile-menu-toggle');
+    
+    sidebar.classList.toggle('open');
+    overlay.classList.toggle('show');
+    toggle.classList.toggle('active');
+}
+
+function closeSidebar() {
+    const sidebar = document.getElementById('sidebar');
+    const overlay = document.querySelector('.sidebar-overlay');
+    const toggle = document.querySelector('.mobile-menu-toggle');
+    
+    sidebar.classList.remove('open');
+    overlay.classList.remove('show');
+    toggle.classList.remove('active');
+}
+
+// Close sidebar when clicking on a link (mobile)
+document.addEventListener('DOMContentLoaded', function() {
+    const sidebarLinks = document.querySelectorAll('.sidebar-nav a');
+    sidebarLinks.forEach(link => {
+        link.addEventListener('click', function() {
+            if (window.innerWidth <= 768) {
+                closeSidebar();
+            }
+        });
+    });
+});
+</script>
+{{ end }}

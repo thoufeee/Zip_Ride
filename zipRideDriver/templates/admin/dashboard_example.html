@@ -1,0 +1,281 @@
+{{ define "admin/dashboard.html" }}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard | ZipRide Admin</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+            background: #f8fafc;
+            color: #1f2937;
+        }
+        
+        /* Page Content Styles */
+        .page-header {
+            background: white;
+            padding: 24px;
+            border-bottom: 1px solid #e5e7eb;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+        
+        .page-title {
+            font-size: 28px;
+            font-weight: 700;
+            color: #111827;
+            margin-bottom: 8px;
+        }
+        
+        .page-subtitle {
+            color: #6b7280;
+            font-size: 14px;
+        }
+        
+        .content-wrapper {
+            padding: 24px;
+        }
+        
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-bottom: 32px;
+        }
+        
+        .stat-card {
+            background: white;
+            border: 1px solid #e5e7eb;
+            border-radius: 8px;
+            padding: 24px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+        
+        .stat-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+        }
+        
+        .stat-card h3 {
+            color: #6b7280;
+            font-size: 14px;
+            font-weight: 500;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            margin-bottom: 8px;
+        }
+        
+        .stat-value {
+            font-size: 32px;
+            font-weight: 700;
+            color: #111827;
+            margin-bottom: 4px;
+        }
+        
+        .stat-change {
+            font-size: 12px;
+            font-weight: 500;
+        }
+        
+        .stat-change.positive {
+            color: #10b981;
+        }
+        
+        .stat-change.negative {
+            color: #ef4444;
+        }
+        
+        .quick-actions {
+            background: white;
+            border: 1px solid #e5e7eb;
+            border-radius: 8px;
+            padding: 24px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+        
+        .quick-actions h3 {
+            margin-bottom: 16px;
+            color: #111827;
+            font-size: 18px;
+            font-weight: 600;
+        }
+        
+        .actions-grid {
+            display: flex;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+        
+        .action-btn {
+            padding: 10px 16px;
+            text-decoration: none;
+            border-radius: 6px;
+            font-size: 14px;
+            font-weight: 500;
+            transition: all 0.2s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .action-btn.primary {
+            background: #3b82f6;
+            color: white;
+        }
+        
+        .action-btn.primary:hover {
+            background: #2563eb;
+            transform: translateY(-1px);
+        }
+        
+        .action-btn.success {
+            background: #10b981;
+            color: white;
+        }
+        
+        .action-btn.success:hover {
+            background: #059669;
+            transform: translateY(-1px);
+        }
+        
+        .action-btn.warning {
+            background: #f59e0b;
+            color: white;
+        }
+        
+        .action-btn.warning:hover {
+            background: #d97706;
+            transform: translateY(-1px);
+        }
+        
+        .action-btn.info {
+            background: #06b6d4;
+            color: white;
+        }
+        
+        .action-btn.info:hover {
+            background: #0891b2;
+            transform: translateY(-1px);
+        }
+        
+        /* Responsive adjustments */
+        @media (max-width: 768px) {
+            .page-header {
+                padding: 16px;
+            }
+            
+            .content-wrapper {
+                padding: 16px;
+            }
+            
+            .page-title {
+                font-size: 24px;
+            }
+            
+            .stats-grid {
+                grid-template-columns: 1fr;
+                gap: 16px;
+            }
+            
+            .actions-grid {
+                flex-direction: column;
+            }
+            
+            .action-btn {
+                justify-content: center;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Include Sidebar -->
+    {{ template "admin-sidebar" . }}
+    
+    <!-- Main Content -->
+    <div class="main-content">
+        <div class="page-header">
+            <h1 class="page-title">Dashboard</h1>
+            <p class="page-subtitle">Welcome to ZipRide Admin Panel - Monitor your platform performance</p>
+        </div>
+        
+        <div class="content-wrapper">
+            <!-- Statistics Cards -->
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <h3>Total Drivers</h3>
+                    <div class="stat-value">{{.TotalDrivers}}</div>
+                    <div class="stat-change positive">+12% from last month</div>
+                </div>
+                
+                <div class="stat-card">
+                    <h3>Active Drivers</h3>
+                    <div class="stat-value">{{.ActiveDrivers}}</div>
+                    <div class="stat-change positive">+8% from last week</div>
+                </div>
+                
+                <div class="stat-card">
+                    <h3>Total Rides</h3>
+                    <div class="stat-value">{{.TotalRides}}</div>
+                    <div class="stat-change positive">+25% from last month</div>
+                </div>
+                
+                <div class="stat-card">
+                    <h3>Completed Rides</h3>
+                    <div class="stat-value">{{.CompletedRides}}</div>
+                    <div class="stat-change positive">+18% completion rate</div>
+                </div>
+                
+                <div class="stat-card">
+                    <h3>Total Earnings</h3>
+                    <div class="stat-value">₹{{printf "%.0f" .TotalEarnings}}</div>
+                    <div class="stat-change positive">+32% from last month</div>
+                </div>
+            </div>
+            
+            <!-- Quick Actions -->
+            <div class="quick-actions">
+                <h3>Quick Actions</h3>
+                <div class="actions-grid">
+                    <a href="/admin/drivers?status=Pending" class="action-btn warning">
+                        <span>⏳</span>
+                        Review Pending Drivers
+                    </a>
+                    
+                    <a href="/admin/drivers" class="action-btn primary">
+                        <span>🚗</span>
+                        Manage All Drivers
+                    </a>
+                    
+                    <a href="/admin/rides?status=ongoing" class="action-btn info">
+                        <span>🧾</span>
+                        Monitor Active Rides
+                    </a>
+                    
+                    <a href="/admin/earnings" class="action-btn success">
+                        <span>💰</span>
+                        View Earnings Report
+                    </a>
+                    
+                    <a href="/admin/reports" class="action-btn primary">
+                        <span>📈</span>
+                        Analytics Dashboard
+                    </a>
+                    
+                    <a href="/admin/complaints" class="action-btn warning">
+                        <span>⚠️</span>
+                        Handle Complaints
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
+{{ end }}

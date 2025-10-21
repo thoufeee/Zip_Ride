@@ -1,0 +1,432 @@
+{{ define "admin/reports.html" }}
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Reports & Analytics | ZipRide Admin</title>
+    <link rel="stylesheet" href="/static/css/style.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        body { margin: 0; font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif; background: #f8fafc; }
+        .admin-layout { display: flex; min-height: 100vh; }
+        
+        /* Sidebar Styles */
+        .sidebar { 
+            width: 250px; 
+            background: #1f2937; 
+            color: white; 
+            padding: 0;
+            box-shadow: 2px 0 4px rgba(0,0,0,0.1);
+        }
+        .sidebar-header { 
+            padding: 20px; 
+            border-bottom: 1px solid #374151; 
+            background: #111827;
+        }
+        .sidebar-header h2 { 
+            margin: 0; 
+            color: #f9fafb; 
+            font-size: 18px; 
+            font-weight: 600;
+        }
+        .sidebar-nav { padding: 0; margin: 0; list-style: none; }
+        .sidebar-nav li { margin: 0; }
+        .sidebar-nav a { 
+            display: flex; 
+            align-items: center; 
+            padding: 12px 20px; 
+            color: #d1d5db; 
+            text-decoration: none; 
+            transition: all 0.2s;
+            border-left: 3px solid transparent;
+        }
+        .sidebar-nav a:hover { 
+            background: #374151; 
+            color: #f9fafb; 
+            border-left-color: #3b82f6;
+        }
+        .sidebar-nav a.active { 
+            background: #1e40af; 
+            color: white; 
+            border-left-color: #60a5fa;
+        }
+        .sidebar-nav .icon { 
+            margin-right: 10px; 
+            font-size: 16px; 
+            width: 20px; 
+            text-align: center;
+        }
+        .sidebar-footer {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            padding: 20px;
+            border-top: 1px solid #374151;
+            background: #111827;
+        }
+        .logout-btn {
+            display: flex;
+            align-items: center;
+            width: 100%;
+            padding: 10px;
+            background: #dc2626;
+            color: white;
+            text-decoration: none;
+            border-radius: 6px;
+            transition: background 0.2s;
+        }
+        .logout-btn:hover { background: #b91c1c; }
+        
+        /* Main Content Styles */
+        .main-content { 
+            flex: 1; 
+            padding: 24px; 
+            overflow-y: auto;
+        }
+        .content-header { 
+            display: flex; 
+            justify-content: space-between; 
+            align-items: center; 
+            margin-bottom: 24px; 
+        }
+        .content-header h1 { 
+            margin: 0; 
+            color: #111827; 
+            font-size: 28px; 
+            font-weight: 700;
+        }
+        .header-actions {
+            display: flex;
+            gap: 12px;
+        }
+        .btn {
+            padding: 8px 16px;
+            text-decoration: none;
+            border-radius: 6px;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            border: none;
+        }
+        .btn-export {
+            background: #10b981;
+            color: white;
+        }
+        .btn-export:hover {
+            background: #059669;
+        }
+        
+        /* Metrics Grid */
+        .metrics-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 16px;
+            margin-bottom: 32px;
+        }
+        .metric-card {
+            background: white;
+            border: 1px solid #e5e7eb;
+            border-radius: 8px;
+            padding: 20px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+        .metric-card h3 {
+            margin: 0 0 8px 0;
+            color: #6b7280;
+            font-size: 14px;
+            font-weight: 500;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+        .metric-card .value {
+            color: #111827;
+            font-size: 24px;
+            font-weight: 700;
+        }
+        .metric-card .currency {
+            color: #059669;
+        }
+        
+        /* Charts Grid */
+        .charts-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 24px;
+            margin-bottom: 32px;
+        }
+        .chart-card {
+            background: white;
+            border: 1px solid #e5e7eb;
+            border-radius: 8px;
+            padding: 24px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+        .chart-card h3 {
+            margin: 0 0 16px 0;
+            color: #111827;
+            font-size: 18px;
+            font-weight: 600;
+        }
+        .chart-container {
+            position: relative;
+            height: 300px;
+        }
+        
+        /* Tables */
+        .table-card {
+            background: white;
+            border: 1px solid #e5e7eb;
+            border-radius: 8px;
+            padding: 24px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+            margin-bottom: 24px;
+        }
+        .table-card h3 {
+            margin: 0 0 16px 0;
+            color: #111827;
+            font-size: 18px;
+            font-weight: 600;
+        }
+        table { 
+            width: 100%;
+            border-collapse: collapse;
+        }
+        th, td { 
+            padding: 12px; 
+            text-align: left; 
+            border-bottom: 1px solid #e5e7eb;
+        }
+        th { 
+            background: #f9fafb; 
+            color: #374151; 
+            font-weight: 600; 
+            font-size: 12px;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+        .earnings-amount { 
+            color: #059669; 
+            font-weight: 600; 
+        }
+        
+        @media (max-width: 768px) {
+            .charts-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="admin-layout">
+        <!-- Sidebar -->
+        <div class="sidebar">
+            <div class="sidebar-header">
+                <h2>🚗 ZipRide Admin</h2>
+            </div>
+            
+            <ul class="sidebar-nav">
+                <li><a href="/admin/dashboard">
+                    <span class="icon">📊</span>
+                    Dashboard
+                </a></li>
+                <li><a href="/admin/drivers">
+                    <span class="icon">👨‍✈️</span>
+                    Manage Drivers
+                </a></li>
+                <li><a href="/admin/rides">
+                    <span class="icon">🚙</span>
+                    Manage Rides
+                </a></li>
+                <li><a href="/admin/earnings">
+                    <span class="icon">💰</span>
+                    Earnings & Payments
+                </a></li>
+                <li><a href="/admin/users">
+                    <span class="icon">👥</span>
+                    Manage Users
+                </a></li>
+                <li><a href="/admin/reports" class="active">
+                    <span class="icon">📈</span>
+                    Reports & Analytics
+                </a></li>
+                <li><a href="/admin/settings">
+                    <span class="icon">⚙️</span>
+                    Settings
+                </a></li>
+            </ul>
+            
+            <div class="sidebar-footer">
+                <a href="/admin/logout" class="logout-btn">
+                    <span class="icon">🚪</span>
+                    Logout
+                </a>
+            </div>
+        </div>
+        
+        <!-- Main Content -->
+        <div class="main-content">
+            <div class="content-header">
+                <div>
+                    <h1>Reports & Analytics</h1>
+                    <div style="color: #6b7280; font-size: 14px;">
+                        Comprehensive platform performance insights
+                    </div>
+                </div>
+                <div class="header-actions">
+                    <a href="/admin/reports/export" class="btn btn-export">📊 Export Report</a>
+                </div>
+            </div>
+
+            <!-- Key Metrics -->
+            <div class="metrics-grid">
+                <div class="metric-card">
+                    <h3>Total Rides</h3>
+                    <div class="value">{{.Report.TotalRides}}</div>
+                </div>
+                <div class="metric-card">
+                    <h3>Platform Revenue</h3>
+                    <div class="value currency">₹{{printf "%.2f" .Report.TotalEarnings}}</div>
+                </div>
+                <div class="metric-card">
+                    <h3>Active Drivers</h3>
+                    <div class="value">{{.Report.ActiveDrivers}}</div>
+                </div>
+                <div class="metric-card">
+                    <h3>Completion Rate</h3>
+                    <div class="value">
+                        {{if gt .Report.TotalRides 0}}
+                            {{printf "%.1f%%" .Report.CompletionRate}}
+                        {{else}}
+                            0%
+                        {{end}}
+                    </div>
+                </div>
+                <div class="metric-card">
+                    <h3>Average Ride Value</h3>
+                    <div class="value currency">₹{{printf "%.2f" .Report.AvgRideValue}}</div>
+                </div>
+                <div class="metric-card">
+                    <h3>Cancelled Rides</h3>
+                    <div class="value" style="color: #ef4444;">{{.Report.CancelledRides}}</div>
+                </div>
+            </div>
+
+            <!-- Charts -->
+            <div class="charts-grid">
+                <!-- Ride Status Breakdown -->
+                <div class="chart-card">
+                    <h3>Ride Status Distribution</h3>
+                    <div class="chart-container">
+                        <canvas id="statusChart"></canvas>
+                    </div>
+                </div>
+
+                <!-- Daily Trends -->
+                <div class="chart-card">
+                    <h3>Daily Ride Trends (Last 7 Days)</h3>
+                    <div class="chart-container">
+                        <canvas id="trendsChart"></canvas>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Top Drivers Table -->
+            {{if .Report.TopDrivers}}
+            <div class="table-card">
+                <h3>Top Performing Drivers</h3>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Driver Name</th>
+                            <th>Completed Rides</th>
+                            <th>Total Earnings</th>
+                            <th>Avg per Ride</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {{range .Report.TopDrivers}}
+                        <tr>
+                            <td><strong>{{.Name}}</strong></td>
+                            <td>{{.Rides}} rides</td>
+                            <td class="earnings-amount">₹{{printf "%.2f" .Earnings}}</td>
+                            <td>₹{{printf "%.2f" .AvgPerRide}}</td>
+                        </tr>
+                        {{end}}
+                    </tbody>
+                </table>
+            </div>
+            {{end}}
+        </div>
+    </div>
+
+    <script>
+        // Ride Status Distribution Chart
+        const statusCtx = document.getElementById('statusChart').getContext('2d');
+        const statusData = {
+            labels: [{{range .Report.StatusBreakdown}}'{{.Status}}',{{end}}],
+            datasets: [{
+                data: [{{range .Report.StatusBreakdown}}{{.Count}},{{end}}],
+                backgroundColor: [
+                    '#3b82f6', // pending - blue
+                    '#f59e0b', // ongoing - orange  
+                    '#10b981', // completed - green
+                    '#ef4444', // cancelled - red
+                ],
+                borderWidth: 0
+            }]
+        };
+
+        new Chart(statusCtx, {
+            type: 'doughnut',
+            data: statusData,
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        position: 'bottom',
+                    }
+                }
+            }
+        });
+
+        // Daily Trends Chart
+        const trendsCtx = document.getElementById('trendsChart').getContext('2d');
+        const trendsData = {
+            labels: [{{range .Report.DailyStats}}'{{.Date}}',{{end}}],
+            datasets: [{
+                label: 'Rides',
+                data: [{{range .Report.DailyStats}}{{.Rides}},{{end}}],
+                borderColor: '#3b82f6',
+                backgroundColor: 'rgba(59, 130, 246, 0.1)',
+                tension: 0.4,
+                fill: true
+            }]
+        };
+
+        new Chart(trendsCtx, {
+            type: 'line',
+            data: trendsData,
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        ticks: {
+                            precision: 0
+                        }
+                    }
+                },
+                plugins: {
+                    legend: {
+                        display: false
+                    }
+                }
+            }
+        });
+    </script>
+</body>
+</html>
+{{ end }}

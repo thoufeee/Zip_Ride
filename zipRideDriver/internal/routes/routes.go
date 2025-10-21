@@ -1,14 +1,15 @@
 package routes
 
 import (
-	"fmt"
+	"html/template"
+	"net/http"
+	"path/filepath"
 
 	adminhandlers "zipRideDriver/internal/admin/handlers"
 	adminmiddleware "zipRideDriver/internal/admin/middleware"
 	"zipRideDriver/internal/config"
 	"zipRideDriver/internal/handlers"
 	"zipRideDriver/internal/middleware"
-	"zipRideDriver/internal/utils"
 
 	"github.com/gin-gonic/gin"
 	"github.com/redis/go-redis/v9"
@@ -23,14 +24,26 @@ func SetupRouter(cfg *config.Config, log *zap.Logger, db *gorm.DB, rdb *redis.Cl
 
 	// Static & Templates for SSR admin panel
 	r.Static("/static", "./static")
-	r.LoadHTMLGlob("templates/**/*.html")
+	// Ensure base is parsed first so its default blocks don't overwrite page blocks
+	tpl := template.New("")
+	tpl = template.Must(tpl.ParseFiles("templates/layouts/base.html"))
+	adminUIEnabled := false
+	if files, _ := filepath.Glob("templates/admin/*.html"); len(files) > 0 {
+		tpl = template.Must(tpl.ParseFiles(files...))
+		adminUIEnabled = true
+	}
+	if files, _ := filepath.Glob("templates/admin/*/*.html"); len(files) > 0 {
+		tpl = template.Must(tpl.ParseFiles(files...))
+		adminUIEnabled = true
+	}
+	r.SetHTMLTemplate(tpl)
 
-	r.GET("/health", func(c *gin.Context) {
-		utils.Ok(c, "zipride-driver-service running", gin.H{
-			"env":  cfg.AppEnv,
-			"port": fmt.Sprintf("%d", cfg.Port),
-		})
-	})
+	// r.GET("/health", func(c *gin.Context) {
+	// 	utils.Ok(c, "zipride-driver-service running", gin.H{
+	// 		"env":  cfg.AppEnv,
+	// 		"port": fmt.Sprintf("%d", cfg.Port),
+	// 	})
+	// })
 
 	dh := handlers.NewDriverHandler(cfg, db, rdb, log)
 	ddh := handlers.NewDriverDashboardHandler(cfg, db, rdb, log)
@@ -40,10 +53,20 @@ func SetupRouter(cfg *config.Config, log *zap.Logger, db *gorm.DB, rdb *redis.Cl
 	ah := handlers.NewAdminHandler(cfg, db, rdb, log)
 	wsh := handlers.NewWSHandler(cfg, db, rdb, log)
 	auth := handlers.NewAuthHandler(cfg, db, rdb, log)
+	h := handlers.NewPublicHandler(cfg, db, rdb, log)
+	regHandler := handlers.NewDriverRegistrationHandler(db, log)
 
 	// Driver auth
 	driver := r.Group("/driver")
 	driver.POST("/send-otp", auth.SendOTP)
+	// Public API
+	r.POST("/register", h.RegisterDriver)
+	r.POST("/login", h.LoginDriver)
+	r.GET("/health", h.Health)
+
+	// Driver Registration (Public)
+	r.POST("/api/driver/register", regHandler.RegisterDriver)
+	r.GET("/api/driver/registration-status/:email", regHandler.CheckRegistrationStatus)
 	driver.POST("/verify-otp", auth.VerifyOTP)
 	driver.POST("/login", auth.Login)
 	driver.POST("/refresh-token", auth.RefreshToken)
@@ -56,87 +79,97 @@ func SetupRouter(cfg *config.Config, log *zap.Logger, db *gorm.DB, rdb *redis.Cl
 	// Session middleware for SSR admin
 	panel := r.Group("/admin/panel")
 	panel.Use(adminmiddleware.SSRAuthMiddleware(cfg, db, rdb, log))
+	if adminUIEnabled {
+		panel.GET("/", func(c *gin.Context) { c.Redirect(http.StatusSeeOther, "/admin/panel/dashboard") })
+		panel.GET("", func(c *gin.Context) { c.Redirect(http.StatusSeeOther, "/admin/panel/dashboard") })
 
-	// Auth pages
-	authSSR := adminhandlers.NewAuthHandler(cfg, db, rdb, log)
-	panel.GET("/login", authSSR.LoginPage)
-	panel.POST("/login", authSSR.Login)
-	panel.GET("/logout", authSSR.Logout)
+		// Auth pages
+		authSSR := adminhandlers.NewAuthHandler(cfg, db, rdb, log)
+		panel.GET("/login", authSSR.LoginPage)
+		panel.POST("/login", authSSR.Login)
+		panel.GET("/logout", authSSR.Logout)
 
-	// Protected admin panel
-	panelAuth := panel.Group("")
-	panelAuth.Use(adminmiddleware.RequireAdmin())
+		// Protected admin panel
+		panelAuth := panel.Group("")
+		panelAuth.Use(adminmiddleware.RequireAdmin())
 
-	// Dashboard
-	dash := adminhandlers.NewDashboardHandler(db, log)
-	panelAuth.GET("/dashboard", adminmiddleware.ACLMiddleware(db, "admin:dashboard:view"), dash.DashboardPage)
+		// Dashboard
+		dash := adminhandlers.NewDashboardHandler(db, log)
+		panelAuth.GET("/dashboard", adminmiddleware.ACLMiddleware(db, "admin:dashboard:view"), dash.DashboardPage)
 
-	// Drivers
-	drv := adminhandlers.NewDriverHandler(db, log)
-	panelAuth.GET("/drivers", adminmiddleware.ACLMiddleware(db, "admin:drivers:view"), drv.DriversPage)
-	panelAuth.GET("/driver/:id", adminmiddleware.ACLMiddleware(db, "admin:drivers:view"), drv.DriverDetailPage)
-	panelAuth.POST("/driver/:id/approve", adminmiddleware.ACLMiddleware(db, "admin:drivers:approve"), drv.ApproveDriver)
-	panelAuth.POST("/driver/:id/reject", adminmiddleware.ACLMiddleware(db, "admin:drivers:reject"), drv.RejectDriver)
-	panelAuth.POST("/driver/:id/suspend", adminmiddleware.ACLMiddleware(db, "admin:drivers:suspend"), drv.SuspendDriver)
+		// Drivers
+		drv := adminhandlers.NewDriverHandler(db, log)
+		panelAuth.GET("/drivers", adminmiddleware.ACLMiddleware(db, "admin:drivers:view"), drv.DriversPage)
+		panelAuth.GET("/drivers/pending", adminmiddleware.ACLMiddleware(db, "admin:drivers:view"), drv.PendingApprovals)
+		panelAuth.GET("/driver/:id", adminmiddleware.ACLMiddleware(db, "admin:drivers:view"), drv.DriverDetailPage)
+		panelAuth.POST("/driver/:id/approve", adminmiddleware.ACLMiddleware(db, "admin:drivers:approve"), drv.ApproveDriver)
+		panelAuth.POST("/driver/:id/reject", adminmiddleware.ACLMiddleware(db, "admin:drivers:reject"), drv.RejectDriver)
+		panelAuth.POST("/driver/:id/suspend", adminmiddleware.ACLMiddleware(db, "admin:drivers:suspend"), drv.SuspendDriver)
 
-	// Roles
-	roles := adminhandlers.NewRoleHandler(db, log)
-	panelAuth.GET("/roles", adminmiddleware.ACLMiddleware(db, "admin:roles:view"), roles.RolesPage)
-	panelAuth.GET("/roles/new", adminmiddleware.ACLMiddleware(db, "admin:roles:edit"), roles.NewRolePage)
-	panelAuth.POST("/roles", adminmiddleware.ACLMiddleware(db, "admin:roles:edit"), roles.CreateRole)
-	panelAuth.GET("/roles/:id/edit", adminmiddleware.ACLMiddleware(db, "admin:roles:edit"), roles.EditRolePage)
-	panelAuth.POST("/roles/:id", adminmiddleware.ACLMiddleware(db, "admin:roles:edit"), roles.UpdateRole)
-	panelAuth.POST("/roles/:id/delete", adminmiddleware.ACLMiddleware(db, "admin:roles:edit"), roles.DeleteRole)
+		// Roles
+		roles := adminhandlers.NewRoleHandler(db, log)
+		panelAuth.GET("/roles", adminmiddleware.ACLMiddleware(db, "admin:roles:view"), roles.RolesPage)
+		panelAuth.GET("/roles/new", adminmiddleware.ACLMiddleware(db, "admin:roles:edit"), roles.NewRolePage)
+		panelAuth.POST("/roles", adminmiddleware.ACLMiddleware(db, "admin:roles:edit"), roles.CreateRole)
+		panelAuth.GET("/roles/:id/edit", adminmiddleware.ACLMiddleware(db, "admin:roles:edit"), roles.EditRolePage)
+		panelAuth.POST("/roles/:id", adminmiddleware.ACLMiddleware(db, "admin:roles:edit"), roles.UpdateRole)
+		panelAuth.POST("/roles/:id/delete", adminmiddleware.ACLMiddleware(db, "admin:roles:edit"), roles.DeleteRole)
 
-	// Admins
-	admins := adminhandlers.NewAdminsHandler(db, log)
-	panelAuth.GET("/admins", adminmiddleware.ACLMiddleware(db, "admin:admins:view"), admins.AdminsPage)
-	panelAuth.POST("/admins", adminmiddleware.ACLMiddleware(db, "admin:admins:edit"), admins.CreateAdmin)
-	panelAuth.POST("/admins/:id", adminmiddleware.ACLMiddleware(db, "admin:admins:edit"), admins.UpdateAdmin)
-	panelAuth.POST("/admins/:id/delete", adminmiddleware.ACLMiddleware(db, "admin:admins:edit"), admins.DeleteAdmin)
+		// Admins
+		admins := adminhandlers.NewAdminsHandler(db, log)
+		panelAuth.GET("/admins", adminmiddleware.ACLMiddleware(db, "admin:admins:view"), admins.AdminsPage)
+		panelAuth.POST("/admins", adminmiddleware.ACLMiddleware(db, "admin:admins:edit"), admins.CreateAdmin)
+		panelAuth.POST("/admins/:id", adminmiddleware.ACLMiddleware(db, "admin:admins:edit"), admins.UpdateAdmin)
+		panelAuth.POST("/admins/:id/delete", adminmiddleware.ACLMiddleware(db, "admin:admins:edit"), admins.DeleteAdmin)
 
-	// Vehicles
-	vehSSR := adminhandlers.NewVehiclesHandler(db, log)
-	panelAuth.GET("/vehicles", adminmiddleware.ACLMiddleware(db, "admin:vehicles:view"), vehSSR.Index)
-	panelAuth.GET("/vehicles/:id", adminmiddleware.ACLMiddleware(db, "admin:vehicles:view"), vehSSR.Show)
-	panelAuth.POST("/vehicles/:id/verify", adminmiddleware.ACLMiddleware(db, "admin:vehicles:verify"), vehSSR.Verify)
-	panelAuth.POST("/vehicles/:id/assign", adminmiddleware.ACLMiddleware(db, "admin:vehicles:assign"), vehSSR.Assign)
-	panelAuth.POST("/vehicles/:id/deactivate", adminmiddleware.ACLMiddleware(db, "admin:vehicles:deactivate"), vehSSR.Deactivate)
+		// Vehicles
+		vehSSR := adminhandlers.NewVehiclesHandler(db, log)
+		panelAuth.GET("/vehicles", adminmiddleware.ACLMiddleware(db, "admin:vehicles:view"), vehSSR.Index)
+		panelAuth.GET("/vehicles/:id", adminmiddleware.ACLMiddleware(db, "admin:vehicles:view"), vehSSR.Show)
+		panelAuth.POST("/vehicles/:id/verify", adminmiddleware.ACLMiddleware(db, "admin:vehicles:verify"), vehSSR.Verify)
+		panelAuth.POST("/vehicles/:id/assign", adminmiddleware.ACLMiddleware(db, "admin:vehicles:assign"), vehSSR.Assign)
+		panelAuth.POST("/vehicles/:id/deactivate", adminmiddleware.ACLMiddleware(db, "admin:vehicles:deactivate"), vehSSR.Deactivate)
 
-	// Rides
-	ridesSSR := adminhandlers.NewRidesHandler(db, log)
-	panelAuth.GET("/rides", adminmiddleware.ACLMiddleware(db, "admin:rides:view"), ridesSSR.Index)
-	panelAuth.GET("/rides/:id", adminmiddleware.ACLMiddleware(db, "admin:rides:view"), ridesSSR.Show)
-	panelAuth.POST("/rides/:id/cancel", adminmiddleware.ACLMiddleware(db, "admin:rides:cancel"), ridesSSR.Cancel)
+		// Rides
+		ridesSSR := adminhandlers.NewRidesHandler(db, log)
+		panelAuth.GET("/rides", adminmiddleware.ACLMiddleware(db, "admin:rides:view"), ridesSSR.Index)
+		panelAuth.GET("/rides/:id", adminmiddleware.ACLMiddleware(db, "admin:rides:view"), ridesSSR.Show)
+		panelAuth.POST("/rides/:id/cancel", adminmiddleware.ACLMiddleware(db, "admin:rides:cancel"), ridesSSR.Cancel)
 
-	// Earnings & Withdrawals
-	earnSSR := adminhandlers.NewEarningsHandler(db, log)
-	panelAuth.GET("/earnings", adminmiddleware.ACLMiddleware(db, "admin:earnings:view"), earnSSR.Index)
-	panelAuth.GET("/earnings/export", adminmiddleware.ACLMiddleware(db, "admin:earnings:view"), earnSSR.ExportCSV)
-	panelAuth.GET("/withdrawals", adminmiddleware.ACLMiddleware(db, "admin:earnings:view"), earnSSR.Withdrawals)
-	panelAuth.POST("/withdrawals/:id/approve", adminmiddleware.ACLMiddleware(db, "admin:withdrawals:approve"), earnSSR.ApproveWithdrawal)
-	panelAuth.POST("/withdrawals/:id/reject", adminmiddleware.ACLMiddleware(db, "admin:withdrawals:reject"), earnSSR.RejectWithdrawal)
+		// Earnings & Withdrawals
+		earnSSR := adminhandlers.NewEarningsHandler(db, log)
+		panelAuth.GET("/earnings", adminmiddleware.ACLMiddleware(db, "admin:earnings:view"), earnSSR.Index)
+		panelAuth.GET("/earnings/export", adminmiddleware.ACLMiddleware(db, "admin:earnings:view"), earnSSR.ExportCSV)
+		panelAuth.GET("/withdrawals", adminmiddleware.ACLMiddleware(db, "admin:earnings:view"), earnSSR.Withdrawals)
+		panelAuth.POST("/withdrawals/:id/approve", adminmiddleware.ACLMiddleware(db, "admin:withdrawals:approve"), earnSSR.ApproveWithdrawal)
+		panelAuth.POST("/withdrawals/:id/reject", adminmiddleware.ACLMiddleware(db, "admin:withdrawals:reject"), earnSSR.RejectWithdrawal)
 
-	// Users (Riders)
-	usersSSR := adminhandlers.NewUsersHandler(db, log)
-	panelAuth.GET("/users", adminmiddleware.ACLMiddleware(db, "admin:users:view"), usersSSR.Index)
-	panelAuth.POST("/users/:id/block", adminmiddleware.ACLMiddleware(db, "admin:users:block"), usersSSR.Block)
-	panelAuth.POST("/users/:id/unblock", adminmiddleware.ACLMiddleware(db, "admin:users:unblock"), usersSSR.Unblock)
+		// Users (Riders)
+		usersSSR := adminhandlers.NewUsersHandler(db, log)
+		panelAuth.GET("/users", adminmiddleware.ACLMiddleware(db, "admin:users:view"), usersSSR.Index)
+		panelAuth.POST("/users/:id/block", adminmiddleware.ACLMiddleware(db, "admin:users:block"), usersSSR.Block)
+		panelAuth.POST("/users/:id/unblock", adminmiddleware.ACLMiddleware(db, "admin:users:unblock"), usersSSR.Unblock)
 
-	// Help Center (Issues)
-	helpSSR := adminhandlers.NewHelpHandler(db, log)
-	panelAuth.GET("/help", adminmiddleware.ACLMiddleware(db, "admin:help:view"), helpSSR.Index)
-	panelAuth.GET("/help/:id", adminmiddleware.ACLMiddleware(db, "admin:help:view"), helpSSR.Show)
-	panelAuth.POST("/help/:id/reply", adminmiddleware.ACLMiddleware(db, "admin:help:reply"), helpSSR.Reply)
-	panelAuth.POST("/help/:id/close", adminmiddleware.ACLMiddleware(db, "admin:help:close"), helpSSR.Close)
-	// Issues aliases
-	panelAuth.GET("/issues", adminmiddleware.ACLMiddleware(db, "admin:help:view"), helpSSR.Index)
-	panelAuth.POST("/issues/:id/resolve", adminmiddleware.ACLMiddleware(db, "admin:help:close"), helpSSR.Close)
+		// Help Center (Issues)
+		helpSSR := adminhandlers.NewHelpHandler(db, log)
+		panelAuth.GET("/help", adminmiddleware.ACLMiddleware(db, "admin:help:view"), helpSSR.Index)
+		panelAuth.GET("/help/:id", adminmiddleware.ACLMiddleware(db, "admin:help:view"), helpSSR.Show)
+		panelAuth.POST("/help/:id/reply", adminmiddleware.ACLMiddleware(db, "admin:help:reply"), helpSSR.Reply)
+		panelAuth.POST("/help/:id/close", adminmiddleware.ACLMiddleware(db, "admin:help:close"), helpSSR.Close)
+		// Issues aliases
+		panelAuth.GET("/issues", adminmiddleware.ACLMiddleware(db, "admin:help:view"), helpSSR.Index)
+		panelAuth.POST("/issues/:id/resolve", adminmiddleware.ACLMiddleware(db, "admin:help:close"), helpSSR.Close)
 
-	// Settings
-	settings := adminhandlers.NewSettingsHandler(db, log)
-	panelAuth.GET("/settings", adminmiddleware.ACLMiddleware(db, "admin:settings:edit"), settings.SettingsPage)
-	panelAuth.POST("/settings/password", adminmiddleware.ACLMiddleware(db, "admin:settings:edit"), settings.UpdatePassword)
+		// Settings
+		settings := adminhandlers.NewSettingsHandler(db, log)
+		panelAuth.GET("/settings", adminmiddleware.ACLMiddleware(db, "admin:settings:edit"), settings.SettingsPage)
+		panelAuth.POST("/settings/password", adminmiddleware.ACLMiddleware(db, "admin:settings:edit"), settings.UpdatePassword)
+	} else {
+		// Fallback when admin UI is removed; prevents "template is undefined" errors
+		panel.GET("/*any", func(c *gin.Context) {
+			c.String(http.StatusServiceUnavailable, "Admin panel UI is not installed. Implement templates to enable it.")
+		})
+	}
 
 	// Driver private API
 	apiDriver := r.Group("/api/driver")
@@ -172,15 +205,47 @@ func SetupRouter(cfg *config.Config, log *zap.Logger, db *gorm.DB, rdb *redis.Cl
 	helpAuth.POST("/report", helph.CreateReport)
 	helpAuth.POST("/chat/start", helph.StartChat)
 
-	// Admin
+	// Admin Routes (supports both cookie and JWT auth)
 	admin := r.Group("/admin")
-	admin.POST("/login", ah.Login)
+	admin.GET("/login", func(c *gin.Context) {
+		c.HTML(http.StatusOK, "admin/login.html", nil)
+	})
+	admin.POST("/login", ah.Login) // Enhanced to support both cookie and JWT
+	admin.GET("/logout", func(c *gin.Context) {
+		c.SetCookie("admin_token", "", -1, "/", "", false, true)
+		c.Redirect(http.StatusSeeOther, "/admin/login")
+	})
+
+	// Protected Admin Routes (supports both auth methods)
 	adminAuth := admin.Group("")
-	adminAuth.Use(middleware.AuthMiddleware(cfg.JWTSecret), middleware.AdminOnly())
-	adminAuth.GET("/drivers", ah.ListDrivers)
-	adminAuth.POST("/driver/:id/approve", ah.ApproveDriver)
-	adminAuth.POST("/driver/:id/ban", ah.BanDriver)
+	adminAuth.Use(func(c *gin.Context) {
+		// Try cookie auth first
+		if token, err := c.Cookie("admin_token"); err == nil && token != "" {
+			c.Next()
+			return
+		}
+		// Fall back to JWT auth
+		middleware.AuthMiddleware(cfg.JWTSecret)(c)
+		if c.IsAborted() {
+			return
+		}
+		middleware.AdminOnly()(c)
+	})
 	adminAuth.GET("/dashboard", ah.Dashboard)
+	adminAuth.GET("/drivers", ah.ListDrivers)
+	adminAuth.GET("/driver/:id/approve", ah.ApproveDriver)  // HTML link support
+	adminAuth.POST("/driver/:id/approve", ah.ApproveDriver) // API support
+	adminAuth.GET("/driver/:id/suspend", ah.SuspendDriver)  // HTML link support
+	adminAuth.POST("/driver/:id/ban", ah.BanDriver)
+	adminAuth.GET("/rides", ah.ListRides)                 // Ride management
+	adminAuth.GET("/ride/:id", ah.ShowRide)               // Ride details
+	adminAuth.GET("/ride/:id/cancel", ah.CancelRide)      // Cancel ride
+	adminAuth.GET("/earnings", ah.ListEarnings)           // Earnings management
+	adminAuth.GET("/earnings/export", ah.ExportEarnings)  // Export earnings CSV
+	adminAuth.GET("/reports", ah.ListReports)             // Reports & Analytics
+	adminAuth.GET("/reports/export", ah.ExportReports)    // Export platform report CSV
+	adminAuth.GET("/settings", ah.AdminSettings)          // Admin settings
+	adminAuth.POST("/change-password", ah.ChangePassword) // Change password
 
 	// WebSockets
 	ws := r.Group("/ws")
