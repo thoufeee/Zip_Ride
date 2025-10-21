@@ -1,19 +1,54 @@
-// analytics.js
-
-// Logout handler
+// ==================== LOGOUT ====================
 document.getElementById("logout-btn").addEventListener("click", () => {
   localStorage.removeItem("accessToken");
   localStorage.removeItem("refreshToken");
   localStorage.removeItem("role");
+  localStorage.removeItem("permissions"); // optional if you store permissions
   window.location.href = "signin.html";
 });
 
-// Color palette
-const PRIMARY_COLOR = '#06b6d4'; // cyan
-const SECONDARY_COLOR = '#3b82f6'; // blue
-const ACCENT_COLOR = '#ef4444'; // red
+// ==================== HELPER: PERMISSION CHECK ====================
+function getPermissions() {
+  try {
+    // if you store permissions in localStorage
+    const perms = JSON.parse(localStorage.getItem("permissions"));
+    if (Array.isArray(perms)) return perms;
 
-// Common chart options
+    // else if you store permissions inside JWT token, decode it
+    const token = localStorage.getItem("accessToken");
+    if (!token) return [];
+    const payload = JSON.parse(atob(token.split(".")[1]));
+    return payload.permissions || [];
+  } catch {
+    return [];
+  }
+}
+
+function hasPermission(permission) {
+  const perms = getPermissions();
+  return perms.includes(permission);
+}
+
+// ==================== ACCESS CONTROL (ACL) ====================
+if (!hasPermission("VIEW_ANALYTICS")) {
+  document.body.innerHTML = `
+    <div class="flex flex-col items-center justify-center min-h-screen bg-gray-50 text-center">
+      <h1 class="text-3xl font-bold text-red-600 mb-3">Access Denied</h1>
+      <p class="text-gray-600 mb-6">You don't have permission to view this page.</p>
+      <button onclick="window.location.href='admindash.html'" 
+        class="bg-cyan-600 hover:bg-cyan-700 text-white px-5 py-2.5 rounded-xl font-semibold shadow-md">
+        Go to Dashboard
+      </button>
+    </div>
+  `;
+  throw new Error("Unauthorized access to Analytics page");
+}
+
+// ==================== CHARTS CONFIG ====================
+const PRIMARY_COLOR = '#06b6d4'; 
+const SECONDARY_COLOR = '#3b82f6'; 
+const ACCENT_COLOR = '#ef4444'; 
+
 const chartOptions = {
   responsive: true,
   maintainAspectRatio: false,
@@ -41,7 +76,7 @@ const chartOptions = {
   }
 };
 
-// 📊 1. Daily Bookings Chart
+// ==================== CHART CREATION ====================
 new Chart(document.getElementById('dailyBookingsChart').getContext('2d'), {
   type: 'bar',
   data: {
@@ -56,7 +91,6 @@ new Chart(document.getElementById('dailyBookingsChart').getContext('2d'), {
   options: chartOptions
 });
 
-// 📈 2. Weekly Bookings Chart
 new Chart(document.getElementById('weeklyBookingsChart').getContext('2d'), {
   type: 'line',
   data: {
@@ -75,7 +109,6 @@ new Chart(document.getElementById('weeklyBookingsChart').getContext('2d'), {
   options: chartOptions
 });
 
-// 📊 3. Monthly Bookings Chart
 new Chart(document.getElementById('monthlyBookingsChart').getContext('2d'), {
   type: 'bar',
   data: {
@@ -90,7 +123,6 @@ new Chart(document.getElementById('monthlyBookingsChart').getContext('2d'), {
   options: chartOptions
 });
 
-// 💰 4. Monthly Revenue Chart
 new Chart(document.getElementById('revenueChart').getContext('2d'), {
   type: 'line',
   data: {
