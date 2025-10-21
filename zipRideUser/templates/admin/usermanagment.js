@@ -42,10 +42,13 @@ function hasPermission(requiredPermission) {
 
 if (!hasPermission("VIEW_USERS")) {
   document.body.innerHTML = `
-    <div class="flex items-center justify-center h-screen">
-      <h2 class="text-xl font-semibold text-red-500">
-        Access Denied: You don't have permission to view this page.
-      </h2>
+     <div class="flex flex-col items-center justify-center min-h-screen bg-gray-50 text-center">
+      <h1 class="text-3xl font-bold text-red-600 mb-3">Access Denied</h1>
+      <p class="text-gray-600 mb-6">You don't have permission to view this page.</p>
+      <button onclick="window.location.href='admindash.html'" 
+        class="bg-cyan-600 hover:bg-cyan-700 text-white px-5 py-2.5 rounded-xl font-semibold shadow-md">
+        Go to Dashboard
+      </button>
     </div>
   `;
   throw new Error("Permission denied");
@@ -266,6 +269,5 @@ if (createUserForm) {
     }
   });
 }
-
 
 fetchUsers();
