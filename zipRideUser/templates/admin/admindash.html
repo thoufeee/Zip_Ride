@@ -36,7 +36,7 @@
       </a>
       <a href="adminmanagment.html" class="flex items-center px-4 py-3 rounded-xl hover:bg-cyan-700 transition duration-150">
         <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5m-5 0a2 2 0 01-2-2V9a2 2 0 012-2h5m-5 0V9a2 2 0 002 2h5m-2-2v5a2 2 0 01-2 2H9a2 2 0 01-2-2V7a2 2 0 012-2h5a2 2 0 012 2v5"></path></svg>
-        Admin Management
+        Access Control Management
       </a>
       <a href="createadmin.html" class="flex items-center px-4 py-3 rounded-xl hover:bg-cyan-700 transition duration-150">
         <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z"></path></svg>
@@ -68,62 +68,41 @@
      
     </header>
 
-    <section class="grid gap-8 md:grid-cols-3 mb-12">
+  <section class="grid gap-8 md:grid-cols-3 mb-12">
       <div class="bg-white rounded-xl shadow-xl p-8 text-left border-t-4 border-cyan-500 hover:shadow-2xl transition duration-300">
         <h3 class="text-gray-500 font-bold mb-2 uppercase text-sm tracking-wider">Total Users</h3>
         <p id="user-count" class="text-4xl font-extrabold text-cyan-600">0</p>
       </div>
       <div class="bg-white rounded-xl shadow-xl p-8 text-left border-t-4 border-cyan-500 hover:shadow-2xl transition duration-300">
-        <h3 class="text-gray-500 font-bold mb-2 uppercase text-sm tracking-wider">Total Lastest Users</h3>
+        <h3 class="text-gray-500 font-bold mb-2 uppercase text-sm tracking-wider">Total Latest Users</h3>
         <p id="staff-count" class="text-4xl font-extrabold text-cyan-600">0</p>
       </div>
       <div class="bg-white rounded-xl shadow-xl p-8 text-left border-t-4 border-cyan-500 hover:shadow-2xl transition duration-300">
-        <h3 class="text-gray-500 font-bold mb-2 uppercase text-sm tracking-wider">TODAYS Total BOOKINGS</h3>
+        <h3 class="text-gray-500 font-bold mb-2 uppercase text-sm tracking-wider">Today's Total Bookings</h3>
         <p id="manager-count" class="text-4xl font-extrabold text-cyan-600">0</p>
       </div>
     </section>
 
+    <!-- Recent Bookings Table -->
     <section class="bg-white rounded-xl shadow-2xl p-8 border border-gray-100">
       <h2 class="text-2xl font-bold text-gray-800 mb-6 border-b pb-3">Recent Booking History</h2>
       <div class="overflow-x-auto">
         <table class="min-w-full divide-y divide-gray-200">
-          <thead class="bg-cyan-50"> <tr>
+          <thead class="bg-cyan-50">
+            <tr>
               <th class="px-6 py-4 text-left text-xs font-bold text-cyan-800 uppercase tracking-wider">Booking ID</th>
               <th class="px-6 py-4 text-left text-xs font-bold text-cyan-800 uppercase tracking-wider">User</th>
-              <th class="px-6 py-4 text-left text-xs font-bold text-cyan-800 uppercase tracking-wider">Service</th>
+              <th class="px-6 py-4 text-left text-xs font-bold text-cyan-800 uppercase tracking-wider">Driver</th>
+              <th class="px-6 py-4 text-left text-xs font-bold text-cyan-800 uppercase tracking-wider">Pickup</th>
+              <th class="px-6 py-4 text-left text-xs font-bold text-cyan-800 uppercase tracking-wider">Drop-off</th>
+              <th class="px-6 py-4 text-left text-xs font-bold text-cyan-800 uppercase tracking-wider">Vehicle</th>
               <th class="px-6 py-4 text-left text-xs font-bold text-cyan-800 uppercase tracking-wider">Status</th>
               <th class="px-6 py-4 text-left text-xs font-bold text-cyan-800 uppercase tracking-wider">Date</th>
             </tr>
           </thead>
           <tbody id="booking-history-body" class="bg-white divide-y divide-gray-100 text-sm">
-            <tr class="hover:bg-gray-50 transition duration-150">
-              <td class="px-6 py-4 whitespace-nowrap font-medium text-gray-900">#BK-9021</td>
-              <td class="px-6 py-4 whitespace-nowrap text-gray-600">Alice Smith</td>
-              <td class="px-6 py-4 whitespace-nowrap text-gray-600">Deep Cleaning</td>
-              <td class="px-6 py-4 whitespace-nowrap">
-                  <span class="px-3 py-1 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">Completed</span>
-              </td>
-              <td class="px-6 py-4 whitespace-nowrap text-gray-500">2025-10-15</td>
-            </tr>
-            <tr class="hover:bg-gray-50 transition duration-150">
-              <td class="px-6 py-4 whitespace-nowrap font-medium text-gray-900">#BK-9022</td>
-              <td class="px-6 py-4 whitespace-nowrap text-gray-600">John Brown</td>
-              <td class="px-6 py-4 whitespace-nowrap text-gray-600">Car Wash</td>
-              <td class="px-6 py-4 whitespace-nowrap">
-                  <span class="px-3 py-1 inline-flex text-xs leading-5 font-semibold rounded-full bg-yellow-100 text-yellow-800">Pending</span>
-              </td>
-              <td class="px-6 py-4 whitespace-nowrap text-gray-500">2025-10-16</td>
-            </tr>
-            <tr class="hover:bg-gray-50 transition duration-150">
-              <td class="px-6 py-4 whitespace-nowrap font-medium text-gray-900">#BK-9023</td>
-              <td class="px-6 py-4 whitespace-nowrap text-gray-600">Sarah Lee</td>
-              <td class="px-6 py-4 whitespace-nowrap text-gray-600">Oil Change</td>
-              <td class="px-6 py-4 whitespace-nowrap">
-                  <span class="px-3 py-1 inline-flex text-xs leading-5 font-semibold rounded-full bg-blue-100 text-blue-800">Scheduled</span>
-              </td>
-              <td class="px-6 py-4 whitespace-nowrap text-gray-500">2025-10-17</td>
-            </tr>
-            </tbody>
+            <tr><td colspan="8" class="text-center py-4">Loading...</td></tr>
+          </tbody>
         </table>
       </div>
     </section>
@@ -131,7 +110,6 @@
     <footer class="mt-16 text-center text-gray-400 text-sm">
       &copy; 2025 Admin Panel. All rights reserved.
     </footer>
-  </div>
 
   <script type="module" src="admindash.js"></script>
 </body>
