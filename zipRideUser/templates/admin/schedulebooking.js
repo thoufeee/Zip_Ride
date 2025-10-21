@@ -6,6 +6,36 @@ const assignDriverModal = document.getElementById('assignDriverModal');
 const driverNameInput = document.getElementById('driverNameInput');
 const modalBookingId = document.getElementById('modalBookingId');
 
+// ==================== UTILITY FUNCTIONS ====================
+function getPermissions() {
+    const perms = localStorage.getItem("permissions");
+    try {
+        return perms ? JSON.parse(perms) : [];
+    } catch {
+        return [];
+    }
+}
+
+function hasPermission(permission) {
+    const perms = getPermissions();
+    return perms.some(p => String(p).toUpperCase() === String(permission).toUpperCase());
+}
+
+// ==================== PAGE ACCESS CONTROL ====================
+if (!hasPermission("SCHEDULED_BOOKINGS")) {
+    document.body.innerHTML = `
+      <div class="flex flex-col items-center justify-center min-h-screen bg-gray-50 text-center">
+        <h1 class="text-3xl font-bold text-red-600 mb-3">Access Denied</h1>
+        <p class="text-gray-600 mb-6">You don't have permission to view this page.</p>
+        <button onclick="window.location.href='admindash.html'" 
+          class="bg-cyan-600 hover:bg-cyan-700 text-white px-5 py-2.5 rounded-xl font-semibold shadow-md">
+          Go to Dashboard
+        </button>
+      </div>
+    `;
+    throw new Error("Unauthorized access to Scheduled Bookings");
+}
+
 // ==================== LOGOUT HANDLER ====================
 document.getElementById("logout-btn").addEventListener("click", () => {
     localStorage.clear();
