@@ -1,6 +1,5 @@
-const BASE_URL = "http://localhost:8080/admin"; // backend base URL
+const BASE_URL = "http://localhost:8080/admin";
 
-// 🔹 Logout
 document.getElementById("logout-btn").addEventListener("click", () => {
   localStorage.removeItem("access");
   localStorage.removeItem("refresh");
@@ -9,13 +8,13 @@ document.getElementById("logout-btn").addEventListener("click", () => {
   window.location.href = "signin.html";
 });
 
-// 🔹 Permission check
+
 function hasPermission(permissionName) {
   const permissions = JSON.parse(localStorage.getItem("permissions") || "[]");
   return permissions.includes(permissionName);
 }
 
-// ✅ Restrict page access
+
 if (!hasPermission("SYSTEM_SETTINGS")) {
   document.body.innerHTML = `
     <div class="flex flex-col items-center justify-center min-h-screen bg-gray-50 text-center">
@@ -30,7 +29,7 @@ if (!hasPermission("SYSTEM_SETTINGS")) {
   throw new Error("Unauthorized access to System Settings");
 }
 
-// 🔹 Load Fare List
+
 const fareList = document.getElementById("fareList");
 const addFareBtn = document.getElementById("addFareBtn");
 
@@ -68,12 +67,11 @@ async function loadFares() {
   }
 }
 
-// 🔹 Edit Fare
+
 function editFare(id) {
   window.location.href = `fare_edit.html?id=${id}`;
 }
 
-// 🔹 Delete Fare
 async function deleteFare(id) {
   if (!confirm("Are you sure you want to delete this fare?")) return;
   try {
@@ -89,12 +87,12 @@ async function deleteFare(id) {
   }
 }
 
-// 🔹 Add Fare Button
+
 addFareBtn.addEventListener("click", () => {
-  window.location.href = "fare_edit.html"; // open blank form for new fare
+  window.location.href = "fare_edit.html"; 
 });
 
-// 🔹 Demo Save Handlers for other forms
+
 document.querySelectorAll("form").forEach(form => {
   form.addEventListener("submit", e => {
     e.preventDefault();
@@ -102,5 +100,5 @@ document.querySelectorAll("form").forEach(form => {
   });
 });
 
-// Initial load
+
 loadFares();
