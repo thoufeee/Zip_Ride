@@ -39,16 +39,18 @@ func UpdateStaff(c *gin.Context) {
 	}
 
 	// Validate email
-	if !utils.EmailCheck(input.Email) {
+	if input.Email != "" && !utils.EmailCheck(input.Email) {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid email format"})
 		return
 	}
 
-	// Normalize and validate phone number
-	phone, ok := utils.PhoneNumberCheck(input.PhoneNumber)
-	if !ok {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid phone number format"})
-		return
+	if input.PhoneNumber != "" {
+		phone, ok := utils.PhoneNumberCheck(input.PhoneNumber)
+		if !ok {
+			c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid phone number format"})
+			return
+		}
+		staff.PhoneNumber = phone
 	}
 
 	// Update password if provided
@@ -63,14 +65,6 @@ func UpdateStaff(c *gin.Context) {
 
 	if input.Name != "" {
 		staff.Name = input.Name
-	}
-
-	if input.Email != "" {
-		staff.Email = input.Email
-	}
-
-	if input.PhoneNumber != "" {
-		staff.PhoneNumber = input.PhoneNumber
 	}
 
 	if len(input.ExtraPerms) > 0 {
@@ -113,9 +107,8 @@ func UpdateStaff(c *gin.Context) {
 	}
 
 	c.JSON(http.StatusOK, gin.H{
-		"message":     "Staff updated successfully",
-		"Name":        staff.Name,
-		"Email":       staff.Email,
-		"PhoneNumber": phone,
+		"message": "Staff updated successfully",
+		"Name":    staff.Name,
+		"Email":   staff.Email,
 	})
 }
