@@ -17,7 +17,7 @@ func SendOtpHandler(c *gin.Context) {
 		Phone string `json:"phone"`
 	}
 
-	if err := c.ShouldBindJSON(&data); err != nil || data.Phone == "" {
+	if err := c.ShouldBindJSON(&data); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"err": "Phone required"})
 		return
 	}
