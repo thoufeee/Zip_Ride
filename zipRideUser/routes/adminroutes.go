@@ -7,6 +7,7 @@ import (
 	staffmanagment "zipride/internal/domain/user_Admin/staffManagment"
 	"zipride/internal/domain/user_Admin/staffManagment/controllers"
 	services "zipride/internal/domain/user_Admin/userManagment/controllers"
+	vehiclemanagement "zipride/internal/domain/user_Admin/vehicleManagement"
 	"zipride/internal/middleware"
 
 	"github.com/gin-gonic/gin"
@@ -41,10 +42,19 @@ func SuperAdminRoutes(c *gin.Engine) {
 	admin.PUT("/staffupdate/:id", middleware.RequirePermission(constants.PermissionEditStaff), controllers.UpdateStaff)
 	admin.DELETE("/staffdelete/:id", middleware.RequirePermission(constants.PermissionDeleteStaff), controllers.DeleteStaff)
 	admin.PUT("/staffblock/:id", middleware.RequirePermission(constants.PermissionBlockStaff), controllers.BlockStaff)
-	admin.PUT("/staffunblock/:id", middleware.RequirePermission(constants.PermissionUnBlockStaff), controllers.UnblockStaff)
+	// admin.PUT("/staffunblock/:id", middleware.RequirePermission(constants.PermissionUnBlockStaff), controllers.UnblockStaff)
 
 	//route for all permissions && roles
 	admin.GET("/allpermissions", middleware.RequirePermission(constants.ViewAllPermissions), allpermission.Permissions)
 	admin.GET("/allroles", middleware.RequirePermission(constants.PermissionViewAllRoles), allpermission.AllRoles)
 
+	// Vehicle Fare Management (SuperAdmin / Manager)
+	vehicleFare := admin.Group("/vehiclefare")
+	{
+		vehicleFare.POST("/",  vehiclemanagement.VehicleFareCreation)
+		vehicleFare.GET("/",  vehiclemanagement.GetAllVehicleFares)
+		vehicleFare.PUT("/:id",vehiclemanagement.UpdateVehicleFare)
+		vehicleFare.DELETE("/:id",vehiclemanagement.DeleteVehicleFare)
+
+	}
 }
