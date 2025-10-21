@@ -34,6 +34,17 @@ func CreateStaff(c *gin.Context) {
 		return
 	}
 
+	var admin models.Admin
+	if err := database.DB.Where("email = ?", data.Email).First(&admin).Error; err == nil {
+		c.JSON(http.StatusUnauthorized, gin.H{"err": "email already registered"})
+		return
+	}
+
+	if err := database.DB.Where("phone_number = ?", data.PhoneNumber).First(&admin).Error; err == nil {
+		c.JSON(http.StatusBadRequest, gin.H{"err": "phone number already registered"})
+		return
+	}
+
 	hashpass, err := utils.GenerateHash(data.Password)
 
 	if err != nil {
