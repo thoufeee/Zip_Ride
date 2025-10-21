@@ -6,7 +6,7 @@ import (
 	"zipride/internal/domain/user_Admin/allpermission"
 	staffmanagment "zipride/internal/domain/user_Admin/staffManagment"
 	"zipride/internal/domain/user_Admin/staffManagment/controllers"
-	services "zipride/internal/domain/user_Admin/userManagment/controllers"
+	"zipride/internal/domain/user_Admin/userManagment/services"
 	"zipride/internal/middleware"
 
 	"github.com/gin-gonic/gin"
@@ -24,11 +24,12 @@ func SuperAdminRoutes(c *gin.Engine) {
 	// verify route
 	admin.GET("/verify", allpermission.Verify)
 
-	// admin || staff || manager profile
 	admin.GET("/profile", staffmanagment.StaffProfile)
 
 	//user management
 	admin.GET("/allusers", middleware.RequirePermission(constants.PermissionViewUsers), services.GetAllUsers)
+	admin.GET("/alluserslength", middleware.RequirePermission(constants.PermissionAccessAdminDash), services.AllusersLength)
+	admin.GET("/latestuserslength", middleware.RequirePermission(constants.PermissionAccessAdminDash), services.LatestUsersLength)
 	admin.POST("/createuser", middleware.RequirePermission(constants.PermissionAddUser), services.AddUser)
 	admin.PUT("/user/:id", middleware.RequirePermission(constants.PermissionEditUser), services.UpdateUser)
 	admin.DELETE("/user/:id", middleware.RequirePermission(constants.PermissionDeleteUser), services.DeleteUser)
@@ -43,7 +44,7 @@ func SuperAdminRoutes(c *gin.Engine) {
 	admin.PUT("/staffblock/:id", middleware.RequirePermission(constants.PermissionBlockStaff), controllers.BlockStaff)
 	admin.PUT("/staffunblock/:id", middleware.RequirePermission(constants.PermissionUnBlockStaff), controllers.UnblockStaff)
 
-	//route for all permissions && roles
+	//route for all permissions
 	admin.GET("/allpermissions", middleware.RequirePermission(constants.ViewAllPermissions), allpermission.Permissions)
 
 }
