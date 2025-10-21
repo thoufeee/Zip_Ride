@@ -166,7 +166,21 @@ func HasPermission(db *gorm.DB, roleID uint, permissionName string) (bool, error
 }
 
 func HasPermissionForUser(db *gorm.DB, userID uint, permissionName string) (bool, error) {
+	// First check if user has a direct role assignment
 	roleID, err := GetUserRoleID(db, userID)
-	if err != nil { return false, err }
+	if err != nil {
+		// If no UserRole found, check if the user is a super_admin via AdminUser.Role field
+		var admin models.AdminUser
+		if err := db.First(&admin, userID).Error; err != nil {
+			return false, err
+		}
+		// Super admins have all permissions
+		if strings.EqualFold(admin.Role, "super_admin") || 
+		   strings.EqualFold(admin.Role, "superadmin") ||
+		   strings.EqualFold(admin.Role, "admin") {
+			return true, nil
+		}
+		return false, err
+	}
 	return HasPermission(db, roleID, permissionName)
 }
