@@ -38,7 +38,7 @@ func createBooking(c *gin.Context, req models.CreateBookingRequest, scheduleAt *
 		return
 	}
 
-	// Calculate distance & duration using map service (Google Maps, Mapbox, etc.)
+	// Calculate distance & duration using map service 
 	distance, durationSec, err := mapservice.GetRouteDistance(req.PickupLat, req.PickupLong, req.DropLat, req.DropLong)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
