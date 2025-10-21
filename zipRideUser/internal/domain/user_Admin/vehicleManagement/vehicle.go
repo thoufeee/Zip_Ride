@@ -7,6 +7,7 @@ import (
 
 	"github.com/gin-gonic/gin"
 )
+
 // Fetch all vehicle fares
 func GetAllVehicleFares(c *gin.Context) {
 	var fares []models.Vehicle
@@ -17,6 +18,7 @@ func GetAllVehicleFares(c *gin.Context) {
 
 	c.JSON(http.StatusOK, fares)
 }
+
 // VehicleFareCreation
 func VehicleFareCreation(c *gin.Context) {
 	var fare models.Vehicle
@@ -29,10 +31,9 @@ func VehicleFareCreation(c *gin.Context) {
 
 	// Basic validation
 	if fare.VehicleType == "" || fare.BaseFare <= 0 || fare.PerKmRate <= 0 || fare.PeopleCount <= 0 {
-    c.JSON(http.StatusBadRequest, gin.H{"error": "All fare fields are required and must be valid"})
-    return
-}
-
+		c.JSON(http.StatusBadRequest, gin.H{"error": "All fare fields are required and must be valid"})
+		return
+	}
 
 	// Save to database
 	if err := database.DB.Create(&fare).Error; err != nil {
@@ -58,7 +59,7 @@ func GetVehicleFareByID(c *gin.Context) {
 	c.JSON(http.StatusOK, fare)
 }
 
-//Update a vehicle fare
+// Update a vehicle fare
 func UpdateVehicleFare(c *gin.Context) {
 	id := c.Param("id")
 	var fare models.Vehicle
@@ -86,7 +87,7 @@ func UpdateVehicleFare(c *gin.Context) {
 	})
 }
 
-//Delete a fare
+// Delete a fare
 func DeleteVehicleFare(c *gin.Context) {
 	id := c.Param("id")
 	if err := database.DB.Delete(&models.Vehicle{}, id).Error; err != nil {
@@ -95,4 +96,3 @@ func DeleteVehicleFare(c *gin.Context) {
 	}
 	c.JSON(http.StatusOK, gin.H{"message": "Vehicle fare deleted successfully"})
 }
-
