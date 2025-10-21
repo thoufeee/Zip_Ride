@@ -12,6 +12,8 @@ import (
 func SeedPermisiions() {
 	permission := []models.Permission{
 
+		{Name: constants.PermissionAccessAdminDash},
+
 		//  user managmnet
 		{Name: constants.PermissionViewUsers},
 		{Name: constants.PermissionAddUser},
@@ -39,7 +41,6 @@ func SeedPermisiions() {
 		{Name: constants.PermissionSystemSettings},
 
 		// permissions
-		{Name: constants.PermissionScheduleBooking},
 		{Name: constants.ViewAllPermissions},
 	}
 
