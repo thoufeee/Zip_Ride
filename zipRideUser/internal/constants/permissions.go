@@ -3,6 +3,7 @@ package constants
 // permission for admins
 
 const (
+	PermissionAccessAdminDash = "ACCESS_ADMINDASH"
 
 	// user managment
 	PermissionViewUsers   = "VIEW_USERS"
@@ -22,7 +23,7 @@ const (
 
 	// booking managment
 	PermissionBookingManagment = "BOOKING_MANAGEMENT"
-	PermissionScheduleBooking  = "SCHEDULED_BOOKINGS_VIEW"
+	PermissionScheduleBooking  = "SCHEDULED_BOOKINGS"
 
 	// view ride && eranings && user analytics
 	PermissionViewAnalytics = "VIEW_ANALYTICS"
