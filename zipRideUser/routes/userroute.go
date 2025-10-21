@@ -3,6 +3,7 @@ package routes
 import (
 	"zipride/internal/constants"
 	"zipride/internal/domain/booking_module/handlers"
+	ratingdriver "zipride/internal/domain/booking_module/handlers/Rating_Driver"
 	chathandler "zipride/internal/domain/chat/Chathandler"
 	"zipride/internal/domain/user/services"
 	"zipride/internal/middleware"
@@ -33,7 +34,10 @@ func UserRoutes(c *gin.Engine) {
 	user.GET("/history", handlers.GetBookingHistoryHandler)
 
 	//Chat
-	user.GET("/chat/:id",chathandler.ChatWebSocket)
+	user.GET("/chat/:booking_id", chathandler.ChatWebSocket)
+
+	//feedback
+	user.POST("/rate-driver/:booking_id", ratingdriver.RateDriver)
 
 	// logout
 	user.POST("/logout", authHandlers.UserLogout)
