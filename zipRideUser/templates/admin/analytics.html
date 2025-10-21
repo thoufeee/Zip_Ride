@@ -10,11 +10,8 @@
 <style>
  body { 
  font-family: 'Inter', sans-serif; 
- /* Ensures the main content starts correctly after the fixed sidebar */
  padding-left: 18rem; 
 }
-
- /* Media query for responsiveness (mobile layout) */
  @media (max-width: 1024px) {
  body {
  padding-left: 0;
@@ -32,8 +29,6 @@
 </style>
 </head>
 <body class="bg-gray-50 text-gray-800">
-
-<!-- Sidebar -->
 <aside class="w-72 bg-cyan-800 text-white min-h-screen flex flex-col fixed top-0 left-0 shadow-2xl sidebar-fixed">
  <div class="p-6 text-center border-b border-cyan-700">
  <h2 class="text-2xl font-extrabold tracking-wider">Admin<span class="text-cyan-300">Panel</span></h2>
@@ -43,7 +38,7 @@
  <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-10v10a1 1 0 001 1h3m-6 0a1 1 0 001-1v-4a1 1 0 00-1-1H9m6 6h2"></path></svg>
  Dashboard
  </a>
- <!-- Active Link Style -->
+
  <a href="analytics.html" class="flex items-center px-4 py-3 rounded-xl bg-cyan-600 font-semibold shadow-lg text-white transition duration-150">
  <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 8v8m-4-8v8m-4-8v8M4 16h16"></path></svg>
  Analytics Dashboard
@@ -54,7 +49,7 @@
  </a>
  <a href="adminmanagment.html" class="flex items-center px-4 py-3 rounded-xl hover:bg-cyan-700 transition duration-150">
  <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5m-5 0a2 2 0 01-2-2V9a2 2 0 012-2h5m-5 0V9a2 2 0 002 2h5m-2-2v5a2 2 0 01-2 2H9a2 2 0 01-2-2V7a2 2 0 012-2h5a2 2 0 012 2v5"></path></svg>
- Admin Management
+ Access Control Management
  </a>
  <a href="createadmin.html" class="flex items-center px-4 py-3 rounded-xl hover:bg-cyan-700 transition duration-150">
  <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z"></path></svg>
@@ -80,36 +75,34 @@
  </div>
 </aside>
 
-<!-- Main Content -->
 <main class="flex-1 p-10 lg:p-12 main-content">
- <!-- Header -->
+
 <header class="mb-10 p-6 bg-white rounded-xl shadow-md border-b-4 border-cyan-500">
  <h1 class="text-3xl font-extrabold text-gray-800 mb-1">Analytics Dashboard</h1>
  <p class="text-gray-500 text-lg">Overview of bookings and revenue statistics for informed decision-making.</p>
  </header>
 
- <!-- Charts Section -->
+
  <section class="grid gap-8 grid-cols-1 md:grid-cols-2 lg:grid-cols-2">
 
- <!-- Daily Bookings -->
+
  <div class="bg-white rounded-xl shadow-2xl p-6 border border-gray-100 hover:shadow-xl transition duration-300">
  <h2 class="text-xl font-extrabold mb-4 text-cyan-800 border-b pb-2">Daily Bookings Pattern</h2>
  <div class="h-64"><canvas id="dailyBookingsChart"></canvas></div>
  </div>
 
- <!-- Weekly Bookings -->
+
  <div class="bg-white rounded-xl shadow-2xl p-6 border border-gray-100 hover:shadow-xl transition duration-300">
  <h2 class="text-xl font-extrabold mb-4 text-cyan-800 border-b pb-2">Weekly Bookings Summary</h2>
  <div class="h-64"><canvas id="weeklyBookingsChart"></canvas></div>
  </div>
 
- <!-- Monthly Bookings -->
+
  <div class="bg-white rounded-xl shadow-2xl p-6 border border-gray-100 hover:shadow-xl transition duration-300">
  <h2 class="text-xl font-extrabold mb-4 text-cyan-800 border-b pb-2">Monthly Bookings Trend</h2>
  <div class="h-64"><canvas id="monthlyBookingsChart"></canvas></div>
  </div>
 
- <!-- Monthly Revenue -->
  <div class="bg-white rounded-xl shadow-2xl p-6 border border-gray-100 hover:shadow-xl transition duration-300">
  <h2 class="text-xl font-extrabold mb-4 text-cyan-800 border-b pb-2">Monthly Revenue (₹)</h2>
  <div class="h-64"><canvas id="revenueChart"></canvas></div>
@@ -122,7 +115,6 @@
  </footer>
 </main>
 
-<!-- Link to the external JavaScript file -->
 <script type="module" src="chart.js"></script>
 </body>
 </html>
