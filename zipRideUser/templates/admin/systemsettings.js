@@ -68,7 +68,7 @@ async function loadFares() {
   }
 }
 
-// --- Show Fare Modal (Add / Edit) ---
+
 function showFareModal(fare = null) {
   const isEdit = fare !== null;
 
@@ -141,7 +141,6 @@ function showFareModal(fare = null) {
   });
 }
 
-// --- Edit Fare Handler ---
 function editFare(id) {
   const fareDiv = Array.from(fareList.children).find(div => parseInt(div.dataset.id) === id);
   if (!fareDiv) return;
@@ -158,7 +157,6 @@ function editFare(id) {
   showFareModal(fare);
 }
 
-// --- Delete Fare ---
 async function deleteFare(id) {
   if (!confirm("Are you sure you want to delete this fare?")) return;
 
@@ -175,8 +173,8 @@ async function deleteFare(id) {
   }
 }
 
-// --- Add Fare Button ---
+
 addFareBtn.addEventListener("click", () => showFareModal());
 
-// --- Initial Load ---
+
 loadFares();
