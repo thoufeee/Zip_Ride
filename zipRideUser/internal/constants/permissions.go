@@ -28,6 +28,9 @@ const (
 	// view ride && eranings && user analytics
 	PermissionViewAnalytics = "VIEW_ANALYTICS"
 
+	// prize pool and commission
+	PermissionPrizePool = "ACCESS_PRIZEPOOL"
+
 	// system settings (pricing rules && commisions && app settings)
 	PermissionSystemSettings = "SYSTEM_SETTINGS"
 
