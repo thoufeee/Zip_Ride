@@ -1,11 +1,9 @@
 const BASE_URL = "http://localhost:8080/admin";
 
-
 const logoutBtn = document.getElementById("logout-btn");
 const usersList = document.getElementById("users-list");
-const createUserForm = document.getElementById("createUserForm");
-const createUserResult = document.getElementById("createUserResult");
-
+const dynamicSection = document.getElementById("dynamicSection");
+const addUserBtn = document.getElementById("addUserBtn");
 
 const accessToken = localStorage.getItem("accessToken");
 const userPermissions = JSON.parse(localStorage.getItem("permissions")) || [];
@@ -24,14 +22,12 @@ axios.interceptors.response.use(
   }
 );
 
-
 if (logoutBtn) {
   logoutBtn.addEventListener("click", () => {
     localStorage.clear();
     window.location.href = "signin.html";
   });
 }
-
 
 function hasPermission(requiredPermission) {
   return userPermissions.some(
@@ -42,7 +38,7 @@ function hasPermission(requiredPermission) {
 
 if (!hasPermission("VIEW_USERS")) {
   document.body.innerHTML = `
-     <div class="flex flex-col items-center justify-center min-h-screen bg-gray-50 text-center">
+    <div class="flex flex-col items-center justify-center min-h-screen bg-gray-50 text-center">
       <h1 class="text-3xl font-bold text-red-600 mb-3">Access Denied</h1>
       <p class="text-gray-600 mb-6">You don't have permission to view this page.</p>
       <button onclick="window.location.href='admindash.html'" 
@@ -54,17 +50,13 @@ if (!hasPermission("VIEW_USERS")) {
   throw new Error("Permission denied");
 }
 
-
 async function fetchUsers() {
   if (!usersList) return;
-
   try {
     const res = await axios.get(`${BASE_URL}/allusers`, {
       headers: { Authorization: `Bearer ${accessToken}` },
     });
-
-    const users = res.data.res || [];
-    renderUsers(users);
+    renderUsers(res.data.res || []);
   } catch (err) {
     console.error("Error fetching users:", err);
     usersList.innerHTML = `<p class="text-red-500 text-sm">Failed to load users.</p>`;
@@ -92,16 +84,24 @@ function renderUsers(users) {
     const actions = [];
 
     if (hasPermission("EDIT_USER")) {
-      actions.push(`<button class="edit-btn bg-blue-500 hover:bg-blue-600 text-white px-3 py-1 rounded-md text-xs font-medium transition" data-id="${user.ID}">Edit</button>`);
+      actions.push(
+        `<button class="edit-btn bg-blue-500 hover:bg-blue-600 text-white px-3 py-1 rounded-md text-xs font-medium transition" data-id="${user.ID}">Edit</button>`
+      );
     }
     if (hasPermission("DELETE_USER")) {
-      actions.push(`<button class="delete-btn bg-red-500 hover:bg-red-600 text-white px-3 py-1 rounded-md text-xs font-medium ml-1" data-id="${user.ID}">Delete</button>`);
+      actions.push(
+        `<button class="delete-btn bg-red-500 hover:bg-red-600 text-white px-3 py-1 rounded-md text-xs font-medium ml-1" data-id="${user.ID}">Delete</button>`
+      );
     }
     if (hasPermission("BLOCK_USER") && !user.Block) {
-      actions.push(`<button class="block-btn bg-yellow-400 hover:bg-yellow-500 text-white px-3 py-1 rounded-md text-xs font-medium ml-1" data-id="${user.ID}">Block</button>`);
+      actions.push(
+        `<button class="block-btn bg-yellow-400 hover:bg-yellow-500 text-white px-3 py-1 rounded-md text-xs font-medium ml-1" data-id="${user.ID}">Block</button>`
+      );
     }
     if (hasPermission("UNBLOCK_USER") && user.Block) {
-      actions.push(`<button class="unblock-btn bg-green-500 hover:bg-green-600 text-white px-3 py-1 rounded-md text-xs font-medium ml-1" data-id="${user.ID}">Unblock</button>`);
+      actions.push(
+        `<button class="unblock-btn bg-green-500 hover:bg-green-600 text-white px-3 py-1 rounded-md text-xs font-medium ml-1" data-id="${user.ID}">Unblock</button>`
+      );
     }
 
     div.innerHTML = `
@@ -120,12 +120,10 @@ function renderUsers(users) {
   attachUserActions(users);
 }
 
-
 function attachUserActions(users) {
   document.querySelectorAll(".edit-btn").forEach((btn) => {
     btn.addEventListener("click", () => {
-      const id = btn.dataset.id;
-      const user = users.find((u) => u.ID == id);
+      const user = users.find((u) => u.ID == btn.dataset.id);
       if (user) showEditModal(user);
     });
   });
@@ -134,11 +132,12 @@ function attachUserActions(users) {
     btn.addEventListener("click", async () => {
       if (!confirm("Are you sure you want to delete this user?")) return;
       try {
-        const res = await axios.delete(`${BASE_URL}/user/${btn.dataset.id}`, { headers: { Authorization: `Bearer ${accessToken}` } });
+        const res = await axios.delete(`${BASE_URL}/user/${btn.dataset.id}`, {
+          headers: { Authorization: `Bearer ${accessToken}` },
+        });
         alert(res.data.message || "User deleted successfully!");
         fetchUsers();
       } catch (err) {
-        console.error(err);
         alert(err.response?.data?.error || "Failed to delete user.");
       }
     });
@@ -147,11 +146,11 @@ function attachUserActions(users) {
   document.querySelectorAll(".block-btn").forEach((btn) => {
     btn.addEventListener("click", async () => {
       try {
-        const res = await axios.put(`${BASE_URL}/userblock/${btn.dataset.id}`, {}, { headers: { Authorization: `Bearer ${accessToken}` } });
-        alert(res.data.message || "User blocked successfully!");
+        await axios.put(`${BASE_URL}/userblock/${btn.dataset.id}`, {}, {
+          headers: { Authorization: `Bearer ${accessToken}` },
+        });
         fetchUsers();
       } catch (err) {
-        console.error(err);
         alert(err.response?.data?.error || "Failed to block user.");
       }
     });
@@ -160,11 +159,11 @@ function attachUserActions(users) {
   document.querySelectorAll(".unblock-btn").forEach((btn) => {
     btn.addEventListener("click", async () => {
       try {
-        const res = await axios.put(`${BASE_URL}/userunblock/${btn.dataset.id}`, {}, { headers: { Authorization: `Bearer ${accessToken}` } });
-        alert(res.data.message || "User unblocked successfully!");
+        await axios.put(`${BASE_URL}/userunblock/${btn.dataset.id}`, {}, {
+          headers: { Authorization: `Bearer ${accessToken}` },
+        });
         fetchUsers();
       } catch (err) {
-        console.error(err);
         alert(err.response?.data?.error || "Failed to unblock user.");
       }
     });
@@ -172,76 +171,55 @@ function attachUserActions(users) {
 }
 
 
-function showEditModal(user) {
-  const modal = document.createElement("div");
-  modal.className = "fixed inset-0 flex items-center justify-center bg-black bg-opacity-40 backdrop-blur-sm z-50";
+addUserBtn.addEventListener("click", () => {
+  if (!hasPermission("CREATE_USER") && !hasPermission("ADD_USER")) {
+    alert("You do not have permission to add users.");
+    return;
+  }
 
-  modal.innerHTML = `
-    <div class="bg-white rounded-xl shadow-xl p-6 w-[400px]">
-      <h2 class="text-xl font-semibold mb-4 text-gray-800">Edit User</h2>
-      <form id="editUserForm" class="space-y-3">
-        <input type="hidden" id="editUserId" value="${user.ID}">
-        <div><label class="block text-sm font-medium text-gray-600">First Name</label><input id="editFirstname" value="${user.firstname || ''}" class="w-full border border-gray-300 rounded-lg px-3 py-2" /></div>
-        <div><label class="block text-sm font-medium text-gray-600">Last Name</label><input id="editLastname" value="${user.lastname || ''}" class="w-full border border-gray-300 rounded-lg px-3 py-2" /></div>
-        <div><label class="block text-sm font-medium text-gray-600">Email</label><input id="editEmail" value="${user.email || ''}" class="w-full border border-gray-300 rounded-lg px-3 py-2" /></div>
-        <div><label class="block text-sm font-medium text-gray-600">Phone</label><input id="editPhone" value="${user.phone || ''}" class="w-full border border-gray-300 rounded-lg px-3 py-2" /></div>
-        <div><label class="block text-sm font-medium text-gray-600">Gender</label>
-          <select id="editGender" class="w-full border border-gray-300 rounded-lg px-3 py-2">
-            <option value="">Select</option>
-            <option value="Male" ${user.gender === "Male" ? "selected" : ""}>Male</option>
-            <option value="Female" ${user.gender === "Female" ? "selected" : ""}>Female</option>
-            <option value="Other" ${user.gender === "Other" ? "selected" : ""}>Other</option>
-          </select>
-        </div>
-        <div><label class="block text-sm font-medium text-gray-600">Location</label><input id="editPlace" value="${user.place || ''}" class="w-full border border-gray-300 rounded-lg px-3 py-2" /></div>
-        <div class="flex justify-end space-x-2 mt-4">
-          <button type="button" id="closeEditModal" class="bg-gray-400 hover:bg-gray-500 text-white px-4 py-2 rounded-lg">Cancel</button>
-          <button type="submit" class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-lg">Save</button>
-        </div>
-      </form>
+  dynamicSection.innerHTML = `
+    <div class="flex justify-between items-center mb-6">
+      <h2 class="text-2xl font-bold text-gray-800">Create New User</h2>
+      <button id="backToUsers" 
+        class="bg-gray-300 hover:bg-gray-400 text-gray-800 font-medium px-3 py-1.5 rounded-lg transition">
+        ← Back
+      </button>
     </div>
+
+    <form id="createUserForm" class="grid grid-cols-1 md:grid-cols-2 gap-6 bg-white p-6 rounded-xl shadow-md border border-gray-200">
+      <input type="text" id="newFirstname" placeholder="First Name" class="border p-3 rounded-lg focus:ring-2 focus:ring-cyan-400" required>
+      <input type="text" id="newLastname" placeholder="Last Name" class="border p-3 rounded-lg focus:ring-2 focus:ring-cyan-400">
+      <input type="email" id="newEmail" placeholder="Email" class="border p-3 rounded-lg focus:ring-2 focus:ring-cyan-400" required>
+      <input type="text" id="newPhone" placeholder="Phone Number" class="border p-3 rounded-lg focus:ring-2 focus:ring-cyan-400" required>
+      <select id="newGender" class="border p-3 rounded-lg focus:ring-2 focus:ring-cyan-400">
+        <option value="">Select Gender</option>
+        <option>Male</option><option>Female</option><option>Other</option>
+      </select>
+      <input type="text" id="newPlace" placeholder="Location" class="border p-3 rounded-lg focus:ring-2 focus:ring-cyan-400">
+      <input type="password" id="newPassword" placeholder="Initial Password" class="border p-3 rounded-lg focus:ring-2 focus:ring-cyan-400" required>
+
+      <div class="md:col-span-2 flex justify-center">
+       <button type="submit" 
+          class="bg-cyan-600 hover:bg-cyan-700 text-white font-semibold py-2.5 px-8 rounded-lg shadow-md hover:shadow-lg transition text-base">
+          Create User
+        </button>
+      </div>
+    </form>
+
+    <p id="createUserResult" class="mt-4 text-center font-bold"></p>
   `;
 
-  document.body.appendChild(modal);
-
-  document.getElementById("closeEditModal").addEventListener("click", () => modal.remove());
-
-  document.getElementById("editUserForm").addEventListener("submit", async (e) => {
-    e.preventDefault();
-    try {
-      const updatedUser = {
-        firstname: document.getElementById("editFirstname").value.trim(),
-        lastname: document.getElementById("editLastname").value.trim(),
-        email: document.getElementById("editEmail").value.trim(),
-        phone: document.getElementById("editPhone").value.trim(),
-        gender: document.getElementById("editGender").value,
-        place: document.getElementById("editPlace").value.trim(),
-      };
-
-      const res = await axios.put(`${BASE_URL}/user/${user.ID}`, updatedUser, {
-        headers: { Authorization: `Bearer ${accessToken}` },
-      });
-
-      alert(res.data.message || "User updated successfully!");
-      modal.remove();
-      fetchUsers();
-    } catch (err) {
-      console.error(err);
-      alert(err.response?.data?.error || "Failed to update user.");
-    }
-  });
-}
+  document.getElementById("backToUsers").addEventListener("click", () => location.reload());
+  handleCreateUser();
+});
 
 
-if (createUserForm) {
+function handleCreateUser() {
+  const createUserForm = document.getElementById("createUserForm");
+  const createUserResult = document.getElementById("createUserResult");
+
   createUserForm.addEventListener("submit", async (e) => {
     e.preventDefault();
-
-    if (!hasPermission("CREATE_USER") && !hasPermission("ADD_USER")) {
-      createUserResult.textContent = "You do not have permission to create users.";
-      createUserResult.className = "text-red-500 font-bold mt-4 text-center";
-      return;
-    }
 
     const newUser = {
       firstname: document.getElementById("newFirstname").value.trim(),
@@ -250,7 +228,7 @@ if (createUserForm) {
       phone: document.getElementById("newPhone").value.trim(),
       place: document.getElementById("newPlace").value.trim(),
       password: document.getElementById("newPassword").value.trim(),
-      gender: document.getElementById("newGender")?.value || "",
+      gender: document.getElementById("newGender").value,
     };
 
     try {
@@ -259,13 +237,11 @@ if (createUserForm) {
       });
 
       createUserResult.textContent = res.data.message || "User added successfully!";
-      createUserResult.className = "text-green-600 font-bold mt-4 text-center";
+      createUserResult.className = "text-green-600 font-bold";
       createUserForm.reset();
-      fetchUsers();
     } catch (err) {
-      console.error(err);
       createUserResult.textContent = err.response?.data?.error || "Failed to add user.";
-      createUserResult.className = "text-red-500 font-bold mt-4 text-center";
+      createUserResult.className = "text-red-500 font-bold";
     }
   });
 }

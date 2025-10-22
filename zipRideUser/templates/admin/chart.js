@@ -1,20 +1,18 @@
-// ==================== LOGOUT ====================
+
 document.getElementById("logout-btn").addEventListener("click", () => {
   localStorage.removeItem("accessToken");
   localStorage.removeItem("refreshToken");
   localStorage.removeItem("role");
-  localStorage.removeItem("permissions"); // optional if you store permissions
+  localStorage.removeItem("permissions"); 
   window.location.href = "signin.html";
 });
 
-// ==================== HELPER: PERMISSION CHECK ====================
 function getPermissions() {
   try {
-    // if you store permissions in localStorage
+    
     const perms = JSON.parse(localStorage.getItem("permissions"));
     if (Array.isArray(perms)) return perms;
 
-    // else if you store permissions inside JWT token, decode it
     const token = localStorage.getItem("accessToken");
     if (!token) return [];
     const payload = JSON.parse(atob(token.split(".")[1]));
@@ -29,7 +27,6 @@ function hasPermission(permission) {
   return perms.includes(permission);
 }
 
-// ==================== ACCESS CONTROL (ACL) ====================
 if (!hasPermission("VIEW_ANALYTICS")) {
   document.body.innerHTML = `
     <div class="flex flex-col items-center justify-center min-h-screen bg-gray-50 text-center">
@@ -44,7 +41,6 @@ if (!hasPermission("VIEW_ANALYTICS")) {
   throw new Error("Unauthorized access to Analytics page");
 }
 
-// ==================== CHARTS CONFIG ====================
 const PRIMARY_COLOR = '#06b6d4'; 
 const SECONDARY_COLOR = '#3b82f6'; 
 const ACCENT_COLOR = '#ef4444'; 
@@ -76,7 +72,6 @@ const chartOptions = {
   }
 };
 
-// ==================== CHART CREATION ====================
 new Chart(document.getElementById('dailyBookingsChart').getContext('2d'), {
   type: 'bar',
   data: {

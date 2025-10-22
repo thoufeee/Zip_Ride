@@ -5,7 +5,7 @@ import (
 	"gorm.io/gorm"
 )
 
-// manager && staff && admin
+// admin
 
 type Admin struct {
 	gorm.Model

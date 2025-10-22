@@ -49,6 +49,11 @@ func AddUser(c *gin.Context) {
 		c.JSON(http.StatusConflict, gin.H{"error": "Email already registered"})
 		return
 	}
+
+	if err := database.DB.Where("phone_number = ?", phone).First(&existingUser).Error; err == nil {
+		c.JSON(http.StatusConflict, gin.H{"error": "Phonenumber already registered"})
+		return
+	}
 	//Hash the password
 	hashed, err := utils.GenerateHash(input.Password)
 	if err != nil {

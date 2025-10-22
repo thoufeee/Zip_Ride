@@ -3,6 +3,7 @@ package routes
 import (
 	"zipride/internal/constants"
 
+	"zipride/internal/domain/prize_pool/prizepoolmanagment"
 	"zipride/internal/domain/user_Admin/allpermission"
 	staffmanagment "zipride/internal/domain/user_Admin/staffManagment"
 	"zipride/internal/domain/user_Admin/staffManagment/controllers"
@@ -43,7 +44,7 @@ func SuperAdminRoutes(c *gin.Engine) {
 	admin.PUT("/staffupdate/:id", middleware.RequirePermission(constants.PermissionEditStaff), controllers.UpdateStaff)
 	admin.DELETE("/staffdelete/:id", middleware.RequirePermission(constants.PermissionDeleteStaff), controllers.DeleteStaff)
 	admin.PUT("/staffblock/:id", middleware.RequirePermission(constants.PermissionBlockStaff), controllers.BlockStaff)
-	// admin.PUT("/staffunblock/:id", middleware.RequirePermission(constants.PermissionUnBlockStaff), controllers.UnblockStaff)
+	admin.PUT("/staffunblock/:id", middleware.RequirePermission(constants.PermissionUnBlockStaff), controllers.UnblockStaff)
 
 	//route for all permissions
 	admin.GET("/allpermissions", middleware.RequirePermission(constants.ViewAllPermissions), allpermission.Permissions)
@@ -51,10 +52,20 @@ func SuperAdminRoutes(c *gin.Engine) {
 	// Vehicle Fare Management (SuperAdmin / Manager)
 	vehicleFare := admin.Group("/vehiclefare")
 	{
-		vehicleFare.POST("/", vehiclemanagement.VehicleFareCreation)
-		vehicleFare.GET("/", vehiclemanagement.GetAllVehicleFares)
-		vehicleFare.PUT("/:id", vehiclemanagement.UpdateVehicleFare)
-		vehicleFare.DELETE("/:id", vehiclemanagement.DeleteVehicleFare)
+		vehicleFare.POST("/", middleware.RequirePermission(constants.PermissionSystemSettings), vehiclemanagement.VehicleFareCreation)
+		vehicleFare.GET("/", middleware.RequirePermission(constants.PermissionSystemSettings), vehiclemanagement.GetAllVehicleFares)
+		vehicleFare.PUT("/:id", middleware.RequirePermission(constants.PermissionSystemSettings), vehiclemanagement.UpdateVehicleFare)
+		vehicleFare.DELETE("/:id", middleware.RequirePermission(constants.PermissionSystemSettings), vehiclemanagement.DeleteVehicleFare)
+	}
 
+	// prize pool
+
+	pricePool := admin.Group("/pricepool")
+
+	{
+		pricePool.GET("/", middleware.RequirePermission(constants.PermissionPrizePool), prizepoolmanagment.GetAllPrizePool)
+		pricePool.POST("/", middleware.RequirePermission(constants.PermissionPrizePool), prizepoolmanagment.CreatePrizePool)
+		pricePool.PUT("/:id", middleware.RequirePermission(constants.PermissionPrizePool), prizepoolmanagment.UpdatePrizePool)
+		pricePool.DELETE("/:id", middleware.RequirePermission(constants.PermissionPrizePool), prizepoolmanagment.DeletePrizePool)
 	}
 }

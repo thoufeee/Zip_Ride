@@ -1,4 +1,4 @@
-// ==================== GLOBAL VARIABLES ====================
+
 let currentBookingIdToAssign = null;
 
 const tableBody = document.getElementById('bookingTable');
@@ -6,7 +6,6 @@ const assignDriverModal = document.getElementById('assignDriverModal');
 const driverNameInput = document.getElementById('driverNameInput');
 const modalBookingId = document.getElementById('modalBookingId');
 
-// ==================== UTILITY FUNCTIONS ====================
 function getPermissions() {
     const perms = localStorage.getItem("permissions");
     try {
@@ -21,7 +20,6 @@ function hasPermission(permission) {
     return perms.some(p => String(p).toUpperCase() === String(permission).toUpperCase());
 }
 
-// ==================== PAGE ACCESS CONTROL ====================
 if (!hasPermission("SCHEDULED_BOOKINGS")) {
     document.body.innerHTML = `
       <div class="flex flex-col items-center justify-center min-h-screen bg-gray-50 text-center">
@@ -36,13 +34,11 @@ if (!hasPermission("SCHEDULED_BOOKINGS")) {
     throw new Error("Unauthorized access to Scheduled Bookings");
 }
 
-// ==================== LOGOUT HANDLER ====================
 document.getElementById("logout-btn").addEventListener("click", () => {
     localStorage.clear();
     window.location.href = "signin.html";
 });
 
-// ==================== SAMPLE DATA ====================
 const bookings = [
     {id:101,user:'John Doe',phone:'+1 (123) 456-7890',vehicle:'Car',pickupLoc:'Airport Terminal 1',dropLoc:'Grand Hyatt Hotel',pickup:'2025-10-18 10:00',status:'Pending',driver:'',price:500,payment:'Cash',commission:50},
     {id:102,user:'Jane Smith',phone:'+1 (234) 567-8901',vehicle:'Bike',pickupLoc:'Main Street Station',dropLoc:'Tech Park Office',pickup:'2025-10-19 14:00',status:'Accepted',driver:'',price:200,payment:'Online',commission:20},
@@ -51,7 +47,6 @@ const bookings = [
     {id:105,user:'Charlie Day',phone:'+1 (567) 890-1234',vehicle:'Bike',pickupLoc:'Industrial Zone',dropLoc:'City Center',pickup:'2025-10-22 12:00',status:'Cancelled',driver:'',price:150,payment:'Cash',commission:0},
 ];
 
-// ==================== STATUS UPDATE FUNCTION ====================
 function updateBookingStatus(id, newStatus, driverName = '') {
     const booking = bookings.find(b => b.id === id);
     if (booking) {
@@ -62,7 +57,6 @@ function updateBookingStatus(id, newStatus, driverName = '') {
     }
 }
 
-// ==================== RENDER TABLE ====================
 function renderTable() {
     tableBody.innerHTML = '';
     bookings.forEach(b => {
@@ -110,7 +104,6 @@ function renderTable() {
         `;
         tableBody.appendChild(tr);
 
-        // Buttons handler
         if (b.status === 'Pending') {
             tr.querySelector('.accept-btn').addEventListener('click', () => updateBookingStatus(b.id, 'Accepted'));
             tr.querySelector('.cancel-btn').addEventListener('click', () => {
@@ -130,7 +123,6 @@ function renderTable() {
     });
 }
 
-// ==================== MODAL HANDLERS ====================
 document.getElementById('confirmAssignBtn').addEventListener('click', () => {
     const driverName = driverNameInput.value.trim();
     if (!driverName) {
@@ -153,5 +145,4 @@ document.getElementById('closeAssignModal').addEventListener('click', () => {
     currentBookingIdToAssign = null;
 });
 
-// ==================== INITIAL RENDER ====================
 renderTable();

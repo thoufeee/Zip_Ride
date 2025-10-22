@@ -29,7 +29,6 @@ func main() {
 	// seeders run
 	seeders.RunAllSeeders()
 
-
 	r := gin.Default()
 
 	r.Use(cors.New(cors.Config{

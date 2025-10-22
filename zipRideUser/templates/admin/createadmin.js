@@ -35,13 +35,11 @@ if (!hasPermission("ADD_STAFF")) {
 }
 
 
-// Logout
 logoutBtn.addEventListener("click", () => {
   localStorage.clear();
   window.location.href = "signin.html";
 });
 
-// Axios interceptor for 401
 axios.interceptors.response.use(
   (response) => response,
   (error) => {
@@ -53,7 +51,6 @@ axios.interceptors.response.use(
   }
 );
 
-// Fetch permissions from server
 async function fetchPermissions() {
   try {
     const res = await axios.get(`${BASE_URL}/allpermissions`, {
@@ -75,7 +72,6 @@ async function fetchPermissions() {
   }
 }
 
-// Render available permissions
 function renderPermissions(permissions) {
   permissionsList.innerHTML = ""; 
   permissions.forEach((perm) => {
@@ -88,13 +84,10 @@ function renderPermissions(permissions) {
   });
 }
 
-// Add permission to selected list
 function addPermission(permissionName) {
-  // Remove placeholder if exists
   const placeholder = addedPermissions.querySelector("p");
   if (placeholder) placeholder.remove();
 
-  // Check if permission already added
   if (
     [...addedPermissions.children].some(
       (el) => el.tagName === "SPAN" && el.textContent.replace(/\s/g, "_") === permissionName
@@ -113,7 +106,6 @@ function addPermission(permissionName) {
   addedPermissions.appendChild(tag);
 }
 
-// Show placeholder if no permissions are selected
 function showPlaceholderIfEmpty() {
   if (![...addedPermissions.children].some(el => el.tagName === "SPAN")) {
     addedPermissions.innerHTML = `<p class="text-gray-400 text-sm italic">
@@ -122,7 +114,6 @@ function showPlaceholderIfEmpty() {
   }
 }
 
-// Handle form submission
 form.addEventListener("submit", async (e) => {
   e.preventDefault();
   result.textContent = "";
@@ -133,7 +124,6 @@ form.addEventListener("submit", async (e) => {
   const phone = document.getElementById("phone").value.trim();
   const password = document.getElementById("password").value.trim();
 
-  // Only include actual SPAN tags as permissions
   const permissions = [...addedPermissions.children]
     .filter(el => el.tagName === "SPAN")
     .map(el => el.textContent.replace(/\s/g, "_"));
@@ -178,5 +168,4 @@ form.addEventListener("submit", async (e) => {
   }
 });
 
-// Initialize
 fetchPermissions();

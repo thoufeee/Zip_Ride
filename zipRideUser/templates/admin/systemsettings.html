@@ -80,14 +80,67 @@
     <p class="text-gray-500 text-lg">Configure fare, commission, payment, and subscription settings for ZipRide.</p>
   </header>
 
+
   <section class="bg-white rounded-xl shadow-2xl p-8 mb-10 border border-gray-100">
     <div class="flex justify-between items-center mb-6 border-b pb-2">
       <h2 class="text-2xl font-extrabold text-cyan-800">Fare & Commission Configuration</h2>
-      <button id="addFareBtn" class="bg-cyan-600 hover:bg-cyan-700 text-white font-semibold py-2 px-4 rounded-xl text-sm shadow-md">Add New Fare</button>
+      <button id="addFareBtn"
+        class="bg-cyan-600 hover:bg-cyan-700 text-white font-semibold py-2 px-4 rounded-xl text-sm shadow-md">
+        Add New Fare
+      </button>
     </div>
 
-    <div id="fareList" class="space-y-4">
-     
+    <div id="fareList" class="space-y-4"></div>
+
+    <div id="fareFormContainer" class="hidden mt-10 p-6 border-t border-gray-200">
+      <h3 id="fareFormTitle" class="text-xl font-bold text-cyan-700 mb-4">Add Fare Configuration</h3>
+
+      <form id="fareForm" class="space-y-6 bg-gray-50 p-6 rounded-xl border border-gray-200 shadow-sm">
+        <input type="hidden" id="fareId">
+
+        <div class="grid md:grid-cols-2 gap-6">
+          <div>
+            <label class="block text-gray-700 font-medium mb-2" for="vehicleType">Vehicle Type</label>
+            <input type="text" id="vehicleType" name="vehicleType" placeholder="e.g., Car, Bike"
+              class="w-full border border-gray-300 rounded-xl px-4 py-2 focus:ring-2 focus:ring-cyan-500" required>
+          </div>
+
+          <div>
+            <label class="block text-gray-700 font-medium mb-2" for="baseFare">Base Fare (₹)</label>
+            <input type="number" id="baseFare" name="baseFare" placeholder="e.g., 30"
+              class="w-full border border-gray-300 rounded-xl px-4 py-2 focus:ring-2 focus:ring-cyan-500" required>
+          </div>
+
+          <div>
+            <label class="block text-gray-700 font-medium mb-2" for="perKmRate">Fare per Km (₹)</label>
+            <input type="number" id="perKmRate" name="perKmRate" placeholder="e.g., 10"
+              class="w-full border border-gray-300 rounded-xl px-4 py-2 focus:ring-2 focus:ring-cyan-500" required>
+          </div>
+
+          <div>
+            <label class="block text-gray-700 font-medium mb-2" for="perMinRate">Fare per Minute (₹)</label>
+            <input type="number" id="perMinRate" name="perMinRate" placeholder="e.g., 2"
+              class="w-full border border-gray-300 rounded-xl px-4 py-2 focus:ring-2 focus:ring-cyan-500">
+          </div>
+
+          <div>
+            <label class="block text-gray-700 font-medium mb-2" for="peopleCount">People Count</label>
+            <input type="number" id="peopleCount" name="peopleCount" placeholder="e.g., 4"
+              class="w-full border border-gray-300 rounded-xl px-4 py-2 focus:ring-2 focus:ring-cyan-500" required>
+          </div>
+        </div>
+
+        <div class="flex justify-end space-x-4 mt-6">
+          <button type="button" id="cancelFareBtn"
+            class="bg-gray-300 hover:bg-gray-400 text-gray-800 font-semibold py-2 px-5 rounded-xl shadow">
+            Cancel
+          </button>
+          <button type="submit"
+            class="bg-cyan-600 hover:bg-cyan-700 text-white font-semibold py-2 px-6 rounded-xl shadow">
+            Save Fare
+          </button>
+        </div>
+      </form>
     </div>
   </section>
 
@@ -97,13 +150,16 @@
     <form id="paymentForm" class="space-y-6">
       <div>
         <span class="font-medium text-gray-700 block mb-2">Enabled Payment Methods:</span>
-        <div class="flex flex-col space-y-2 md:flex-row md:space-x-6 md:space-y-0 p-3 bg-gray-50 rounded-lg border border-gray-200">
+        <div
+          class="flex flex-col space-y-2 md:flex-row md:space-x-6 md:space-y-0 p-3 bg-gray-50 rounded-lg border border-gray-200">
           <label class="inline-flex items-center space-x-2 text-gray-800">
-            <input type="checkbox" name="paymentMethods" value="cash" class="form-checkbox h-5 w-5 text-cyan-600 rounded" checked>
+            <input type="checkbox" name="paymentMethods" value="cash"
+              class="form-checkbox h-5 w-5 text-cyan-600 rounded" checked>
             <span>Cash</span>
           </label>
           <label class="inline-flex items-center space-x-2 text-gray-800">
-            <input type="checkbox" name="paymentMethods" value="online" class="form-checkbox h-5 w-5 text-cyan-600 rounded" checked>
+            <input type="checkbox" name="paymentMethods" value="online"
+              class="form-checkbox h-5 w-5 text-cyan-600 rounded" checked>
             <span>Online Payment (Card/UPI)</span>
           </label>
         </div>
@@ -112,12 +168,17 @@
       <div class="flex flex-col sm:flex-row sm:space-x-6">
         <label for="refundPolicy" class="font-medium text-gray-700 w-full sm:w-40 pt-2">Refund Policy Text</label>
         <div class="w-full sm:w-3/4">
-          <textarea id="refundPolicy" name="refundPolicy" rows="4" placeholder="Enter full refund policy details..." class="w-full border border-gray-300 rounded-xl px-4 py-2.5 focus:ring-2 focus:ring-cyan-500"></textarea>
+          <textarea id="refundPolicy" name="refundPolicy" rows="4"
+            placeholder="Enter full refund policy details..."
+            class="w-full border border-gray-300 rounded-xl px-4 py-2.5 focus:ring-2 focus:ring-cyan-500"></textarea>
         </div>
       </div>
 
       <div class="pt-4 flex justify-end">
-        <button type="submit" class="bg-cyan-600 hover:bg-cyan-700 text-white font-semibold py-2.5 px-6 rounded-xl transition duration-200 shadow-md">Save Payment Settings</button>
+        <button type="submit"
+          class="bg-cyan-600 hover:bg-cyan-700 text-white font-semibold py-2.5 px-6 rounded-xl transition duration-200 shadow-md">
+          Save Payment Settings
+        </button>
       </div>
     </form>
   </section>
@@ -126,29 +187,35 @@
     <h2 class="text-2xl font-extrabold text-cyan-800 mb-6 border-b pb-2">Subscription Plans</h2>
 
     <form id="subscriptionForm" class="space-y-6">
-      <div class="flex flex-col sm:flex-row sm:items-center sm:space-x-6"> 
+      <div class="flex flex-col sm:flex-row sm:items-center sm:space-x-6">
         <label for="planName" class="font-medium text-gray-700 w-full sm:w-40">Plan Name</label>
         <div class="w-full sm:w-60">
-          <input type="text" id="planName" name="planName" placeholder="e.g., Premium Ride Plan" class="w-full border border-gray-300 rounded-xl px-4 py-2.5 focus:ring-2 focus:ring-cyan-500">
+          <input type="text" id="planName" name="planName" placeholder="e.g., Premium Ride Plan"
+            class="w-full border border-gray-300 rounded-xl px-4 py-2.5 focus:ring-2 focus:ring-cyan-500">
         </div>
       </div>
 
       <div class="flex flex-col sm:flex-row sm:items-center sm:space-x-6">
         <label for="planDuration" class="font-medium text-gray-700 w-full sm:w-40">Duration (Days)</label>
         <div class="w-full sm:w-60">
-          <input type="number" id="planDuration" name="planDuration" placeholder="e.g., 30" class="w-full border border-gray-300 rounded-xl px-4 py-2.5 focus:ring-2 focus:ring-cyan-500">
+          <input type="number" id="planDuration" name="planDuration" placeholder="e.g., 30"
+            class="w-full border border-gray-300 rounded-xl px-4 py-2.5 focus:ring-2 focus:ring-cyan-500">
         </div>
       </div>
 
       <div class="flex flex-col sm:flex-row sm:items-center sm:space-x-6">
         <label for="planPrice" class="font-medium text-gray-700 w-full sm:w-40">Price (₹)</label>
         <div class="w-full sm:w-60">
-          <input type="number" id="planPrice" name="planPrice" placeholder="e.g., 499" class="w-full border border-gray-300 rounded-xl px-4 py-2.5 focus:ring-2 focus:ring-cyan-500">
+          <input type="number" id="planPrice" name="planPrice" placeholder="e.g., 499"
+            class="w-full border border-gray-300 rounded-xl px-4 py-2.5 focus:ring-2 focus:ring-cyan-500">
         </div>
       </div>
 
       <div class="pt-4 flex justify-end">
-        <button type="submit" class="bg-cyan-600 hover:bg-cyan-700 text-white font-semibold py-2.5 px-6 rounded-xl transition duration-200 shadow-md">Save Plan</button>
+        <button type="submit"
+          class="bg-cyan-600 hover:bg-cyan-700 text-white font-semibold py-2.5 px-6 rounded-xl transition duration-200 shadow-md">
+          Save Plan
+        </button>
       </div>
     </form>
   </section>
@@ -157,6 +224,7 @@
     &copy; 2025 Admin Panel. All rights reserved.
   </footer>
 </main>
+
 
 <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
 <script src="systemsettings.js"></script>

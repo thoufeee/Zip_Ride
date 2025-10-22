@@ -1,4 +1,4 @@
-// ==================== GLOBAL VARIABLES ====================
+
 let currentBooking = null;
 
 const tableBody = document.getElementById('bookingTable');
@@ -7,7 +7,7 @@ const modalContent = document.getElementById('modalContent');
 const updateStatusBtn = document.getElementById('updateStatusBtn');
 const cancelBookingBtn = document.getElementById('cancelBookingBtn');
 
-// ==================== SAMPLE BOOKINGS ====================
+
 const bookings = [
     {id: 'B001', user: 'John Doe', userPhone: '1234567890', driver: 'Mike Ross', driverPhone: '9876543210', pickup: '123 Main St, New York', dropoff: '456 Park Ave, New York', vehicle: 'Car', price: 500, commission: 50, payment: 'Cash', status: 'Pending'},
     {id: 'B002', user: 'Jane Smith', userPhone: '2345678901', driver: 'Rachel Zane', driverPhone: '8765432109', pickup: '789 Elm St, London', dropoff: '101 Maple Rd, London', vehicle: 'Bike', price: 200, commission: 20, payment: 'Online', status: 'In Progress'},
@@ -22,7 +22,7 @@ const statusColors = {
     'Cancelled': 'bg-red-100 text-red-700 border border-red-200'
 };
 
-// ==================== PERMISSION UTILITIES ====================
+
 function getPermissions() {
     const perms = localStorage.getItem("permissions");
     try { return perms ? JSON.parse(perms) : []; } catch { return []; }
@@ -33,7 +33,7 @@ function hasPermission(permission) {
     return perms.some(p => String(p).toUpperCase() === String(permission).toUpperCase());
 }
 
-// ==================== PAGE ACCESS CONTROL ====================
+
 if (!hasPermission("BOOKING_MANAGEMENT")) {
     document.body.innerHTML = `
       <div class="flex flex-col items-center justify-center min-h-screen bg-gray-50 text-center">
@@ -48,13 +48,13 @@ if (!hasPermission("BOOKING_MANAGEMENT")) {
     throw new Error("Unauthorized access to Booking Management page");
 }
 
-// ==================== LOGOUT ====================
+
 document.getElementById("logout-btn").addEventListener("click", () => {
     localStorage.clear();
     window.location.href = "signin.html";
 });
 
-// ==================== RENDER TABLE ====================
+
 const renderTable = () => {
     tableBody.innerHTML = '';
     bookings.forEach(b => {
@@ -104,7 +104,6 @@ const renderTable = () => {
     });
 };
 
-// ==================== SHOW MODAL ====================
 const showBookingModal = (b) => {
     modalContent.innerHTML = `
         <div class="grid grid-cols-2 gap-x-4 gap-y-3 text-sm">
@@ -129,7 +128,6 @@ const showBookingModal = (b) => {
     modal.classList.add('flex');
 };
 
-// ==================== MODAL ACTIONS ====================
 updateStatusBtn.onclick = () => {
     if (!currentBooking) return;
     const b = currentBooking;
@@ -151,13 +149,10 @@ cancelBookingBtn.onclick = () => {
         renderTable();
     }
 };
-
-// ==================== CLOSE MODAL ====================
 document.getElementById('closeModal').addEventListener('click', () => {
     modal.classList.add('hidden');
     modal.classList.remove('flex');
     currentBooking = null;
 });
 
-// ==================== INITIAL RENDER ====================
 renderTable();
