@@ -3,6 +3,7 @@ package routes
 import (
 	"zipride/internal/constants"
 
+	"zipride/internal/domain/prize_pool/prizepoolmanagment"
 	"zipride/internal/domain/user_Admin/allpermission"
 	staffmanagment "zipride/internal/domain/user_Admin/staffManagment"
 	"zipride/internal/domain/user_Admin/staffManagment/controllers"
@@ -55,5 +56,16 @@ func SuperAdminRoutes(c *gin.Engine) {
 		vehicleFare.GET("/", middleware.RequirePermission(constants.PermissionSystemSettings), vehiclemanagement.GetAllVehicleFares)
 		vehicleFare.PUT("/:id", middleware.RequirePermission(constants.PermissionSystemSettings), vehiclemanagement.UpdateVehicleFare)
 		vehicleFare.DELETE("/:id", middleware.RequirePermission(constants.PermissionSystemSettings), vehiclemanagement.DeleteVehicleFare)
+	}
+
+	// prize pool
+
+	pricePool := admin.Group("/pricepool")
+
+	{
+		pricePool.GET("/", middleware.RequirePermission(constants.PermissionPrizePool), prizepoolmanagment.GetAllPrizePool)
+		pricePool.POST("/", middleware.RequirePermission(constants.PermissionPrizePool), prizepoolmanagment.CreatePrizePool)
+		pricePool.PUT("/:id", middleware.RequirePermission(constants.PermissionPrizePool), prizepoolmanagment.UpdatePrizePool)
+		pricePool.DELETE("/:id", middleware.RequirePermission(constants.PermissionPrizePool), prizepoolmanagment.DeletePrizePool)
 	}
 }
