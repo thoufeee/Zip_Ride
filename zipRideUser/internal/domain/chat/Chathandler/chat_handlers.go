@@ -57,7 +57,7 @@ func ChatWebSocket(c *gin.Context) {
 	client := &services.Client{
 		Conn:      conn,
 		BookingID: uint(bookingID),
-		Role:      "user", // Always "user" for your side
+		Role:      "user",
 	}
 
 	// Register the client in the global clients map
