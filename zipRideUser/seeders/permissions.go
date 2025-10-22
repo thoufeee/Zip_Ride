@@ -42,6 +42,9 @@ func SeedPermisiions() {
 
 		// permissions
 		{Name: constants.ViewAllPermissions},
+
+		// prize pool
+		{Name: constants.PermissionPrizePool},
 	}
 
 	for _, p := range permission {
