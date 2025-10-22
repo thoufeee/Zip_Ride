@@ -20,20 +20,18 @@ document.getElementById("signinForm").addEventListener("submit", async function 
         const access = response.data.access;
         const refresh = response.data.refresh;
         const role = response.data.role ? response.data.role.toUpperCase() : null;
-        const permissions = response.data.permissions || []; // default to empty array if null
-
+        const permissions = response.data.permissions || []; 
         if (!access || !refresh) {
             errorMsg.textContent = "Login failed: tokens not received.";
             return;
         }
 
-        // Save to localStorage
+      
         localStorage.setItem("accessToken", access);
         localStorage.setItem("refreshToken", refresh);
-        localStorage.setItem("role", role || ""); // role can be empty
+        localStorage.setItem("role", role || ""); 
         localStorage.setItem("permissions", JSON.stringify(permissions));
 
-        // Redirect all users to ACL-based dashboard
         window.location.href = "admindash.html";
 
     } catch (err) {
