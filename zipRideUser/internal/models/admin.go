@@ -12,8 +12,7 @@ type Admin struct {
 	Email       string       `json:"email"`
 	PhoneNumber string       `json:"phonenumber"`
 	Password    string       `json:"password"`
-	RoleID      uint         `json:"role_id"`
-	Role        Role         `json:"role"`
+	Role        string       `json:"role"`
 	Permissions []Permission `gorm:"many2many:admin_permissions;"`
 	Block       bool         `gorm:"default:false"`
 }

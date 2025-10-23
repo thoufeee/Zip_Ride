@@ -39,7 +39,7 @@ func SignIn(c *gin.Context) {
 		perms := utils.PermissionToString(admin.Permissions)
 
 		// generate access token
-		access, err := utils.GenerateAccess(admin.ID, admin.Email, admin.Role.Name, perms)
+		access, err := utils.GenerateAccess(admin.ID, admin.Email, admin.Role, perms)
 
 		if err != nil {
 			c.JSON(http.StatusInternalServerError, gin.H{"err": "failed to create access token"})
@@ -47,7 +47,7 @@ func SignIn(c *gin.Context) {
 		}
 
 		// generate access token
-		refresh, err := utils.GenerateAccess(admin.ID, admin.Email, admin.Role.Name, perms)
+		refresh, err := utils.GenerateAccess(admin.ID, admin.Email, admin.Role, perms)
 
 		if err != nil {
 			c.JSON(http.StatusInternalServerError, gin.H{"err": "failed to create refresh token"})
@@ -56,7 +56,7 @@ func SignIn(c *gin.Context) {
 
 		c.JSON(http.StatusOK, gin.H{
 			"res":         "Successfuly Logged",
-			"role":        admin.Role.Name,
+			"role":        admin.Role,
 			"access":      access,
 			"refresh":     refresh,
 			"permissions": perms,

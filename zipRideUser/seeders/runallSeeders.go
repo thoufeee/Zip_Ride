@@ -4,7 +4,6 @@ package seeders
 
 func RunAllSeeders() {
 	SeedPermisiions()
-	SeedRoles()
-	SeedRolePermissions()
+	
 	SeedAdmin()
 }

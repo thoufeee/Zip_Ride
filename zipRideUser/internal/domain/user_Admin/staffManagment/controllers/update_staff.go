@@ -18,7 +18,7 @@ func UpdateStaff(c *gin.Context) {
 	}
 
 	var staff models.Admin
-	if err := database.DB.Where("id = ? AND RoleID = ?", staffID, constants.RoleStaff).First(&staff).Error; err != nil {
+	if err := database.DB.Where("id = ? AND RoleID = ?", staffID, constants.RoleAdmin).First(&staff).Error; err != nil {
 		c.JSON(http.StatusNotFound, gin.H{"error": "Staff not found"})
 		return
 	}

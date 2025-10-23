@@ -1,8 +1,10 @@
 package controllers
 
 import (
+	"encoding/json"
 	"net/http"
 	"zipride/database"
+	"zipride/internal/constants"
 	"zipride/internal/models"
 	"zipride/utils"
 
@@ -10,7 +12,6 @@ import (
 )
 
 // creating staff || manager
-
 func CreateStaff(c *gin.Context) {
 
 	var data struct {
@@ -27,25 +28,21 @@ func CreateStaff(c *gin.Context) {
 		return
 	}
 
-	// finding role
-	var role models.Role
-
-	if err := database.DB.Preload("Permissions").Where("name = ?", data.Role).First(&role).Error; err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"err": "role not found"})
+	if !utils.PasswordStrength(data.Password) {
+		c.JSON(http.StatusConflict, gin.H{"err": "increase password strength"})
 		return
 	}
 
-	// for extra permissions
-	var extraPermission []models.Permission
-
-	if len(data.ExtraPerms) > 0 {
-		if err := database.DB.Where("name IN ?", data.ExtraPerms).Find(&extraPermission).Error; err != nil {
-			c.JSON(http.StatusInternalServerError, gin.H{"err": "failed to fetch extra permissions"})
-			return
-		}
+	var admin models.Admin
+	if err := database.DB.Where("email = ?", data.Email).First(&admin).Error; err == nil {
+		c.JSON(http.StatusUnauthorized, gin.H{"err": "email already registered"})
+		return
 	}
 
-	allPermission := append(role.Permissions, extraPermission...)
+	if err := database.DB.Where("phone_number = ?", data.PhoneNumber).First(&admin).Error; err == nil {
+		c.JSON(http.StatusBadRequest, gin.H{"err": "phone number already registered"})
+		return
+	}
 
 	hashpass, err := utils.GenerateHash(data.Password)
 
@@ -54,13 +51,19 @@ func CreateStaff(c *gin.Context) {
 		return
 	}
 
+	permjson, err := json.Marshal(data.ExtraPerms)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"err": "failed to proccess permissions"})
+		return
+	}
+
 	newStaff := models.Admin{
 		Name:        data.Name,
 		Email:       data.Email,
 		PhoneNumber: data.PhoneNumber,
 		Password:    hashpass,
-		RoleID:      role.ID,
-		Permissions: allPermission,
+		Role:        constants.RoleAdmin,
+		Permissions: permjson,
 	}
 
 	if err := database.DB.Create(&newStaff).Error; err != nil {

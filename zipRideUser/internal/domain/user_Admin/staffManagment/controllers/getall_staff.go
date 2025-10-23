@@ -13,7 +13,7 @@ import (
 func GETAllStaff(c *gin.Context) {
 	var Staffs []models.Admin
 	//fetch staff data from database
-	if err := database.DB.Where("role=?", constants.RoleStaff).Find(&Staffs).Error; err != nil {
+	if err := database.DB.Where("role=?", constants.RoleAdmin).Find(&Staffs).Error; err != nil {
 		c.JSON(http.StatusNotFound, gin.H{"error": "failed to fetch staffs"})
 		return
 	}
