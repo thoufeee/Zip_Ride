@@ -1,6 +1,5 @@
 const API_BASE_URL = "http://localhost:8080"; 
 
-// ✅ Check permission
 const userPermissions = JSON.parse(localStorage.getItem("permissions") || "[]");
 if (!userPermissions.includes("ACCESS_ADMINDASH")) {
   document.body.innerHTML = `
@@ -16,7 +15,6 @@ if (!userPermissions.includes("ACCESS_ADMINDASH")) {
   throw new Error("Unauthorized access to Admin Dashboard");
 }
 
-// ✅ Helper: fetch with Authorization header
 async function fetchWithAuth(url) {
   const token = localStorage.getItem("accessToken");
   if (!token) {
@@ -48,7 +46,6 @@ async function loadDashboardData() {
     const totalUsers = usersRes.res ?? usersRes.count ?? 0;
     const totalLatestUsers = latestUsersRes.res ?? latestUsersRes.count ?? 0;
 
-    // Mock data for bookings
     const totalDailyBookings = 5; 
     const recentBookings = [
       {
@@ -110,13 +107,11 @@ async function loadDashboardData() {
   }
 }
 
-// ✅ Load dashboard on page ready
 window.addEventListener("DOMContentLoaded", () => {
   console.log("Admin Dashboard ready");
   loadDashboardData();
 });
 
-// ✅ Logout handler
 document.getElementById("logout-btn")?.addEventListener("click", () => {
   localStorage.removeItem("accessToken");
   localStorage.removeItem("refreshToken");
