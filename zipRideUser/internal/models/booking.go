@@ -2,13 +2,7 @@ package models
 
 import "time"
 
-// BookingStatus constants
-const (
-	StatusPending   = "pending"
-	StatusAssigned  = "assigned"
-	StatusCompleted = "completed"
-	StatusCancelled = "cancelled"
-)
+
 
 // Booking represents a ride booking
 type Booking struct {
@@ -61,4 +55,18 @@ type EstimateRequest struct {
 	DropLat     float64 `json:"drop_lat" binding:"required"`
 	DropLong    float64 `json:"drop_long" binding:"required"`
 	VehicleType string  `json:"vehicle_type,omitempty"`
+}
+
+
+// BookingMessage is the payload we send to Kafka
+type BookingMessage struct {
+	BookingID  uint    `json:"booking_id"`
+	UserID     uint    `json:"user_id"`
+	PickupLat  float64 `json:"pickup_lat"`
+	PickupLong float64 `json:"pickup_long"`
+	DropLat    float64 `json:"drop_lat"`
+	DropLong   float64 `json:"drop_long"`
+	Vehicle    string  `json:"vehicle"`
+	Fare       float64 `json:"fare"`
+	Status     string  `json:"status"`
 }

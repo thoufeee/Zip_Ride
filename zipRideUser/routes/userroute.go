@@ -4,7 +4,7 @@ import (
 	"zipride/internal/constants"
 	"zipride/internal/domain/booking_module/handlers"
 	ratingdriver "zipride/internal/domain/booking_module/handlers/Rating_Driver"
-	chathandler "zipride/internal/domain/chat/Chathandler"
+	"zipride/internal/domain/chat"
 	"zipride/internal/domain/user/services"
 	"zipride/internal/middleware"
 	authHandlers "zipride/internal/user_Auth/handlers"
@@ -34,7 +34,9 @@ func UserRoutes(c *gin.Engine) {
 	user.GET("/history", handlers.GetBookingHistoryHandler)
 
 	//Chat
-	user.GET("/chat/:booking_id", chathandler.ChatWebSocket)
+	user.GET("/chat/:booking_id", chat.ConnectUser)
+	//testing
+	// user.GET("/driver/bookings",kafka.GetKafkaBookings)
 
 	//feedback
 	user.POST("/rate-driver/:booking_id", ratingdriver.RateDriver)
