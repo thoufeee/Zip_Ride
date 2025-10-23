@@ -13,7 +13,6 @@ import (
 )
 
 // jwt token check
-
 func JwtValidation() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		header := c.GetHeader("Authorization")

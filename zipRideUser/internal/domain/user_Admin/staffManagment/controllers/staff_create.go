@@ -11,8 +11,12 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
+<<<<<<< HEAD
 // creating admin
 
+=======
+// creating staff || manager
+>>>>>>> 2c00f30 (folders changed)
 func CreateStaff(c *gin.Context) {
 
 	var data struct {

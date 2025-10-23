@@ -20,7 +20,11 @@ func UpdateStaff(c *gin.Context) {
 	}
 
 	var staff models.Admin
+<<<<<<< HEAD
 	if err := database.DB.Where("id = ? AND role = ?", staffID, constants.RoleAdmin).First(&staff).Error; err != nil {
+=======
+	if err := database.DB.Where("id = ? AND RoleID = ?", staffID, constants.RoleAdmin).First(&staff).Error; err != nil {
+>>>>>>> 2c00f30 (folders changed)
 		c.JSON(http.StatusNotFound, gin.H{"error": "Staff not found"})
 		return
 	}

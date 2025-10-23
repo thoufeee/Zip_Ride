@@ -13,7 +13,6 @@ import (
 )
 
 // adding admin
-
 func SeedAdmin() {
 
 	adminEmail := os.Getenv("EMAIL")
