@@ -29,7 +29,7 @@ func (h *DriverHandler) DriversPage(c *gin.Context) {
 		q = q.Where("status = ?", status)
 	}
 	_ = q.Find(&list).Error
-	c.HTML(http.StatusOK, "admin/drivers/index.html", gin.H{
+	c.HTML(http.StatusOK, "admin/drivers.html", gin.H{
 		"Drivers": list,
 		"FilterStatus": status,
 	})

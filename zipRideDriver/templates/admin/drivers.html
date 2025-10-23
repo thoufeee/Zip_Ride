@@ -1,212 +1,220 @@
 {{ define "admin/drivers.html" }}
-<!DOCTYPE html>
-<html>
-<head>
-    <meta charset="UTF-8">
-    <title>Drivers | ZipRide Admin</title>
-    <link rel="stylesheet" href="/static/css/style.css">
-    <style>
-        body { margin: 0; font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif; background: #f8fafc; }
-        .admin-layout { display: flex; min-height: 100vh; }
-        
-        /* Sidebar Styles */
-        .sidebar { 
-            width: 250px; 
-            background: #1f2937; 
-            color: white; 
-            padding: 0;
-            box-shadow: 2px 0 4px rgba(0,0,0,0.1);
-        }
-        .sidebar-header { 
-            padding: 20px; 
-            border-bottom: 1px solid #374151; 
-            background: #111827;
-        }
-        .sidebar-header h2 { 
-            margin: 0; 
-            color: #f9fafb; 
-            font-size: 18px; 
-            font-weight: 600;
-        }
-        .sidebar-nav { padding: 0; margin: 0; list-style: none; }
-        .sidebar-nav li { margin: 0; }
-        .sidebar-nav a { 
-            display: flex; 
-            align-items: center; 
-            padding: 12px 20px; 
-            color: #d1d5db; 
-            text-decoration: none; 
-            transition: all 0.2s;
-            border-left: 3px solid transparent;
-        }
-        .sidebar-nav a:hover { 
-            background: #374151; 
-            color: #f9fafb; 
-            border-left-color: #3b82f6;
-        }
-        .sidebar-nav a.active { 
-            background: #1e40af; 
-            color: white; 
-            border-left-color: #60a5fa;
-        }
-        .sidebar-nav .icon { 
-            margin-right: 10px; 
-            font-size: 16px; 
-            width: 20px; 
-            text-align: center;
-        }
-        .sidebar-footer {
-            position: absolute;
-            bottom: 0;
-            left: 0;
-            right: 0;
-            padding: 20px;
-            border-top: 1px solid #374151;
-            background: #111827;
-        }
-        .logout-btn {
-            display: flex;
-            align-items: center;
-            width: 100%;
-            padding: 10px;
-            background: #dc2626;
-            color: white;
-            text-decoration: none;
-            border-radius: 6px;
-            transition: background 0.2s;
-        }
-        .logout-btn:hover { background: #b91c1c; }
-        
-        /* Main Content Styles */
-        .main-content { 
-            flex: 1; 
-            padding: 24px; 
-            overflow-y: auto;
-        }
-        .content-header { 
-            display: flex; 
-            justify-content: space-between; 
-            align-items: center; 
-            margin-bottom: 24px; 
-        }
-        .content-header h1 { 
-            margin: 0; 
-            color: #111827; 
-            font-size: 28px; 
-            font-weight: 700;
-        }
-        .filters { display: flex; gap: 10px; margin-bottom: 20px; }
-        .filters select, .filters button { padding: 8px 12px; border: 1px solid #ddd; border-radius: 4px; }
-        .filters button { background: #1E90FF; color: white; border: none; cursor: pointer; }
-        .filters button:hover { background: #0c7cd5; }
-        table { border-collapse: collapse; width: 100%; margin-top: 20px; background: white; }
-        th, td { border: 1px solid #ddd; padding: 12px 8px; text-align: left; }
-        th { background: #1E90FF; color: white; font-weight: 600; }
-        .status-Pending { color: #f59e0b; font-weight: 500; }
-        .status-Approved { color: #10b981; font-weight: 500; }
-        .status-Rejected { color: #ef4444; font-weight: 500; }
-        .status-Suspended { color: #ef4444; font-weight: 500; }
-        .status-Banned { color: #7c2d12; font-weight: 500; }
-        .actions { display: flex; gap: 8px; }
-        .actions a { padding: 4px 8px; text-decoration: none; border-radius: 4px; font-size: 12px; }
-        .btn-edit { background: #3b82f6; color: white; }
-        .btn-suspend { background: #ef4444; color: white; }
-        .btn-approve { background: #10b981; color: white; }
-        .error { background: #fee2e2; color: #7f1d1d; padding: 12px; border-radius: 6px; margin-bottom: 16px; }
-        .rating { color: #f59e0b; }
-        .vehicle-info { font-size: 12px; color: #6b7280; }
-    </style>
-</head>
-<body>
-    <div class="admin-layout">
-        <!-- Sidebar -->
-        <div class="sidebar">
-            <div class="sidebar-header">
-                <h2>🚗 ZipRide Admin</h2>
-            </div>
-            
-            <ul class="sidebar-nav">
-                <li><a href="/admin/panel/dashboard">
-                    <span class="icon">📊</span>
-                    Dashboard
-                </a></li>
-                <li><a href="/admin/panel/drivers" class="active">
-                    <span class="icon">👨‍✈️</span>
-                    Manage Drivers
-                </a></li>
-                <li><a href="/admin/panel/rides">
-                    <span class="icon">🚙</span>
-                    Manage Rides
-                </a></li>
-                <li><a href="/admin/panel/vehicles">
-                    <span class="icon">🚗</span>
-                    Vehicles
-                </a></li>
-                <li><a href="/admin/panel/earnings">
-                    <span class="icon">💰</span>
-                    Earnings & Payments
-                </a></li>
-                <li><a href="/admin/panel/withdrawals">
-                    <span class="icon">🏦</span>
-                    Withdrawals
-                </a></li>
-                <li><a href="/admin/panel/users">
-                    <span class="icon">👥</span>
-                    Manage Users
-                </a></li>
-                <li><a href="/admin/panel/help">
-                    <span class="icon">❓</span>
-                    Help Center
-                </a></li>
-                <li><a href="/admin/panel/admins">
-                    <span class="icon">🛡️</span>
-                    Admins
-                </a></li>
-                <li><a href="/admin/panel/roles">
-                    <span class="icon">🔑</span>
-                    Roles
-                </a></li>
-                <li><a href="/admin/panel/settings">
-                    <span class="icon">⚙️</span>
-                    Settings
-                </a></li>
-            </ul>
-            
-            <div class="sidebar-footer">
-                <a href="/admin/panel/logout" class="logout-btn">
-                    <span class="icon">🚪</span>
-                    Logout
-                </a>
-            </div>
+    {{ template "base" . }}
+{{ end }}
+
+{{ define "page-title" }}Driver Management{{ end }}
+
+{{ define "content" }}
+<style>
+    .drivers-page {
+        display: flex;
+        flex-direction: column;
+        gap: 24px;
+    }
+
+    .drivers-header {
+        background: white;
+        border-radius: 16px;
+        padding: 28px;
+        box-shadow: 0 8px 24px rgba(15, 23, 42, 0.08);
+        border: 1px solid #e2e8f0;
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+        gap: 16px;
+    }
+
+    .drivers-header h2 {
+        margin: 0;
+        font-size: 26px;
+        font-weight: 700;
+        color: #1f2937;
+    }
+
+    .drivers-header p {
+        margin: 6px 0 0;
+        color: #6b7280;
+        font-size: 14px;
+    }
+
+    .drivers-filters {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 12px;
+        background: white;
+        border-radius: 14px;
+        padding: 16px 20px;
+        box-shadow: 0 6px 20px rgba(15, 23, 42, 0.06);
+        border: 1px solid #e2e8f0;
+    }
+
+    .drivers-filters select,
+    .drivers-filters button {
+        padding: 10px 14px;
+        border-radius: 10px;
+        border: 1px solid #d1d5db;
+        background: white;
+        font-size: 14px;
+        color: #1f2937;
+    }
+
+    .drivers-filters button {
+        background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
+        color: white;
+        font-weight: 600;
+        border: none;
+        cursor: pointer;
+        transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+
+    .drivers-filters button:hover {
+        transform: translateY(-1px);
+        box-shadow: 0 8px 20px rgba(99, 102, 241, 0.25);
+    }
+
+    .drivers-table-wrapper {
+        background: white;
+        border-radius: 16px;
+        overflow: hidden;
+        border: 1px solid #e2e8f0;
+        box-shadow: 0 12px 32px rgba(15, 23, 42, 0.08);
+    }
+
+    table {
+        width: 100%;
+        border-collapse: collapse;
+        font-size: 14px;
+    }
+
+    thead {
+        background: linear-gradient(135deg, rgba(99, 102, 241, 0.15) 0%, rgba(129, 140, 248, 0.08) 100%);
+    }
+
+    th {
+        text-align: left;
+        padding: 16px 18px;
+        font-weight: 600;
+        color: #374151;
+        text-transform: uppercase;
+        font-size: 12px;
+        letter-spacing: 0.5px;
+    }
+
+    td {
+        padding: 18px;
+        border-top: 1px solid #edf2f7;
+        color: #1f2937;
+        vertical-align: middle;
+    }
+
+    tbody tr:hover {
+        background: #f8fafc;
+    }
+
+    .driver-vehicle {
+        color: #64748b;
+        font-size: 13px;
+    }
+
+    .status-pill {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        padding: 6px 12px;
+        border-radius: 999px;
+        font-weight: 600;
+        text-transform: capitalize;
+        font-size: 12px;
+    }
+
+    .status-pill.Pending { background: rgba(251, 191, 36, 0.15); color: #b45309; }
+    .status-pill.Approved { background: rgba(34, 197, 94, 0.15); color: #047857; }
+    .status-pill.Rejected { background: rgba(248, 113, 113, 0.15); color: #b91c1c; }
+    .status-pill.Suspended { background: rgba(248, 113, 113, 0.15); color: #b91c1c; }
+    .status-pill.Banned { background: rgba(107, 114, 128, 0.2); color: #111827; }
+
+    .drivers-actions {
+        display: flex;
+        gap: 10px;
+        flex-wrap: wrap;
+    }
+
+    .drivers-actions a,
+    .drivers-actions button {
+        padding: 8px 14px;
+        border-radius: 10px;
+        font-size: 12px;
+        font-weight: 600;
+        border: none;
+        cursor: pointer;
+        transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+
+    .action-view { background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%); color: white; text-decoration: none; display: inline-flex; align-items: center; }
+    .action-suspend { background: linear-gradient(135deg, #f97316 0%, #ea580c 100%); color: white; }
+    .action-approve { background: linear-gradient(135deg, #22c55e 0%, #16a34a 100%); color: white; }
+
+    .drivers-actions a:hover,
+    .drivers-actions button:hover {
+        transform: translateY(-1px);
+        box-shadow: 0 8px 16px rgba(15, 23, 42, 0.15);
+    }
+
+    .empty-state {
+        text-align: center;
+        padding: 48px 24px;
+        color: #6b7280;
+        font-size: 15px;
+    }
+
+    .drivers-count {
+        text-align: center;
+        color: #6b7280;
+        font-size: 14px;
+    }
+
+    .drivers-count span { font-weight: 600; color: #4f46e5; }
+
+    .form-inline { display: inline; }
+
+    @media (max-width: 1024px) {
+        .drivers-actions { flex-direction: column; align-items: flex-start; }
+    }
+
+    @media (max-width: 640px) {
+        th, td { padding: 12px; font-size: 13px; }
+        .drivers-header { flex-direction: column; }
+    }
+</style>
+
+<div class="drivers-page">
+    <div class="drivers-header">
+        <div>
+            <h2>Driver Management</h2>
+            <p>Monitor onboarding progress, verification status, and take actions on driver accounts.</p>
         </div>
-        
-        <!-- Main Content -->
-        <div class="main-content">
-            <div class="content-header">
-                <h1>Driver Management</h1>
-                <div style="color: #6b7280; font-size: 14px;">
-                    Manage and monitor all registered drivers
-                </div>
-            </div>
+    </div>
 
-        {{if .Error}}
-        <div class="error">{{.Error}}</div>
-        {{end}}
+    {{ if .Error }}
+    <div class="alert alert-error">{{ .Error }}</div>
+    {{ end }}
 
-        <!-- Filters -->
-        <form class="filters" method="GET" action="/admin/panel/drivers">
-            <select name="status">
-                <option value="" {{if eq .FilterStatus ""}}selected{{end}}>All Drivers</option>
-                <option value="Pending" {{if eq .FilterStatus "Pending"}}selected{{end}}>Pending</option>
-                <option value="Approved" {{if eq .FilterStatus "Approved"}}selected{{end}}>Approved</option>
-                <option value="Rejected" {{if eq .FilterStatus "Rejected"}}selected{{end}}>Rejected</option>
-                <option value="Suspended" {{if eq .FilterStatus "Suspended"}}selected{{end}}>Suspended</option>
-                <option value="Banned" {{if eq .FilterStatus "Banned"}}selected{{end}}>Banned</option>
-            </select>
-            <button type="submit">Filter</button>
-        </form>
+    <form class="drivers-filters" method="GET" action="/admin/panel/drivers">
+        <select name="status">
+            <option value="" {{if eq .FilterStatus ""}}selected{{end}}>All statuses</option>
+            <option value="Pending" {{if eq .FilterStatus "Pending"}}selected{{end}}>Pending</option>
+            <option value="Approved" {{if eq .FilterStatus "Approved"}}selected{{end}}>Approved</option>
+            <option value="Rejected" {{if eq .FilterStatus "Rejected"}}selected{{end}}>Rejected</option>
+            <option value="Suspended" {{if eq .FilterStatus "Suspended"}}selected{{end}}>Suspended</option>
+            <option value="Banned" {{if eq .FilterStatus "Banned"}}selected{{end}}>Banned</option>
+        </select>
+        <button type="submit">Apply filter</button>
+        {{ if .FilterStatus }}
+        <a href="/admin/panel/drivers" class="reset-link">Reset</a>
+        {{ end }}
+    </form>
 
-        <!-- Drivers Table -->
+    <div class="drivers-table-wrapper">
         <table>
             <thead>
                 <tr>
@@ -222,49 +230,49 @@
                 </tr>
             </thead>
             <tbody>
-                {{range .Drivers}}
+                {{ range .Drivers }}
                 <tr>
-                    <td>{{.ID}}</td>
-                    <td>{{.Name}}</td>
-                    <td>{{.Phone}}</td>
+                    <td>#{{ .ID }}</td>
+                    <td>{{ .Name }}</td>
+                    <td>{{ .Phone }}</td>
                     <td>
-                        {{if .VehicleModel}}{{.VehicleModel}}{{else}}N/A{{end}}
-                        {{if .VehicleNumber}}<br><span class="vehicle-info">{{.VehicleNumber}}</span>{{end}}
+                        {{ if .VehicleModel }}{{ .VehicleModel }}{{ else }}—{{ end }}
+                        {{ if .VehicleNumber }}<div class="driver-vehicle">{{ .VehicleNumber }}</div>{{ end }}
                     </td>
-                    <td class="status-{{.Status}}">{{.Status}}</td>
-                    <td class="rating">★ {{printf "%.1f" .Rating}}</td>
-                    <td>{{if .IsVerified}}✅ Yes{{else}}❌ No{{end}}</td>
-                    <td>{{.CreatedAt.Format "2006-01-02"}}</td>
-                    <td class="actions">
-                        <a href="/admin/panel/driver/{{.ID}}" class="btn-edit">View</a>
-                        {{if eq .Status "Approved"}}
-                            <form method="POST" action="/admin/panel/driver/{{.ID}}/suspend" style="display:inline">
-                                <button type="submit" class="btn-suspend">Suspend</button>
-                            </form>
-                        {{else if eq .Status "Pending"}}
-                            <form method="POST" action="/admin/panel/driver/{{.ID}}/approve" style="display:inline">
-                                <button type="submit" class="btn-approve">Approve</button>
-                            </form>
-                        {{end}}
+                    <td><span class="status-pill {{ .Status }}">{{ .Status }}</span></td>
+                    <td>★ {{ printf "%.1f" .Rating }}</td>
+                    <td>{{ if .IsVerified }}Yes{{ else }}No{{ end }}</td>
+                    <td>{{ .CreatedAt.Format "2006-01-02" }}</td>
+                    <td>
+                        <div class="drivers-actions">
+                            <a href="/admin/panel/driver/{{ .ID }}" class="action-view">View</a>
+                            {{ if eq .Status "Approved" }}
+                                <form class="form-inline" method="POST" action="/admin/panel/driver/{{ .ID }}/suspend">
+                                    <button type="submit" class="action-suspend">Suspend</button>
+                                </form>
+                            {{ else if eq .Status "Pending" }}
+                                <form class="form-inline" method="POST" action="/admin/panel/driver/{{ .ID }}/approve">
+                                    <button type="submit" class="action-approve">Approve</button>
+                                </form>
+                            {{ end }}
+                        </div>
                     </td>
                 </tr>
-                {{else}}
+                {{ else }}
                 <tr>
-                    <td colspan="9" style="text-align: center; padding: 40px; color: #6b7280;">
-                        No drivers found. {{if .FilterStatus}}Try changing the filter.{{end}}
+                    <td colspan="9" class="empty-state">
+                        No drivers found. {{ if .FilterStatus }}Try changing the status filter.{{ end }}
                     </td>
                 </tr>
-                {{end}}
+                {{ end }}
             </tbody>
         </table>
-
-            {{if .Drivers}}
-            <div style="margin-top: 20px; text-align: center; color: #6b7280;">
-                Showing {{len .Drivers}} drivers
-            </div>
-            {{end}}
-        </div>
     </div>
-</body>
-</html>
+
+    {{ if .Drivers }}
+    <div class="drivers-count">
+        Showing <span>{{ len .Drivers }}</span> driver records
+    </div>
+    {{ end }}
+</div>
 {{ end }}

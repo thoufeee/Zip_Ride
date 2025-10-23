@@ -304,7 +304,21 @@ func SetupRouter(cfg *config.Config, log *zap.Logger, db *gorm.DB, rdb *redis.Cl
 	tpl = template.Must(tpl.ParseFiles("templates/layouts/base.html"))
 
 	adminUIEnabled := false
-	if files, _ := filepath.Glob("templates/admin/**/*.html"); len(files) > 0 {
+	patterns := []string{
+		"templates/admin/*.html",
+		"templates/admin/*/*.html",
+		"templates/admin/*/*/*.html",
+	}
+
+	for _, pattern := range patterns {
+		files, err := filepath.Glob(pattern)
+		if err != nil {
+			log.Warn("failed to glob admin templates", zap.String("pattern", pattern), zap.Error(err))
+			continue
+		}
+		if len(files) == 0 {
+			continue
+		}
 		tpl = template.Must(tpl.ParseFiles(files...))
 		adminUIEnabled = true
 	}

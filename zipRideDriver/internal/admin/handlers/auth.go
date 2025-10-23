@@ -27,10 +27,6 @@ func NewAuthHandler(cfg *config.Config, db *gorm.DB, rdb *redis.Client, log *zap
 }
 
 func (h *AuthHandler) LoginPage(c *gin.Context) {
-	if _, ok := c.Get("admin"); ok {
-		c.Redirect(http.StatusSeeOther, "/admin/panel/dashboard")
-		return
-	}
 	c.HTML(http.StatusOK, "admin/login.html", gin.H{"title": "Admin Login"})
 }
 

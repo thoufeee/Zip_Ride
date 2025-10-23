@@ -1,136 +1,137 @@
 {{ define "admin/complaints.html" }}
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Complaints | ZipRide Admin</title>
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-        
-        body {
-            font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
-            background: #f8fafc;
-            color: #1f2937;
-        }
-        
-        .page-header {
-            background: white;
+    {{ template "base" . }}
+{{ end }}
+
+{{ define "page-title" }}Complaints Management{{ end }}
+
+{{ define "content" }}
+<style>
+    .complaints-page {
+        display: flex;
+        flex-direction: column;
+        gap: 24px;
+    }
+
+    .complaints-hero {
+        background: white;
+        border-radius: 16px;
+        padding: 32px;
+        box-shadow: 0 12px 30px rgba(15, 23, 42, 0.08);
+        border: 1px solid #e2e8f0;
+    }
+
+    .complaints-hero h2 {
+        margin: 0;
+        font-size: 28px;
+        font-weight: 700;
+        color: #1e293b;
+    }
+
+    .complaints-hero p {
+        margin-top: 8px;
+        color: #64748b;
+        font-size: 15px;
+    }
+
+    .coming-soon-card {
+        background: white;
+        border-radius: 16px;
+        padding: 40px 32px;
+        text-align: center;
+        box-shadow: 0 10px 35px rgba(15, 23, 42, 0.08);
+        border: 1px solid #e2e8f0;
+    }
+
+    .coming-soon-icon {
+        font-size: 56px;
+        margin-bottom: 16px;
+    }
+
+    .coming-soon-card h3 {
+        font-size: 24px;
+        margin-bottom: 8px;
+        color: #1e293b;
+    }
+
+    .coming-soon-card p {
+        color: #64748b;
+        font-size: 16px;
+        margin-bottom: 24px;
+    }
+
+    .planned-features {
+        max-width: 420px;
+        margin: 0 auto;
+        text-align: left;
+    }
+
+    .planned-features h4 {
+        font-size: 16px;
+        font-weight: 600;
+        margin-bottom: 12px;
+        color: #1e293b;
+    }
+
+    .planned-features ul {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+        display: grid;
+        gap: 10px;
+    }
+
+    .planned-features li {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        padding: 12px 16px;
+        background: #f8fafc;
+        border-radius: 10px;
+        color: #475569;
+        font-size: 14px;
+        border: 1px solid #e2e8f0;
+    }
+
+    .planned-features li span {
+        display: inline-flex;
+        width: 24px;
+        height: 24px;
+        border-radius: 9999px;
+        align-items: center;
+        justify-content: center;
+        background: rgba(56, 189, 248, 0.15);
+        color: #0284c7;
+        font-weight: 600;
+    }
+@media (max-width: 768px) {
+        .complaints-hero,
+        .coming-soon-card {
             padding: 24px;
-            border-bottom: 1px solid #e5e7eb;
-            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
         }
-        
-        .page-title {
-            font-size: 28px;
-            font-weight: 700;
-            color: #111827;
-            margin-bottom: 8px;
-        }
-        
-        .page-subtitle {
-            color: #6b7280;
-            font-size: 14px;
-        }
-        
-        .content-wrapper {
-            padding: 24px;
-        }
-        
-        .coming-soon {
-            background: white;
-            border: 1px solid #e5e7eb;
-            border-radius: 8px;
-            padding: 48px 24px;
-            text-align: center;
-            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
-        }
-        
-        .coming-soon-icon {
-            font-size: 64px;
-            margin-bottom: 16px;
-        }
-        
-        .coming-soon h3 {
-            font-size: 24px;
-            color: #111827;
-            margin-bottom: 8px;
-        }
-        
-        .coming-soon p {
-            color: #6b7280;
-            font-size: 16px;
-            margin-bottom: 24px;
-        }
-        
-        .feature-list {
-            text-align: left;
-            max-width: 400px;
-            margin: 0 auto;
-        }
-        
-        .feature-list h4 {
-            color: #111827;
-            margin-bottom: 12px;
-            font-size: 18px;
-        }
-        
-        .feature-list ul {
-            list-style: none;
-            padding: 0;
-        }
-        
-        .feature-list li {
-            padding: 8px 0;
-            color: #6b7280;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-        
-        .feature-list li::before {
-            content: "✓";
-            color: #10b981;
-            font-weight: bold;
-        }
-    </style>
-</head>
-<body>
-    <!-- Include Sidebar -->
-    {{ template "admin-sidebar" . }}
-    
-    <!-- Main Content -->
-    <div class="main-content">
-        <div class="page-header">
-            <h1 class="page-title">Complaints Management</h1>
-            <p class="page-subtitle">Handle user complaints and driver disputes</p>
-        </div>
-        
-        <div class="content-wrapper">
-            <div class="coming-soon">
-                <div class="coming-soon-icon">⚠️</div>
-                <h3>{{.Message}}</h3>
-                <p>We're working on building a comprehensive complaints management system for you.</p>
-                
-                <div class="feature-list">
-                    <h4>Planned Features:</h4>
-                    <ul>
-                        <li>View and respond to user complaints</li>
-                        <li>Track driver disputes and issues</li>
-                        <li>Mark tickets as resolved or pending</li>
-                        <li>Internal notes system for admin coordination</li>
-                        <li>Complaint categorization and filtering</li>
-                        <li>Automated complaint routing</li>
-                        <li>Performance metrics and reporting</li>
-                    </ul>
-                </div>
-            </div>
+    }
+</style>
+
+<div class="complaints-page">
+    <div class="complaints-hero">
+        <h2>Complaints & Support</h2>
+        <p>We are preparing a comprehensive complaints and dispute management experience for admins.</p>
+    </div>
+
+    <div class="coming-soon-card">
+        <div class="coming-soon-icon">⚠️</div>
+        <h3>{{ .Message }}</h3>
+        <p>We're actively building tools to streamline issue resolution between drivers and riders.</p>
+
+        <div class="planned-features">
+            <h4>Planned capabilities</h4>
+            <ul>
+                <li><span>1</span>Real-time inbox for rider complaints and driver disputes</li>
+                <li><span>2</span>Status tracking with escalate, resolve, and pending states</li>
+                <li><span>3</span>Internal notes and assignment for collaboration</li>
+                <li><span>4</span>Automatic categorisation and priority scoring</li>
+                <li><span>5</span>Insights dashboard to track resolution SLAs</li>
+            </ul>
         </div>
     </div>
-</body>
-</html>
+</div>
 {{ end }}
