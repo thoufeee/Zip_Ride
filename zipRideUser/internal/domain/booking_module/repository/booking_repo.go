@@ -3,6 +3,7 @@ package repository
 import (
 	"time"
 	"zipride/database"
+	"zipride/internal/constants"
 	"zipride/internal/models"
 )
 
@@ -24,7 +25,7 @@ func IsDuplicateBooking(userID uint, pickupLat, pickupLong, dropLat, dropLong fl
 
 	query := db.Model(&models.Booking{}).
 		Where("user_id = ? AND pickup_lat = ? AND pickup_long = ? AND drop_lat = ? AND drop_long = ? AND vehicle = ? AND status = ?",
-			userID, pickupLat, pickupLong, dropLat, dropLong, vehicle, models.StatusPending)
+			userID, pickupLat, pickupLong, dropLat, dropLong, vehicle, constants.StatusPending)
 
 	if scheduleAt != nil {
 		query = query.Where("schedule_at = ?", scheduleAt)

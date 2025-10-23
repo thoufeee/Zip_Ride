@@ -1,8 +1,7 @@
-package services
+package connection
 
 import (
 	"encoding/json"
-	"fmt"
 	"log"
 	"sync"
 	"zipride/internal/models"
@@ -13,11 +12,11 @@ import (
 type Client struct {
 	Conn      *websocket.Conn
 	BookingID uint
-	Role      string
+	Role      string // "user" or "driver"
 }
 
 var (
-	clients = make(map[uint][]*Client) // bookingID -> clients
+	clients = make(map[uint][]*Client) // bookingID -> clients (user + driver)
 	mutex   = &sync.Mutex{}
 )
 
@@ -25,6 +24,18 @@ var (
 func AddClient(client *Client) {
 	mutex.Lock()
 	defer mutex.Unlock()
+
+	// Only allow max 2 clients per booking (user + driver)
+	if len(clients[client.BookingID]) >= 2 {
+		client.Conn.WriteJSON(models.ChatMessage{
+			BookingID: client.BookingID,
+			Sender:    "system",
+			Message:   "Chat full: only one user and one driver allowed",
+		})
+		client.Conn.Close()
+		return
+	}
+
 	clients[client.BookingID] = append(clients[client.BookingID], client)
 }
 
@@ -39,32 +50,26 @@ func RemoveClient(client *Client) {
 			break
 		}
 	}
+	if len(clients[client.BookingID]) == 0 {
+		delete(clients, client.BookingID)
+	}
 }
 
-// Broadcast message to all clients for the booking
-func BroadcastMessage(msg models.ChatMessage) {
+// Broadcast message to the other client in the booking
+func BroadcastMessage(msg models.ChatMessage, sender *Client) {
 	mutex.Lock()
 	defer mutex.Unlock()
 
 	for _, client := range clients[msg.BookingID] {
-		if err := client.Conn.WriteJSON(msg); err != nil {
-			log.Println("Write error:", err)
+		if client != sender { // send only to the other client
+			if err := client.Conn.WriteJSON(msg); err != nil {
+				log.Println("Write error:", err)
+			}
 		}
 	}
 }
 
-// Delete all chats after booking is completed
-func DeleteBookingChats(bookingID uint) {
-	mutex.Lock()
-	defer mutex.Unlock()
-
-	for _, client := range clients[bookingID] {
-		client.Conn.Close()
-	}
-	delete(clients, bookingID)
-}
-
-// Handle incoming messages for a client
+// Handle incoming messages
 func HandleClientMessages(client *Client) {
 	defer func() {
 		client.Conn.Close()
@@ -84,13 +89,7 @@ func HandleClientMessages(client *Client) {
 			continue
 		}
 
-		BroadcastMessage(msg)
+		// Broadcast to the other client
+		BroadcastMessage(msg, client)
 	}
-}
-
-// Utility to convert string bookingID to uint
-func StringToUint(idStr string) (uint, error) {
-	var id uint
-	_, err := fmt.Sscan(idStr, &id)
-	return id, err
 }

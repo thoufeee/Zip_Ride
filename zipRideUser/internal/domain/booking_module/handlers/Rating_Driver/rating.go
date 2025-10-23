@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"net/http"
 	"zipride/database"
+	"zipride/internal/constants"
 	"zipride/internal/middleware"
 	"zipride/internal/models"
 
@@ -35,7 +36,7 @@ func RateDriver(c *gin.Context) {
 	}
 
 	// //Ensure ride is completed before allowing rating
-	if booking.Status != models.StatusCompleted {
+	if booking.Status != constants.StatusCompleted {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "Cannot rate a ride that is not completed"})
 		return
 	}
