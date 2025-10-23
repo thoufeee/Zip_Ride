@@ -35,8 +35,6 @@ func UserRoutes(c *gin.Engine) {
 
 	//Chat
 	user.GET("/chat/:booking_id", chat.ConnectUser)
-	//testing
-	// user.GET("/driver/bookings",kafka.GetKafkaBookings)
 
 	//feedback
 	user.POST("/rate-driver/:booking_id", ratingdriver.RateDriver)
