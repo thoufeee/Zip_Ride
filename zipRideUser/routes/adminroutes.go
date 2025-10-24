@@ -7,6 +7,7 @@ import (
 	"zipride/internal/domain/user_Admin/prize_pool/prizepoolmanagment"
 	staffmanagment "zipride/internal/domain/user_Admin/staffManagment"
 	"zipride/internal/domain/user_Admin/staffManagment/controllers"
+	subscriptionuser "zipride/internal/domain/user_Admin/subscription_Plan/subscription_user"
 	"zipride/internal/domain/user_Admin/subscription_Plan/subscriptionmanagment"
 	services "zipride/internal/domain/user_Admin/userManagment/services"
 	vehiclemanagement "zipride/internal/domain/user_Admin/vehicleManagement"
@@ -80,6 +81,9 @@ func SuperAdminRoutes(c *gin.Engine) {
 		subscription.POST("/", middleware.RequirePermission(constants.PermissionSubscription), subscriptionmanagment.CreateSubscription)
 		subscription.PUT("/:id", middleware.RequirePermission(constants.PermissionSubscription), subscriptionmanagment.UpdateSubScription)
 		subscription.DELETE("/:id", middleware.RequirePermission(constants.PermissionSubscription), subscriptionmanagment.DeleteSubscription)
+
+		// subscribed users details
+		subscription.GET("/users", middleware.RequirePermission(constants.PermissionSubscription), subscriptionuser.SubScribedUser)
 	}
 
 }
