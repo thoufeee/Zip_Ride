@@ -5,6 +5,7 @@ import (
 	"zipride/internal/domain/booking_module/handlers"
 	ratingdriver "zipride/internal/domain/booking_module/handlers/Rating_Driver"
 	chathandler "zipride/internal/domain/chat/Chathandler"
+	subscriptionplan "zipride/internal/domain/subscription_Plan"
 	"zipride/internal/domain/user/services"
 	"zipride/internal/middleware"
 	authHandlers "zipride/internal/user_Auth/handlers"
@@ -41,5 +42,13 @@ func UserRoutes(c *gin.Engine) {
 
 	// logout
 	user.POST("/logout", authHandlers.UserLogout)
+
+	// subscription plans
+	sub := user.Group("/subscription")
+
+	{
+		sub.GET("/", subscriptionplan.GetAllPlans)
+		sub.POST("/:id", subscriptionplan.BuySubscription)
+	}
 
 }
