@@ -1,0 +1,408 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>ZipRide Admin Panel</title>
+    <!-- Fonts & Icons -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" integrity="sha512-DTOQO9RWCH3ppGqcWaEA1BAXhJf9N8E7Z0fj7LIvUp7V4l+9i2G5HnI0sxE6pXr4l9C1Q9C6V0wR8pJXgS0hGA==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <!-- Styles -->
+    <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+    <!-- APP SHELL -->
+    <div class="app-shell" data-theme="dark">
+        <!-- TOP BAR -->
+        <header class="topbar">
+            <button class="sidebar-toggle" id="sidebarToggle" aria-label="Toggle sidebar">
+                <i class="fas fa-bars"></i>
+            </button>
+            <div class="brand">
+                <span class="brand-logo">🚗</span>
+                <span class="brand-name">ZipRide Admin</span>
+            </div>
+            <div class="topbar-actions">
+                <div class="search-box">
+                    <i class="fas fa-search"></i>
+                    <input type="search" placeholder="Search drivers, rides, payments..." />
+                </div>
+                <button class="theme-toggle" id="themeToggle" aria-label="Toggle theme">
+                    <i class="fas fa-moon"></i>
+                </button>
+                <div class="profile-menu">
+                    <button class="profile-trigger" id="profileTrigger">
+                        <img src="https://i.pravatar.cc/40" alt="Admin" />
+                        <span>Alex Morgan</span>
+                        <i class="fas fa-chevron-down"></i>
+                    </button>
+                    <ul class="profile-dropdown" id="profileDropdown">
+                        <li><a href="#"><i class="fas fa-user-circle"></i>Profile</a></li>
+                        <li><a href="#"><i class="fas fa-sliders-h"></i>Preferences</a></li>
+                        <li><a href="#"><i class="fas fa-sign-out-alt"></i>Sign Out</a></li>
+                    </ul>
+                </div>
+            </div>
+        </header>
+
+        <div class="layout">
+            <!-- SIDEBAR NAVIGATION -->
+            <aside class="sidebar" id="sidebar">
+                <nav class="sidebar-nav">
+                    <ul>
+                        <li class="nav-section-title">Overview</li>
+                        <li><a href="#dashboard" class="nav-link active" data-section="dashboard"><i class="fas fa-gauge"></i><span>Dashboard</span></a></li>
+                        <li><a href="#drivers" class="nav-link" data-section="drivers"><i class="fas fa-id-card"></i><span>Drivers</span></a></li>
+                        <li><a href="#vehicles" class="nav-link" data-section="vehicles"><i class="fas fa-car"></i><span>Vehicles</span></a></li>
+                        <li><a href="#rides" class="nav-link" data-section="rides"><i class="fas fa-route"></i><span>Rides</span></a></li>
+                        <li><a href="#payments" class="nav-link" data-section="payments"><i class="fas fa-wallet"></i><span>Payments</span></a></li>
+                        <li><a href="#reports" class="nav-link" data-section="reports"><i class="fas fa-chart-line"></i><span>Reports</span></a></li>
+                        <li><a href="#notifications" class="nav-link" data-section="notifications"><i class="fas fa-bell"></i><span>Notifications</span></a></li>
+                        <li><a href="#settings" class="nav-link" data-section="settings"><i class="fas fa-gear"></i><span>Settings</span></a></li>
+                    </ul>
+                </nav>
+            </aside>
+
+            <!-- MAIN CONTENT -->
+            <main class="main-content">
+                <!-- DASHBOARD SECTION -->
+                <section id="dashboard" class="content-section active">
+                    <div class="section-header">
+                        <h1>Dashboard</h1>
+                        <button class="btn primary" id="refreshStats"><i class="fas fa-rotate"></i>Refresh Stats</button>
+                    </div>
+                    <div class="stats-grid" id="dashboardStats"></div>
+                    <div class="grid two-columns responsive-stack">
+                        <div class="card chart-card">
+                            <div class="card-header">
+                                <h2>Ride Volume</h2>
+                                <span class="badge">Last 7 days</span>
+                            </div>
+                            <canvas id="ridesChart"></canvas>
+                        </div>
+                        <div class="card chart-card">
+                            <div class="card-header">
+                                <h2>Earnings Trend</h2>
+                                <span class="badge success">+12.4%</span>
+                            </div>
+                            <canvas id="earningsChart"></canvas>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- DRIVERS SECTION -->
+                <section id="drivers" class="content-section">
+                    <div class="section-header">
+                        <div>
+                            <h1>Drivers</h1>
+                            <p>Manage drivers, status, documents and performance.</p>
+                        </div>
+                        <div class="section-actions">
+                            <div class="input-group">
+                                <i class="fas fa-search"></i>
+                                <input type="search" id="driverSearch" placeholder="Search driver name" />
+                            </div>
+                            <select id="driverStatusFilter" aria-label="Filter drivers by status">
+                                <option value="all">All Statuses</option>
+                                <option value="active">Active</option>
+                                <option value="offline">Offline</option>
+                                <option value="suspended">Suspended</option>
+                            </select>
+                            <select id="driverRatingFilter" aria-label="Filter drivers by rating">
+                                <option value="all">All Ratings</option>
+                                <option value="4">4★ & up</option>
+                                <option value="45">4.5★ & up</option>
+                                <option value="48">4.8★ & up</option>
+                            </select>
+                            <button class="btn primary" id="addDriverBtn"><i class="fas fa-plus"></i>Add Driver</button>
+                        </div>
+                    </div>
+                    <div class="table-responsive">
+                        <table class="data-table">
+                            <thead>
+                                <tr>
+                                    <th>Name</th>
+                                    <th>Phone</th>
+                                    <th>Vehicle</th>
+                                    <th>Status</th>
+                                    <th>Rating</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="driversTableBody"></tbody>
+                        </table>
+                    </div>
+                </section>
+
+                <!-- VEHICLES SECTION -->
+                <section id="vehicles" class="content-section">
+                    <div class="section-header">
+                        <h1>Vehicles</h1>
+                        <button class="btn primary" id="addVehicleBtn"><i class="fas fa-plus"></i>Add Vehicle</button>
+                    </div>
+                    <div class="table-responsive">
+                        <table class="data-table">
+                            <thead>
+                                <tr>
+                                    <th>Model</th>
+                                    <th>Plate</th>
+                                    <th>Type</th>
+                                    <th>Assigned Driver</th>
+                                    <th>Photo</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="vehiclesTableBody"></tbody>
+                        </table>
+                    </div>
+                </section>
+
+                <!-- RIDES SECTION -->
+                <section id="rides" class="content-section">
+                    <div class="section-header">
+                        <h1>Active Rides</h1>
+                        <div class="live-indicator"><span class="dot"></span>Live feed</div>
+                    </div>
+                    <div class="grid two-columns responsive-stack">
+                        <div class="card">
+                            <div class="card-header">
+                                <h2>Live Trips</h2>
+                                <button class="btn ghost" id="refreshRides"><i class="fas fa-rotate"></i>Refresh</button>
+                            </div>
+                            <div class="table-responsive">
+                                <table class="data-table">
+                                    <thead>
+                                        <tr>
+                                            <th>Driver</th>
+                                            <th>Rider</th>
+                                            <th>Fare</th>
+                                            <th>Route</th>
+                                            <th>Status</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="ridesTableBody"></tbody>
+                                </table>
+                            </div>
+                        </div>
+                        <div class="card map-card">
+                            <div class="card-header">
+                                <h2>Route Preview</h2>
+                                <span class="badge muted">Static mock</span>
+                            </div>
+                            <div class="map-mock" id="mapPreview">
+                                <div class="map-marker driver">D</div>
+                                <div class="map-marker rider">R</div>
+                                <svg viewBox="0 0 200 200" preserveAspectRatio="none">
+                                    <polyline points="20,160 80,120 140,60 180,40" stroke="#38bdf8" stroke-width="4" fill="none" stroke-dasharray="6 6"></polyline>
+                                </svg>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- PAYMENTS SECTION -->
+                <section id="payments" class="content-section">
+                    <div class="section-header">
+                        <h1>Payments</h1>
+                        <button class="btn ghost" id="exportPayments"><i class="fas fa-file-export"></i>Export Report</button>
+                    </div>
+                    <div class="grid two-columns responsive-stack">
+                        <div class="card">
+                            <div class="card-header">
+                                <h2>Earnings Summary</h2>
+                                <span class="badge">Weekly & Monthly</span>
+                            </div>
+                            <div class="table-responsive">
+                                <table class="data-table compact">
+                                    <thead>
+                                        <tr>
+                                            <th>Period</th>
+                                            <th>Completed Rides</th>
+                                            <th>Gross Earnings</th>
+                                            <th>Net Earnings</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="paymentsTableBody"></tbody>
+                                </table>
+                            </div>
+                        </div>
+                        <div class="card chart-card">
+                            <div class="card-header">
+                                <h2>Revenue Trend</h2>
+                                <span class="badge success">FY 2025</span>
+                            </div>
+                            <canvas id="revenueChart"></canvas>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- REPORTS SECTION -->
+                <section id="reports" class="content-section">
+                    <div class="section-header">
+                        <h1>Reports</h1>
+                        <p>Generate insights across performance, compliance and utilisation.</p>
+                    </div>
+                    <div class="grid three-columns responsive-stack">
+                        <div class="card report-card">
+                            <h2>Driver Performance</h2>
+                            <p>Weekly scorecards, safety incidents and completion rates.</p>
+                            <button class="btn pill">Generate</button>
+                        </div>
+                        <div class="card report-card">
+                            <h2>Demand Heatmap</h2>
+                            <p>Request spikes by geography, time of day and weekday.</p>
+                            <button class="btn pill">View Heatmap</button>
+                        </div>
+                        <div class="card report-card">
+                            <h2>Operations Snapshot</h2>
+                            <p>Top-level metrics for investor & leadership reporting.</p>
+                            <button class="btn pill">Download PDF</button>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- NOTIFICATIONS SECTION -->
+                <section id="notifications" class="content-section">
+                    <div class="section-header">
+                        <h1>Notifications & Reviews</h1>
+                    </div>
+                    <div class="grid three-columns responsive-stack">
+                        <div class="card alert-card" id="systemAlerts"></div>
+                        <div class="card alert-card" id="recentReviews"></div>
+                        <div class="card alert-card" id="driverRatings"></div>
+                    </div>
+                </section>
+
+                <!-- SETTINGS SECTION -->
+                <section id="settings" class="content-section">
+                    <div class="section-header">
+                        <h1>Settings</h1>
+                        <p>Manage platform preferences, notifications and security.</p>
+                    </div>
+                    <div class="settings-grid">
+                        <div class="card">
+                            <h2>General Preferences</h2>
+                            <div class="form-control">
+                                <label>Default city</label>
+                                <input type="text" value="San Francisco" />
+                            </div>
+                            <div class="form-control">
+                                <label>Reporting timezone</label>
+                                <select>
+                                    <option>PST (UTC-8)</option>
+                                    <option>EST (UTC-5)</option>
+                                    <option>UTC</option>
+                                </select>
+                            </div>
+                            <button class="btn primary">Save Preferences</button>
+                        </div>
+                        <div class="card">
+                            <h2>Notifications</h2>
+                            <div class="toggle">
+                                <input type="checkbox" id="emailAlerts" checked />
+                                <label for="emailAlerts">Email alerts for incidents</label>
+                            </div>
+                            <div class="toggle">
+                                <input type="checkbox" id="smsAlerts" />
+                                <label for="smsAlerts">SMS alerts for VIP riders</label>
+                            </div>
+                            <div class="toggle">
+                                <input type="checkbox" id="pushAlerts" checked />
+                                <label for="pushAlerts">Push notifications for payouts</label>
+                            </div>
+                        </div>
+                        <div class="card">
+                            <h2>Security</h2>
+                            <p>Multi-factor authentication is <span class="badge success">Enabled</span></p>
+                            <button class="btn danger">Reset Admin Password</button>
+                        </div>
+                    </div>
+                </section>
+            </main>
+        </div>
+    </div>
+
+    <!-- DRIVER MODAL -->
+    <div class="modal" id="driverModal" aria-hidden="true" role="dialog">
+        <div class="modal-dialog">
+            <header class="modal-header">
+                <h2 id="driverModalTitle">Add Driver</h2>
+                <button class="modal-close" id="driverModalClose" aria-label="Close modal"><i class="fas fa-times"></i></button>
+            </header>
+            <form class="modal-body" id="driverForm">
+                <div class="form-control">
+                    <label for="driverName">Name</label>
+                    <input type="text" id="driverName" required />
+                </div>
+                <div class="form-control">
+                    <label for="driverPhone">Phone</label>
+                    <input type="tel" id="driverPhone" required />
+                </div>
+                <div class="form-control">
+                    <label for="driverVehicle">Vehicle</label>
+                    <input type="text" id="driverVehicle" required />
+                </div>
+                <div class="form-control">
+                    <label for="driverStatus">Status</label>
+                    <select id="driverStatus">
+                        <option value="active">Active</option>
+                        <option value="offline">Offline</option>
+                        <option value="suspended">Suspended</option>
+                    </select>
+                </div>
+                <div class="form-control">
+                    <label for="driverRating">Rating</label>
+                    <input type="number" step="0.1" min="1" max="5" id="driverRating" required />
+                </div>
+                <footer class="modal-footer">
+                    <button type="button" class="btn ghost" id="driverModalCancel">Cancel</button>
+                    <button type="submit" class="btn primary">Save Driver</button>
+                </footer>
+            </form>
+        </div>
+    </div>
+    <div class="modal-backdrop" id="modalBackdrop" aria-hidden="true"></div>
+
+    <!-- VEHICLE MODAL -->
+    <div class="modal" id="vehicleModal" aria-hidden="true" role="dialog">
+        <div class="modal-dialog">
+            <header class="modal-header">
+                <h2 id="vehicleModalTitle">Add Vehicle</h2>
+                <button class="modal-close" id="vehicleModalClose" aria-label="Close modal"><i class="fas fa-times"></i></button>
+            </header>
+            <form class="modal-body" id="vehicleForm">
+                <div class="form-control">
+                    <label for="vehicleModel">Model</label>
+                    <input type="text" id="vehicleModel" required />
+                </div>
+                <div class="form-control">
+                    <label for="vehiclePlate">Plate Number</label>
+                    <input type="text" id="vehiclePlate" required />
+                </div>
+                <div class="form-control">
+                    <label for="vehicleType">Type</label>
+                    <input type="text" id="vehicleType" required />
+                </div>
+                <div class="form-control">
+                    <label for="vehicleDriver">Assigned Driver</label>
+                    <input type="text" id="vehicleDriver" required />
+                </div>
+                <div class="form-control">
+                    <label for="vehiclePhoto">Vehicle Photo</label>
+                    <input type="file" id="vehiclePhoto" accept="image/*" />
+                </div>
+                <footer class="modal-footer">
+                    <button type="button" class="btn ghost" id="vehicleModalCancel">Cancel</button>
+                    <button type="submit" class="btn primary">Save Vehicle</button>
+                </footer>
+            </form>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.4/dist/chart.umd.min.js" integrity="sha384-6vFsgGAaHo9dZYkTfLZNVVRFlE0YyqS/fWznuaCG2lLBVmOAXoJ1Bs8LojRxv2jc" crossorigin="anonymous"></script>
+    <script src="script.js"></script>
+</body>
+</html>
