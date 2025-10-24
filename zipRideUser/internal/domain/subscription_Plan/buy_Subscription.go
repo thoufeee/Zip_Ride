@@ -5,6 +5,7 @@ import (
 	"strconv"
 	"time"
 	"zipride/database"
+	"zipride/internal/constants"
 	"zipride/internal/models"
 
 	"github.com/gin-gonic/gin"
@@ -18,7 +19,7 @@ func BuySubscription(c *gin.Context) {
 	user_Id, _ := strconv.ParseUint(user_idstr, 10, 64)
 
 	var input struct {
-		PlanID string `json:"plan_id"`
+		PlanID string `json:"plan_id" binding:"required"`
 	}
 
 	if err := c.ShouldBindJSON(&input); err != nil {
@@ -33,13 +34,32 @@ func BuySubscription(c *gin.Context) {
 		return
 	}
 
+	var existing models.UserSubscription
+
+	if err := database.DB.Where("user_id = ? AND status = ?", user_Id, constants.Subscription_Active).
+		First(&existing).Error; err == nil {
+		c.JSON(http.StatusBadRequest, gin.H{"err": "You Already Have a Active Subscription"})
+		return
+	}
+
+	var user models.User
+	if err := database.DB.Where("id = ?", user_Id).First(&user).Error; err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"err": "user not found"})
+		return
+	}
+
+	start := time.Now()
+	enddate := time.Now().AddDate(0, 0, plan.DurationDays)
+
 	user_Sub := &models.UserSubscription{
 		ID:        uuid.NewString(),
 		UserID:    uint(user_Id),
+		UserName:  user.FirstName + " " + user.LastName,
 		PlanID:    input.PlanID,
-		StartDate: time.Now(),
-		EndDate:   time.Now().AddDate(0, 0, plan.DurationDays),
-		Status:    "active",
+		PlanName:  plan.PlanName,
+		StartDate: start,
+		EndDate:   enddate,
+		Status:    constants.Subscription_Active,
 	}
 
 	if err := database.DB.Create(&user_Sub).Error; err != nil {
