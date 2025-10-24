@@ -28,7 +28,7 @@ func Connect() {
 	}
 
 	err = DB.AutoMigrate(&models.Permission{}, &models.Admin{}, &models.User{}, &models.Booking{},
-		&models.Vehicle{}, &models.PrizePool{}, models.SubscriptionPlan{},
+		&models.Vehicle{}, &models.PrizePool{}, models.SubscriptionPlan{}, models.UserSubscription{},
 	)
 
 	if err != nil {
