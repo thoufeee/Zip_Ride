@@ -35,7 +35,7 @@ func UserRoutes(c *gin.Engine) {
 	user.GET("/history", handlers.GetBookingHistoryHandler)
 
 	//Chat
-	user.GET("/chat/:booking_id", chathandler.ChatWebSocket)
+	user.GET("/chat/:booking_id", chat.ConnectUser)
 
 	//feedback
 	user.POST("/rate-driver/:booking_id", ratingdriver.RateDriver)
