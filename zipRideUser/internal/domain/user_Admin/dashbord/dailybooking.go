@@ -7,15 +7,17 @@ import (
 
 	"github.com/gin-gonic/gin"
 )
-//struct for booking count
+
+// struct for booking count
 type BookingCount struct {
-	Date  string `json:"date"`
+	Date  time.Time `json:"date"`
 	Count uint   `json:"count"`
 }
-//booking per dat count
+
+// booking per dat count
 func BookingPerDay(c *gin.Context) {
 	var perday []BookingCount
-//query for booking per day 
+	//query for booking per day
 	query := `
 		SELECT 
 			DATE(created_at) AS date,
@@ -25,7 +27,7 @@ func BookingPerDay(c *gin.Context) {
 		GROUP BY DATE(created_at)
 		ORDER BY DATE(created_at);
 	`
-//getting data from the database based on the query
+	//getting data from the database based on the query
 	if err := database.DB.Raw(query).Scan(&perday).Error; err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{
 			"status":  "error",
@@ -36,13 +38,16 @@ func BookingPerDay(c *gin.Context) {
 	}
 
 	// Format date to "Jan 02"
-	for i := range perday {
-		t, _ := time.Parse("2006-01-02", perday[i].Date)
-		perday[i].Date = t.Format("Jan 02")
+	formatted := make([]map[string]interface{}, len(perday))
+	for i, b := range perday {
+		formatted[i] = map[string]interface{}{
+			"date":  b.Date.Format("Jan 02"), // formatted as "Oct 25"
+			"count": b.Count,
+		}
 	}
-	//sucess responce and result
+
 	c.JSON(http.StatusOK, gin.H{
 		"message": "Daily booking counts fetched successfully",
-		"data":    perday,
+		"data":    formatted,
 	})
 }
