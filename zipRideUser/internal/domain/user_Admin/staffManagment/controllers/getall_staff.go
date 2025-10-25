@@ -14,13 +14,8 @@ func GETAllStaff(c *gin.Context) {
 	var admin []models.Admin
 
 	//fetch staff data from database
-<<<<<<< HEAD
 	if err := database.DB.Where("role = ?", constants.RoleAdmin).Find(&admin).Error; err != nil {
 		c.JSON(http.StatusNotFound, gin.H{"error": "failed to fetch"})
-=======
-	if err := database.DB.Where("role=?", constants.RoleAdmin).Find(&Staffs).Error; err != nil {
-		c.JSON(http.StatusNotFound, gin.H{"error": "failed to fetch staffs"})
->>>>>>> 2c00f30 (folders changed)
 		return
 	}
 
