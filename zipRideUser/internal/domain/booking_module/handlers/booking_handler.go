@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"math"
 	"net/http"
+	"strings"
 	"time"
 	"zipride/database"
 	"zipride/internal/constants"
@@ -35,8 +36,11 @@ func EstimateBooking(c *gin.Context) {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}
-	durationMin := durationSec / 60
-	minutes := int(durationSec) / 60
+
+	//Properly convert seconds to minutes
+	durationMin := durationSec / 60.0
+	minutes := int(durationSec / 60.0)
+	seconds := int(math.Mod(durationSec, 60.0))
 
 	// --- Specific vehicle type ---
 	if req.VehicleType != "" {
@@ -45,11 +49,12 @@ func EstimateBooking(c *gin.Context) {
 			c.JSON(http.StatusBadRequest, gin.H{"error": "vehicle type not found"})
 			return
 		}
-
+		//total fare calculation
 		totalFare := fare.BaseFare + (fare.PerKmRate * distance) + (fare.PerMinRate * durationMin)
+		// json responce 
 		c.JSON(http.StatusOK, gin.H{
 			"distance":         fmt.Sprintf("%.2f km", distance),
-			"duration":         fmt.Sprintf("%d min %d sec", minutes, int(durationSec)%60),
+			"duration":         fmt.Sprintf("%d min %d sec", minutes, seconds),
 			"vehicle_type":     fare.VehicleType,
 			"base_fare":        fare.BaseFare,
 			"people_count":     fare.PeopleCount,
@@ -96,10 +101,11 @@ func EstimateBooking(c *gin.Context) {
 
 	c.JSON(http.StatusOK, gin.H{
 		"distance": fmt.Sprintf("%.2f km", distance),
-		"duration": fmt.Sprintf("%d min %d sec", minutes, int(durationSec)%60),
+		"duration": fmt.Sprintf("%d min %d sec", minutes, seconds),
 		"vehicles": results,
 	})
 }
+
 
 // -------------------- 2. CreateBookingNow --------------------
 
@@ -133,7 +139,7 @@ func CreateBookingNow(c *gin.Context) {
 
 	// Fare
 	var fareConfig models.Vehicle
-	if err := database.DB.Where("vehicle_type = ?", req.VehicleType).First(&fareConfig).Error; err != nil {
+	if err := database.DB.Where("LOWER(vehicle_type) = ?", req.VehicleType).First(&fareConfig).Error; err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "vehicle fare not found"})
 		return
 	}
@@ -154,7 +160,6 @@ func CreateBookingNow(c *gin.Context) {
 		ScheduleAt:   ptrTime(now),
 		ScheduleDate: now.Format("2006-01-02"),
 		ScheduleTime: now.Format("03:04 PM"),
-		OTP:          req.OTP,
 	}
 
 	if err := repository.SaveBooking(&booking); err != nil {
@@ -232,7 +237,7 @@ func CreateBookingLater(c *gin.Context) {
 
 	// Fare
 	var fareConfig models.Vehicle
-	if err := database.DB.Where("vehicle_type = ?", req.VehicleType).First(&fareConfig).Error; err != nil {
+	if err := database.DB.Where("LOWER(vehicle_type) = ?", strings.ToLower(req.VehicleType)).First(&fareConfig).Error; err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "vehicle fare not found"})
 		return
 	}
@@ -252,7 +257,6 @@ func CreateBookingLater(c *gin.Context) {
 		ScheduleAt:   req.ScheduleAt,
 		ScheduleDate: req.ScheduleAt.Format("2006-01-02"),
 		ScheduleTime: req.ScheduleAt.Format("03:04 PM"),
-		OTP:          req.OTP,
 	}
 	//save booking
 	if err := repository.SaveBooking(&booking); err != nil {
