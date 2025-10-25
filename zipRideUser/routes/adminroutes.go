@@ -3,10 +3,12 @@ package routes
 import (
 	"zipride/internal/constants"
 
-	"zipride/internal/domain/prize_pool/prizepoolmanagment"
 	"zipride/internal/domain/user_Admin/allpermission"
+	"zipride/internal/domain/user_Admin/prize_pool/prizepoolmanagment"
 	staffmanagment "zipride/internal/domain/user_Admin/staffManagment"
 	"zipride/internal/domain/user_Admin/staffManagment/controllers"
+	subscriptionuser "zipride/internal/domain/user_Admin/subscription_Plan/subscription_user"
+	"zipride/internal/domain/user_Admin/subscription_Plan/subscriptionmanagment"
 	services "zipride/internal/domain/user_Admin/userManagment/services"
 	vehiclemanagement "zipride/internal/domain/user_Admin/vehicleManagement"
 	"zipride/internal/middleware"
@@ -66,6 +68,22 @@ func SuperAdminRoutes(c *gin.Engine) {
 		pricePool.GET("/", middleware.RequirePermission(constants.PermissionPrizePool), prizepoolmanagment.GetAllPrizePool)
 		pricePool.POST("/", middleware.RequirePermission(constants.PermissionPrizePool), prizepoolmanagment.CreatePrizePool)
 		pricePool.PUT("/:id", middleware.RequirePermission(constants.PermissionPrizePool), prizepoolmanagment.UpdatePrizePool)
+		pricePool.PUT("/status/:id", middleware.RequirePermission(constants.PermissionPrizePool), prizepoolmanagment.UpdateStatus)
 		pricePool.DELETE("/:id", middleware.RequirePermission(constants.PermissionPrizePool), prizepoolmanagment.DeletePrizePool)
 	}
+
+	// subscription plan
+
+	subscription := admin.Group("/subscription")
+
+	{
+		subscription.GET("/", middleware.RequirePermission(constants.PermissionSubscription), subscriptionmanagment.GetSubScription)
+		subscription.POST("/", middleware.RequirePermission(constants.PermissionSubscription), subscriptionmanagment.CreateSubscription)
+		subscription.PUT("/:id", middleware.RequirePermission(constants.PermissionSubscription), subscriptionmanagment.UpdateSubScription)
+		subscription.DELETE("/:id", middleware.RequirePermission(constants.PermissionSubscription), subscriptionmanagment.DeleteSubscription)
+
+		// subscribed users details
+		subscription.GET("/users", middleware.RequirePermission(constants.PermissionSubscription), subscriptionuser.SubScribedUser)
+	}
+
 }

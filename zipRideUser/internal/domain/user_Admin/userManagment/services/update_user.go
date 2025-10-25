@@ -48,11 +48,13 @@ func UpdateUser(c *gin.Context) {
 		return
 	}
 
-	// Validate phone number (if updated)
-	phone, ok := utils.PhoneNumberCheck(input.PhoneNumber)
-	if !ok {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid phone number format"})
-		return
+	if input.PhoneNumber != "" {
+		phone, ok := utils.PhoneNumberCheck(input.PhoneNumber)
+		if !ok {
+			c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid phone number format"})
+			return
+		}
+		user.PhoneNumber = phone
 	}
 
 	// Hash password if changed
@@ -77,9 +79,6 @@ func UpdateUser(c *gin.Context) {
 	}
 	if input.Gender != "" {
 		user.Gender = input.Gender
-	}
-	if input.PhoneNumber != "" {
-		user.PhoneNumber = phone
 	}
 	if input.Place != "" {
 		user.Place = input.Place

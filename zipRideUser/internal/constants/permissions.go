@@ -31,6 +31,9 @@ const (
 	// prize pool and commission
 	PermissionPrizePool = "ACCESS_PRIZEPOOL"
 
+	// subscription plan
+	PermissionSubscription = "ACCESS_SUBSCRIPTION"
+
 	// system settings (pricing rules && commisions && app settings)
 	PermissionSystemSettings = "SYSTEM_SETTINGS"
 

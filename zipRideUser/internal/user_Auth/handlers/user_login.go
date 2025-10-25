@@ -54,7 +54,7 @@ func SignIn(c *gin.Context) {
 		}
 
 		// generate access token
-		refresh, err := utils.GenerateAccess(admin.ID, admin.Email, admin.Role, perms)
+		refresh, err := utils.GenerateRefresh(admin.ID, admin.Email, admin.Role, perms)
 
 		if err != nil {
 			c.JSON(http.StatusInternalServerError, gin.H{"err": "failed to create refresh token"})

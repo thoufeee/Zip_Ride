@@ -4,6 +4,7 @@ import (
 	"log"
 	"time"
 	"zipride/database"
+	cronjob "zipride/internal/cronJob"
 	"zipride/routes"
 	"zipride/seeders"
 
@@ -25,6 +26,9 @@ func main() {
 
 	// redis connect
 	database.InitRedis()
+
+	// run cron
+	cronjob.RunCron()
 
 	// seeders run
 	seeders.RunAllSeeders()
