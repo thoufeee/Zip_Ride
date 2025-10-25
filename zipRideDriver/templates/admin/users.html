@@ -1,0 +1,372 @@
+{{ define "admin/users.html" }}
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Users | ZipRide Admin</title>
+    <link rel="stylesheet" href="/static/css/style.css">
+    <style>
+        body { margin: 0; font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif; background: #f8fafc; }
+        .admin-layout { display: flex; min-height: 100vh; }
+        
+        /* Sidebar Styles */
+        .sidebar { 
+            width: 250px; 
+            background: #1f2937; 
+            color: white; 
+            padding: 0;
+            box-shadow: 2px 0 4px rgba(0,0,0,0.1);
+        }
+        .sidebar-header { 
+            padding: 20px; 
+            border-bottom: 1px solid #374151; 
+            background: #111827;
+        }
+        .sidebar-header h2 { 
+            margin: 0; 
+            color: #f9fafb; 
+            font-size: 18px; 
+            font-weight: 600;
+        }
+        .sidebar-nav { padding: 0; margin: 0; list-style: none; }
+        .sidebar-nav li { margin: 0; }
+        .sidebar-nav a { 
+            display: flex; 
+            align-items: center; 
+            padding: 12px 20px; 
+            color: #d1d5db; 
+            text-decoration: none; 
+            transition: all 0.2s;
+            border-left: 3px solid transparent;
+        }
+        .sidebar-nav a:hover { 
+            background: #374151; 
+            color: #f9fafb; 
+            border-left-color: #3b82f6;
+        }
+        .sidebar-nav a.active { 
+            background: #1e40af; 
+            color: white; 
+            border-left-color: #60a5fa;
+        }
+        .sidebar-nav .icon { 
+            margin-right: 10px; 
+            font-size: 16px; 
+            width: 20px; 
+            text-align: center;
+        }
+        .sidebar-footer {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            padding: 20px;
+            border-top: 1px solid #374151;
+            background: #111827;
+        }
+        .logout-btn {
+            display: flex;
+            align-items: center;
+            width: 100%;
+            padding: 10px;
+            background: #dc2626;
+            color: white;
+            text-decoration: none;
+            border-radius: 6px;
+            transition: background 0.2s;
+        }
+        .logout-btn:hover { background: #b91c1c; }
+        
+        /* Main Content Styles */
+        .main-content { 
+            flex: 1; 
+            padding: 24px; 
+            overflow-y: auto;
+        }
+        .content-header { 
+            display: flex; 
+            justify-content: space-between; 
+            align-items: center; 
+            margin-bottom: 24px; 
+        }
+        .content-header h1 { 
+            margin: 0; 
+            color: #111827; 
+            font-size: 28px; 
+            font-weight: 700;
+        }
+        
+        /* Summary Cards */
+        .summary-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 16px;
+            margin-bottom: 24px;
+        }
+        .summary-card {
+            background: white;
+            border: 1px solid #e5e7eb;
+            border-radius: 8px;
+            padding: 20px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+        .summary-card h3 {
+            margin: 0 0 8px 0;
+            color: #6b7280;
+            font-size: 14px;
+            font-weight: 500;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+        .summary-card .value {
+            color: #111827;
+            font-size: 24px;
+            font-weight: 700;
+        }
+        .summary-card .active { color: #10b981; }
+        .summary-card .blocked { color: #ef4444; }
+        
+        .filters { 
+            display: flex; 
+            gap: 12px; 
+            margin-bottom: 20px; 
+            flex-wrap: wrap;
+        }
+        .filters select, .filters button { 
+            padding: 8px 12px; 
+            border: 1px solid #d1d5db; 
+            border-radius: 6px; 
+            background: white;
+            font-size: 14px;
+        }
+        .filters button { 
+            background: #3b82f6; 
+            color: white; 
+            border: none; 
+            cursor: pointer; 
+            font-weight: 500;
+        }
+        .filters button:hover { background: #2563eb; }
+        table { 
+            border-collapse: collapse; 
+            width: 100%; 
+            background: white; 
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+        th, td { 
+            padding: 12px; 
+            text-align: left; 
+            border-bottom: 1px solid #e5e7eb;
+        }
+        th { 
+            background: #f9fafb; 
+            color: #374151; 
+            font-weight: 600; 
+            font-size: 12px;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+        .status-active { color: #10b981; font-weight: 500; }
+        .status-blocked { color: #ef4444; font-weight: 500; }
+        .actions { display: flex; gap: 8px; }
+        .actions a { 
+            padding: 4px 8px; 
+            text-decoration: none; 
+            border-radius: 4px; 
+            font-size: 12px; 
+            font-weight: 500;
+        }
+        .btn-view { background: #3b82f6; color: white; }
+        .btn-block { background: #ef4444; color: white; }
+        .btn-unblock { background: #10b981; color: white; }
+        .btn-view:hover { background: #2563eb; }
+        .btn-block:hover { background: #dc2626; }
+        .btn-unblock:hover { background: #059669; }
+        .error { 
+            background: #fee2e2; 
+            color: #7f1d1d; 
+            padding: 12px; 
+            border-radius: 6px; 
+            margin-bottom: 16px; 
+        }
+        .user-info { font-size: 12px; color: #6b7280; }
+    </style>
+</head>
+<body>
+    <div class="admin-layout">
+        <!-- Sidebar -->
+        <div class="sidebar">
+            <div class="sidebar-header">
+                <h2>🚗 ZipRide Admin</h2>
+            </div>
+            
+            <ul class="sidebar-nav">
+                <li><a href="/admin/panel/dashboard">
+                    <span class="icon">📊</span>
+                    Dashboard
+                </a></li>
+                <li><a href="/admin/panel/drivers">
+                    <span class="icon">👨‍✈️</span>
+                    Manage Drivers
+                </a></li>
+                <li><a href="/admin/panel/rides">
+                    <span class="icon">🚙</span>
+                    Manage Rides
+                </a></li>
+                <li><a href="/admin/panel/vehicles">
+                    <span class="icon">🚗</span>
+                    Vehicles
+                </a></li>
+                <li><a href="/admin/panel/earnings">
+                    <span class="icon">💰</span>
+                    Earnings & Payments
+                </a></li>
+                <li><a href="/admin/panel/withdrawals">
+                    <span class="icon">🏦</span>
+                    Withdrawals
+                </a></li>
+                <li><a href="/admin/panel/users" class="active">
+                    <span class="icon">👥</span>
+                    Manage Users
+                </a></li>
+                <li><a href="/admin/panel/help">
+                    <span class="icon">❓</span>
+                    Help Center
+                </a></li>
+                <li><a href="/admin/panel/admins">
+                    <span class="icon">🛡️</span>
+                    Admins
+                </a></li>
+                <li><a href="/admin/panel/roles">
+                    <span class="icon">🔑</span>
+                    Roles
+                </a></li>
+                <li><a href="/admin/panel/settings">
+                    <span class="icon">⚙️</span>
+                    Settings
+                </a></li>
+            </ul>
+            
+            <div class="sidebar-footer">
+                <a href="/admin/panel/logout" class="logout-btn">
+                    <span class="icon">🚪</span>
+                    Logout
+                </a>
+            </div>
+        </div>
+        
+        <!-- Main Content -->
+        <div class="main-content">
+            <div class="content-header">
+                <div>
+                    <h1>User Management</h1>
+                    <div style="color: #6b7280; font-size: 14px;">
+                        Manage and monitor all registered users/riders
+                    </div>
+                </div>
+            </div>
+
+            {{if .Error}}
+            <div class="error">{{.Error}}</div>
+            {{end}}
+
+            <!-- Summary Cards -->
+            {{if .Users}}
+            <div class="summary-grid">
+                <div class="summary-card">
+                    <h3>Total Users</h3>
+                    <div class="value">{{.TotalUsers}}</div>
+                </div>
+                <div class="summary-card">
+                    <h3>Active Users</h3>
+                    <div class="value active">{{.ActiveUsers}}</div>
+                </div>
+                <div class="summary-card">
+                    <h3>Blocked Users</h3>
+                    <div class="value blocked">{{.BlockedUsers}}</div>
+                </div>
+                <div class="summary-card">
+                    <h3>Active Rate</h3>
+                    <div class="value">{{.ActiveRate}}%</div>
+                </div>
+            </div>
+            {{end}}
+
+            <!-- Filters -->
+            <form class="filters" method="GET" action="/admin/panel/users">
+                <select name="status">
+                    <option value="" {{if eq .FilterStatus ""}}selected{{end}}>All Users</option>
+                    <option value="active" {{if eq .FilterStatus "active"}}selected{{end}}>Active</option>
+                    <option value="blocked" {{if eq .FilterStatus "blocked"}}selected{{end}}>Blocked</option>
+                </select>
+                
+                <button type="submit">Filter</button>
+                <a href="/admin/panel/users" style="padding: 8px 12px; background: #6b7280; color: white; text-decoration: none; border-radius: 6px; font-size: 14px;">Clear</a>
+            </form>
+
+            <!-- Users Table -->
+            <table>
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Name</th>
+                        <th>Email</th>
+                        <th>Phone</th>
+                        <th>Status</th>
+                        <th>Joined</th>
+                        <th>Last Updated</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {{range .Users}}
+                    <tr>
+                        <td>{{.ID}}</td>
+                        <td>
+                            <strong>{{.Name}}</strong>
+                        </td>
+                        <td>{{.Email}}</td>
+                        <td>{{.Phone}}</td>
+                        <td>
+                            {{if .IsBlocked}}
+                                <span class="status-blocked">🔒 Blocked</span>
+                            {{else}}
+                                <span class="status-active">✅ Active</span>
+                            {{end}}
+                        </td>
+                        <td>{{.CreatedAt.Format "2006-01-02"}}</td>
+                        <td>{{.UpdatedAt.Format "2006-01-02"}}</td>
+                        <td class="actions">
+                            {{if .IsBlocked}}
+                                <form method="POST" action="/admin/panel/users/{{.ID}}/unblock" style="display:inline">
+                                    <button type="submit" class="btn-unblock">Unblock</button>
+                                </form>
+                            {{else}}
+                                <form method="POST" action="/admin/panel/users/{{.ID}}/block" style="display:inline">
+                                    <button type="submit" class="btn-block">Block</button>
+                                </form>
+                            {{end}}
+                        </td>
+                    </tr>
+                    {{else}}
+                    <tr>
+                        <td colspan="8" style="text-align: center; padding: 40px; color: #6b7280;">
+                            No users found. {{if .FilterStatus}}Try changing the filter.{{end}}
+                        </td>
+                    </tr>
+                    {{end}}
+                </tbody>
+            </table>
+
+            {{if .Users}}
+            <div style="margin-top: 20px; text-align: center; color: #6b7280;">
+                Showing {{len .Users}} users
+            </div>
+            {{end}}
+        </div>
+    </div>
+</body>
+</html>
+{{ end }}

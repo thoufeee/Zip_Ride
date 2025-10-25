@@ -18,7 +18,7 @@ func CancelBookingHandler(c *gin.Context) {
 	if err := c.ShouldBindJSON(&req); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
-	}
+	}	
 
 	if err := repository.CancelBooking(req.BookingID, req.Reason); err != nil {
 		c.JSON(http.StatusConflict, gin.H{"error": err.Error()})

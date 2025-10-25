@@ -1,0 +1,32 @@
+version: '3.8' #version
+
+networks: #communicate with kafka and zookeper to use same docker network 
+  kafka-net:
+
+services:
+  zookeeper: #Zookeeper Kafka brker used  coordinate.
+    image: confluentinc/cp-zookeeper:7.5.0
+    container_name: zipride_zookeeper   #docker container name
+    environment:
+      ZOOKEEPER_CLIENT_PORT: 2181  #Zookeeper client port
+      ZOOKEEPER_TICK_TIME: 2000 #Zookeeper internal heartbeat interval (2 seconds).
+    ports:
+      - "2181:2181" #Host machine port 2181
+    networks:
+      - kafka-net #Connects Zookeeper to the shared Docker network kafka-net so Kafka can reach it.
+
+  kafka:  #This sets up the Kafka broker container
+    image: confluentinc/cp-kafka:7.5.0
+    container_name: zipride_kafka #Kafka container name
+    depends_on:
+      - zookeeper #ensures that Zookeeper starts first, because Kafka depends on it to run
+    ports:
+      - "9092:9092" #Exposes Kafka on port 9092
+    environment:
+      KAFKA_BROKER_ID: 1 #Sets the Kafka broker ID to 1.
+      KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181 #tells Kafka where Zookeeper is located.
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT,PLAINTEXT_INTERNAL:PLAINTEXT #Defines the communication protocols for different listeners.
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://localhost:9092,PLAINTEXT_INTERNAL://kafka:29092 #tells Kafka which addresses to advertise to clients:
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1 #Specifies how many replicas Kafka creates for its internal topics
+    networks:
+      - kafka-net #the Kafka container to the same kafka-net network as Zookeeper for communication.
