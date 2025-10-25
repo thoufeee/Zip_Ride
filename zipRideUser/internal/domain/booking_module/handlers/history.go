@@ -7,7 +7,8 @@ import (
 
 	"github.com/gin-gonic/gin"
 )
-//users history
+
+// users history
 func GetBookingHistoryHandler(c *gin.Context) {
 	userID := middleware.GetUserID(c)
 	if userID == 0 {

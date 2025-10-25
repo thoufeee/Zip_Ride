@@ -4,7 +4,7 @@ import (
 	"zipride/internal/constants"
 	"zipride/internal/domain/booking_module/handlers"
 	ratingdriver "zipride/internal/domain/booking_module/handlers/Rating_Driver"
-	chathandler "zipride/internal/domain/chat/Chathandler"
+	"zipride/internal/domain/chat"
 	subscriptionplan "zipride/internal/domain/subscription_Plan"
 	"zipride/internal/domain/user/services"
 	"zipride/internal/middleware"

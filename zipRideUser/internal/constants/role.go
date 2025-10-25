@@ -4,11 +4,7 @@ package constants
 
 const (
 	RoleSuperAdmin = "SUPER_ADMIN"
-<<<<<<< HEAD
 	RoleAdmin      = "Admin"
-=======
-	RoleAdmin = "Admin"
->>>>>>> 2c00f30 (folders changed)
 	RoleUser       = "USER"
 )
 
