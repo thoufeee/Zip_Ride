@@ -90,6 +90,9 @@ func SuperAdminRoutes(c *gin.Engine) {
 	Dashbord := admin.Group("/dashbord")
 	{
 		Dashbord.GET("/perday", dashbord.BookingPerDay)
+		Dashbord.GET("/perweek", dashbord.BookingPerWeek)
+		Dashbord.GET("/permonth",dashbord.BookingPerMonth)
+		Dashbord.GET("/revenue",dashbord.RevenuePerMonth)
 	}
 
 }
