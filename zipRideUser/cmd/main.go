@@ -5,6 +5,7 @@ import (
 	"time"
 	"zipride/database"
 	cronjob "zipride/internal/cronJob"
+	// "zipride/internal/kafka"
 	"zipride/routes"
 	"zipride/seeders"
 
@@ -32,6 +33,11 @@ func main() {
 
 	// seeders run
 	seeders.RunAllSeeders()
+
+	// //kafka
+	// go func (){
+	// 	kafka.CreateTopic()
+	// }()
 
 	r := gin.Default()
 
