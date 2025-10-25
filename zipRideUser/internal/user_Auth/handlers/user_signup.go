@@ -25,7 +25,7 @@ func SignUp(c *gin.Context) {
 	}
 
 	if err := c.ShouldBindJSON(&user); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"err": "fill blanks"})
+		c.JSON(http.StatusBadRequest, gin.H{"err": "fill all required fields"})
 		return
 	}
 
@@ -50,7 +50,7 @@ func SignUp(c *gin.Context) {
 		return
 	}
 
-	if err := database.DB.Where("phone = ?", user.PhoneNumber).First(&existing).Error; err == nil {
+	if err := database.DB.Where("phone_number = ?", phone).First(&existing).Error; err == nil {
 		c.JSON(http.StatusUnauthorized, gin.H{"err": "phone number already registered"})
 		return
 	}
