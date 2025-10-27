@@ -4,6 +4,7 @@ import (
 	"zipride/internal/constants"
 
 	"zipride/internal/domain/user_Admin/allpermission"
+	"zipride/internal/domain/user_Admin/configuration"
 	"zipride/internal/domain/user_Admin/prize_pool/prizepoolmanagment"
 	staffmanagment "zipride/internal/domain/user_Admin/staffManagment"
 	"zipride/internal/domain/user_Admin/staffManagment/controllers"
@@ -84,6 +85,15 @@ func SuperAdminRoutes(c *gin.Engine) {
 
 		// subscribed users details
 		subscription.GET("/users", middleware.RequirePermission(constants.PermissionSubscription), subscriptionuser.SubScribedUser)
+	}
+
+	// configuration
+
+	config := admin.Group("/config")
+
+	{
+		config.GET("/", middleware.RequirePermission(constants.PermissionSystemSettings), configuration.AllConfiguration)
+		config.PUT("/", middleware.RequirePermission(constants.PermissionSystemSettings), configuration.UpdateConfig)
 	}
 
 }
