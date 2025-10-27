@@ -8,15 +8,49 @@
  <script src="https://unpkg.com/@phosphor-icons/web"></script>
 <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
 </head>
-<body class="bg-gray-100 flex">
+<style>
+    body {
+      font-family: 'Inter', sans-serif;
+      background-color: #f9fafb;
+      color: #1f2937;
+      display: flex;
+    }
 
-<aside class="w-72 bg-cyan-800 text-white min-h-screen flex flex-col fixed shadow-2xl">
+    aside {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 18rem;
+      height: 100vh;
+      background-color: #155e75;
+      color: white;
+      display: flex;
+      flex-direction: column;
+      overflow-y: scroll; 
+      -ms-overflow-style: none; 
+      scrollbar-width: none; 
+    }
+    aside::-webkit-scrollbar {
+      display: none;
+    }
+
+    .main-content {
+      flex: 1;
+      margin-left: 18rem;
+      padding: 2.5rem;
+    }
+  </style>
+</head>
+
+<body class="bg-gray-50 text-gray-800 flex">
+
+  <aside class="w-72 bg-cyan-800 text-white min-h-screen flex flex-col fixed shadow-2xl">
     <div class="p-6 text-center border-b border-cyan-700">
       <h2 class="text-2xl font-extrabold tracking-wider">Admin<span class="text-cyan-300">Panel</span></h2>
     </div>
 
     <nav class="flex-1 p-4 space-y-2">
-      <a href="admindash.html" class="flex items-center px-4 py-3 rounded-xl bg-cyan-600 font-semibold shadow-lg text-white transition duration-150">
+      <a href="admindash.html" class="flex items-center px-4 py-3 rounded-xl hover:bg-cyan-700 transition duration-150">
         <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-10v10a1 1 0 001 1h3m-6 0a1 1 0 001-1v-4a1 1 0 00-1-1H9m6 6h2"></path></svg>
         Dashboard
       </a>
@@ -47,14 +81,20 @@
       <a href="prizepool.html" class="flex items-center px-4 py-3 rounded-xl hover:bg-cyan-700 transition duration-150">
                 <i class="ph-bold ph-wallet mr-3"></i>Prize Pool Management
             </a>
-       <a href="subscription.html" class="flex items-center px-4 py-3 rounded-xl hover:bg-cyan-700 transition duration-150">
+       <a href="subscription.html" class="flex items-center px-4 py-3 rounded-xl bg-cyan-600 font-semibold shadow-lg text-white transition duration-150">
                 <i class="ph-bold ph-credit-card mr-3"></i>Subscription Plan
             </a>
-            
+      <a href="subscribedUsers.html" class="flex items-center px-4 py-3 rounded-xl hover:bg-cyan-700 transition duration-150">
+        <i class="ph-bold ph-users-three mr-3"></i>Subscribed Users
+      </a>
       <a href="systemSettings.html" class="flex items-center px-4 py-3 rounded-xl hover:bg-cyan-700 transition duration-150">
         <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.945 3.31.83 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.945 1.543-.83 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.945-3.31-.83-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.945-1.543.83-3.31 2.37-2.37a1.724 1.724 0 002.572-1.065z"></path></svg>
-        System Settings
+        Fare Configuration
       </a>
+
+      <a href="paymentConfiguration.html" class="flex items-center px-4 py-3 rounded-xl hover:bg-cyan-700 transition duration-150">
+            <i class="ph-bold ph-sliders-horizontal mr-3"></i>Payment Configuration
+        </a>
     </nav>
 
     <div class="p-6 border-t border-cyan-700">
