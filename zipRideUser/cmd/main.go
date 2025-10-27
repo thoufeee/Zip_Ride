@@ -5,6 +5,7 @@ import (
 	"time"
 	"zipride/database"
 	cronjob "zipride/internal/cronJob"
+	"zipride/internal/domain/user_Admin/configuration"
 	"zipride/routes"
 	"zipride/seeders"
 
@@ -32,6 +33,9 @@ func main() {
 
 	// seeders run
 	seeders.RunAllSeeders()
+
+	// initial configuration load
+	configuration.InitialDefaultConfig()
 
 	r := gin.Default()
 
