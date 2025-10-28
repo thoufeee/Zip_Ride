@@ -4,6 +4,7 @@ document.getElementById("logout-btn").addEventListener("click", () => {
   localStorage.removeItem("accessToken");
   localStorage.removeItem("refreshToken");
   localStorage.removeItem("role");
+  localStorage.removeItem("permissions");
   window.location.href = "signin.html";
 });
 
@@ -16,9 +17,25 @@ function getAuthConfig() {
   return { headers: { Authorization: `Bearer ${token}` } };
 }
 
+function hasPermission(permission) {
+  const permissionsData = localStorage.getItem("permissions");
+  if (!permissionsData) return false;
+
+  try {
+    const permissions = JSON.parse(permissionsData);
+    return Array.isArray(permissions) && permissions.includes(permission);
+  } catch {
+    return false;
+  }
+}
+
 async function fetchSubscribedUsers() {
   try {
-    const response = await axios.get("http://localhost:8080/admin/subscription/users", getAuthConfig());
+    const response = await axios.get(
+      "http://localhost:8080/admin/subscription/users",
+      getAuthConfig()
+    );
+
     const data = response.data.res || response.data.users || response.data || [];
 
     if (!data || (Array.isArray(data) && data.length === 0)) {
@@ -76,7 +93,26 @@ async function fetchSubscribedUsers() {
 function formatDate(dateStr) {
   if (!dateStr) return "-";
   const date = new Date(dateStr);
-  return date.toLocaleString("en-IN", { dateStyle: "medium", timeStyle: "short" });
+  return date.toLocaleString("en-IN", {
+    dateStyle: "medium",
+    timeStyle: "short",
+  });
 }
 
-document.addEventListener("DOMContentLoaded", fetchSubscribedUsers);
+document.addEventListener("DOMContentLoaded", () => {
+  if (!hasPermission("ACCESS_SUBSCRIPTION")) {
+    document.body.innerHTML = `
+      <div class="flex flex-col items-center justify-center min-h-screen bg-gray-50 text-center">
+        <h1 class="text-3xl font-bold text-red-600 mb-3">Access Denied</h1>
+        <p class="text-gray-600 mb-6">You don't have permission to view this page.</p>
+        <button onclick="window.location.href='admindash.html'" 
+          class="bg-cyan-600 hover:bg-cyan-700 text-white px-5 py-2.5 rounded-xl font-semibold shadow-md">
+          Go to Dashboard
+        </button>
+      </div>
+    `;
+    return; 
+  }
+
+  fetchSubscribedUsers();
+});
