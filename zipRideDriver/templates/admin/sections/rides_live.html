@@ -1,0 +1,44 @@
+{{ define "admin/sections/rides_live" }}
+    <!-- RIDES SECTION -->
+    <section id="rides" class="content-section">
+        <div class="section-header">
+            <h1>Active Rides</h1>
+            <div class="live-indicator"><span class="dot"></span>Live feed</div>
+        </div>
+        <div class="grid two-columns responsive-stack">
+            <div class="card">
+                <div class="card-header">
+                    <h2>Live Trips</h2>
+                    <button class="btn ghost" id="refreshRides"><i class="fas fa-rotate"></i>Refresh</button>
+                </div>
+                <div class="table-responsive">
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>Driver</th>
+                                <th>Rider</th>
+                                <th>Fare</th>
+                                <th>Route</th>
+                                <th>Status</th>
+                            </tr>
+                        </thead>
+                        <tbody id="ridesTableBody"></tbody>
+                    </table>
+                </div>
+            </div>
+            <div class="card map-card">
+                <div class="card-header">
+                    <h2>Route Preview</h2>
+                    <span class="badge muted">Static mock</span>
+                </div>
+                <div class="map-mock" id="mapPreview">
+                    <div class="map-marker driver">D</div>
+                    <div class="map-marker rider">R</div>
+                    <svg viewBox="0 0 200 200" preserveAspectRatio="none">
+                        <polyline points="20,160 80,120 140,60 180,40" stroke="#38bdf8" stroke-width="4" fill="none" stroke-dasharray="6 6"></polyline>
+                    </svg>
+                </div>
+            </div>
+        </div>
+    </section>
+{{ end }}

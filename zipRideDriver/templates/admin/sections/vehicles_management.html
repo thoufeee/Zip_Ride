@@ -1,0 +1,24 @@
+{{ define "admin/sections/vehicles_management" }}
+    <!-- VEHICLES SECTION -->
+    <section id="vehicles" class="content-section">
+        <div class="section-header">
+            <h1>Vehicles</h1>
+            <button class="btn primary" id="addVehicleBtn"><i class="fas fa-plus"></i>Add Vehicle</button>
+        </div>
+        <div class="table-responsive">
+            <table class="data-table">
+                <thead>
+                    <tr>
+                        <th>Model</th>
+                        <th>Plate</th>
+                        <th>Type</th>
+                        <th>Assigned Driver</th>
+                        <th>Photo</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody id="vehiclesTableBody"></tbody>
+            </table>
+        </div>
+    </section>
+{{ end }}

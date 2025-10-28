@@ -1,0 +1,26 @@
+{{ define "admin/sections/dashboard_overview" }}
+    <!-- DASHBOARD SECTION -->
+    <section id="dashboard" class="content-section active">
+        <div class="section-header">
+            <h1>Dashboard</h1>
+            <button class="btn primary" id="refreshStats"><i class="fas fa-rotate"></i>Refresh Stats</button>
+        </div>
+        <div class="stats-grid" id="dashboardStats"></div>
+        <div class="grid two-columns responsive-stack">
+            <div class="card chart-card">
+                <div class="card-header">
+                    <h2>Ride Volume</h2>
+                    <span class="badge">Last 7 days</span>
+                </div>
+                <canvas id="ridesChart"></canvas>
+            </div>
+            <div class="card chart-card">
+                <div class="card-header">
+                    <h2>Earnings Trend</h2>
+                    <span class="badge success">+12.4%</span>
+                </div>
+                <canvas id="earningsChart"></canvas>
+            </div>
+        </div>
+    </section>
+{{ end }}

@@ -1,0 +1,24 @@
+{{ define "layouts/base" }}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    {{ template "partials/head" . }}
+</head>
+<body>
+    <!-- APP SHELL -->
+    <div class="app-shell" data-theme="dark">
+        {{ template "partials/topbar" . }}
+        <div class="layout">
+            {{ template "partials/sidebar" . }}
+            <!-- MAIN CONTENT -->
+            <main class="main-content">
+                {{ block "content" . }}{{ end }}
+            </main>
+        </div>
+    </div>
+
+    {{ template "partials/modals" . }}
+    {{ template "partials/scripts" . }}
+</body>
+</html>
+{{ end }}

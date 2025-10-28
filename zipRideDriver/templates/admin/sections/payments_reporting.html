@@ -1,0 +1,37 @@
+{{ define "admin/sections/payments_reporting" }}
+    <!-- PAYMENTS SECTION -->
+    <section id="payments" class="content-section">
+        <div class="section-header">
+            <h1>Payments</h1>
+            <button class="btn ghost" id="exportPayments"><i class="fas fa-file-export"></i>Export Report</button>
+        </div>
+        <div class="grid two-columns responsive-stack">
+            <div class="card">
+                <div class="card-header">
+                    <h2>Earnings Summary</h2>
+                    <span class="badge">Weekly & Monthly</span>
+                </div>
+                <div class="table-responsive">
+                    <table class="data-table compact">
+                        <thead>
+                            <tr>
+                                <th>Period</th>
+                                <th>Completed Rides</th>
+                                <th>Gross Earnings</th>
+                                <th>Net Earnings</th>
+                            </tr>
+                        </thead>
+                        <tbody id="paymentsTableBody"></tbody>
+                    </table>
+                </div>
+            </div>
+            <div class="card chart-card">
+                <div class="card-header">
+                    <h2>Revenue Trend</h2>
+                    <span class="badge success">FY 2025</span>
+                </div>
+                <canvas id="revenueChart"></canvas>
+            </div>
+        </div>
+    </section>
+{{ end }}

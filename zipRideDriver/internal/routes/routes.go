@@ -3,6 +3,7 @@ package routes
 import (
 	"fmt"
 	"html/template"
+	"path/filepath"
 
 	adminhandlers "zipRideDriver/internal/admin/handlers"
 	adminmiddleware "zipRideDriver/internal/admin/middleware"
@@ -23,14 +24,12 @@ func SetupRouter(cfg *config.Config, log *zap.Logger, db *gorm.DB, rdb *redis.Cl
 	r.Use(middleware.LoggerMiddleware(log))
 
 	r.Static("/static", "./static")
-	// tpl := template.New("")
-	// tpl = template.Must(tpl.ParseFiles("templates/layouts/base.html"))
-	// tpl = template.Must(tpl.ParseGlob("templates/admin/*.html"))
-	// tpl = template.Must(tpl.ParseGlob("templates/admin/*/*.html"))
-	// r.SetHTMLTemplate(tpl)
-	tpl := template.Must(template.ParseFiles("templates/layouts/base.html"))
-	tpl = template.Must(tpl.ParseGlob("templates/admin/*.html"))
-	tpl = template.Must(tpl.ParseGlob("templates/admin/*/*.html"))
+
+	tpl := template.Must(template.New("").ParseFiles("templates/layouts/base.html"))
+	tpl = mustParseGlob(tpl, "templates/layouts/partials/*.html")
+	tpl = mustParseGlob(tpl, "templates/admin/*.html")
+	tpl = mustParseGlob(tpl, "templates/admin/*/*.html")
+	tpl = mustParseGlob(tpl, "templates/admin/*/*/*.html")
 
 	r.SetHTMLTemplate(tpl)
 
@@ -194,4 +193,20 @@ func SetupRouter(cfg *config.Config, log *zap.Logger, db *gorm.DB, rdb *redis.Cl
 	ws.GET("/driver/:driverId", wsh.DriverWS)
 
 	return r
+}
+
+func mustParseGlob(tpl *template.Template, pattern string) *template.Template {
+    matches, err := filepath.Glob(pattern)
+    if err != nil {
+        panic(err)
+    }
+    if len(matches) == 0 {
+        return tpl
+    }
+
+    tpl, err = tpl.ParseGlob(pattern)
+    if err != nil {
+        panic(err)
+    }
+    return tpl
 }

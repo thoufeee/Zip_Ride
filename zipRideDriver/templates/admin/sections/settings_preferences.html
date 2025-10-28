@@ -1,0 +1,47 @@
+{{ define "admin/sections/settings_preferences" }}
+    <!-- SETTINGS SECTION -->
+    <section id="settings" class="content-section">
+        <div class="section-header">
+            <h1>Settings</h1>
+            <p>Manage platform preferences, notifications and security.</p>
+        </div>
+        <div class="settings-grid">
+            <div class="card">
+                <h2>General Preferences</h2>
+                <div class="form-control">
+                    <label>Default city</label>
+                    <input type="text" value="San Francisco" />
+                </div>
+                <div class="form-control">
+                    <label>Reporting timezone</label>
+                    <select>
+                        <option>PST (UTC-8)</option>
+                        <option>EST (UTC-5)</option>
+                        <option>UTC</option>
+                    </select>
+                </div>
+                <button class="btn primary">Save Preferences</button>
+            </div>
+            <div class="card">
+                <h2>Notifications</h2>
+                <div class="toggle">
+                    <input type="checkbox" id="emailAlerts" checked />
+                    <label for="emailAlerts">Email alerts for incidents</label>
+                </div>
+                <div class="toggle">
+                    <input type="checkbox" id="smsAlerts" />
+                    <label for="smsAlerts">SMS alerts for VIP riders</label>
+                </div>
+                <div class="toggle">
+                    <input type="checkbox" id="pushAlerts" checked />
+                    <label for="pushAlerts">Push notifications for payouts</label>
+                </div>
+            </div>
+            <div class="card">
+                <h2>Security</h2>
+                <p>Multi-factor authentication is <span class="badge success">Enabled</span></p>
+                <button class="btn danger">Reset Admin Password</button>
+            </div>
+        </div>
+    </section>
+{{ end }}

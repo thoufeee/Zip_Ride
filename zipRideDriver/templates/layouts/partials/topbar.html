@@ -1,0 +1,33 @@
+{{ define "partials/topbar" }}
+    <!-- TOP BAR -->
+    <header class="topbar">
+        <button class="sidebar-toggle" id="sidebarToggle" aria-label="Toggle sidebar">
+            <i class="fas fa-bars"></i>
+        </button>
+        <div class="brand">
+            <span class="brand-logo">🚗</span>
+            <span class="brand-name">ZipRide Admin</span>
+        </div>
+        <div class="topbar-actions">
+            <div class="search-box">
+                <i class="fas fa-search"></i>
+                <input type="search" placeholder="Search drivers, rides, payments..." />
+            </div>
+            <button class="theme-toggle" id="themeToggle" aria-label="Toggle theme">
+                <i class="fas fa-moon"></i>
+            </button>
+            <div class="profile-menu">
+                <button class="profile-trigger" id="profileTrigger">
+                    <img src="https://i.pravatar.cc/40" alt="Admin" />
+                    <span>Alex Morgan</span>
+                    <i class="fas fa-chevron-down"></i>
+                </button>
+                <ul class="profile-dropdown" id="profileDropdown">
+                    <li><a href="#"><i class="fas fa-user-circle"></i>Profile</a></li>
+                    <li><a href="#"><i class="fas fa-sliders-h"></i>Preferences</a></li>
+                    <li><a href="#"><i class="fas fa-sign-out-alt"></i>Sign Out</a></li>
+                </ul>
+            </div>
+        </div>
+    </header>
+{{ end }}

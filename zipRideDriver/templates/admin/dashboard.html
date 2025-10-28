@@ -1,0 +1,14 @@
+{{ define "admin/dashboard.html" }}
+    {{ template "layouts/base" . }}
+{{ end }}
+
+{{ define "content" }}
+    {{ template "admin/sections/dashboard_overview" . }}
+    {{ template "admin/sections/drivers_management" . }}
+    {{ template "admin/sections/vehicles_management" . }}
+    {{ template "admin/sections/rides_live" . }}
+    {{ template "admin/sections/payments_reporting" . }}
+    {{ template "admin/sections/reports_insights" . }}
+    {{ template "admin/sections/notifications_reviews" . }}
+    {{ template "admin/sections/settings_preferences" . }}
+{{ end }}

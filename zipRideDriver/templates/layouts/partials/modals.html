@@ -1,0 +1,78 @@
+{{ define "partials/modals" }}
+    <!-- DRIVER MODAL -->
+    <div class="modal" id="driverModal" aria-hidden="true" role="dialog">
+        <div class="modal-dialog">
+            <header class="modal-header">
+                <h2 id="driverModalTitle">Add Driver</h2>
+                <button class="modal-close" id="driverModalClose" aria-label="Close modal"><i class="fas fa-times"></i></button>
+            </header>
+            <form class="modal-body" id="driverForm">
+                <div class="form-control">
+                    <label for="driverName">Name</label>
+                    <input type="text" id="driverName" required />
+                </div>
+                <div class="form-control">
+                    <label for="driverPhone">Phone</label>
+                    <input type="tel" id="driverPhone" required />
+                </div>
+                <div class="form-control">
+                    <label for="driverVehicle">Vehicle</label>
+                    <input type="text" id="driverVehicle" required />
+                </div>
+                <div class="form-control">
+                    <label for="driverStatus">Status</label>
+                    <select id="driverStatus">
+                        <option value="active">Active</option>
+                        <option value="offline">Offline</option>
+                        <option value="suspended">Suspended</option>
+                    </select>
+                </div>
+                <div class="form-control">
+                    <label for="driverRating">Rating</label>
+                    <input type="number" step="0.1" min="1" max="5" id="driverRating" required />
+                </div>
+                <footer class="modal-footer">
+                    <button type="button" class="btn ghost" id="driverModalCancel">Cancel</button>
+                    <button type="submit" class="btn primary">Save Driver</button>
+                </footer>
+            </form>
+        </div>
+    </div>
+    <div class="modal-backdrop" id="modalBackdrop" aria-hidden="true"></div>
+
+    <!-- VEHICLE MODAL -->
+    <div class="modal" id="vehicleModal" aria-hidden="true" role="dialog">
+        <div class="modal-dialog">
+            <header class="modal-header">
+                <h2 id="vehicleModalTitle">Add Vehicle</h2>
+                <button class="modal-close" id="vehicleModalClose" aria-label="Close modal"><i class="fas fa-times"></i></button>
+            </header>
+            <form class="modal-body" id="vehicleForm">
+                <div class="form-control">
+                    <label for="vehicleModel">Model</label>
+                    <input type="text" id="vehicleModel" required />
+                </div>
+                <div class="form-control">
+                    <label for="vehiclePlate">Plate Number</label>
+                    <input type="text" id="vehiclePlate" required />
+                </div>
+                <div class="form-control">
+                    <label for="vehicleType">Type</label>
+                    <input type="text" id="vehicleType" required />
+                </div>
+                <div class="form-control">
+                    <label for="vehicleDriver">Assigned Driver</label>
+                    <input type="text" id="vehicleDriver" required />
+                </div>
+                <div class="form-control">
+                    <label for="vehiclePhoto">Vehicle Photo</label>
+                    <input type="file" id="vehiclePhoto" accept="image/*" />
+                </div>
+                <footer class="modal-footer">
+                    <button type="button" class="btn ghost" id="vehicleModalCancel">Cancel</button>
+                    <button type="submit" class="btn primary">Save Vehicle</button>
+                </footer>
+            </form>
+        </div>
+    </div>
+{{ end }}
