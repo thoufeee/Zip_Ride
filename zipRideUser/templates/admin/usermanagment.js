@@ -10,7 +10,6 @@ const userPermissions = JSON.parse(localStorage.getItem("permissions")) || [];
 
 if (!accessToken) window.location.href = "signin.html";
 
-
 axios.interceptors.response.use(
   (response) => response,
   (error) => {
@@ -34,7 +33,6 @@ function hasPermission(requiredPermission) {
     (p) => p.toUpperCase() === requiredPermission.toUpperCase()
   );
 }
-
 
 if (!hasPermission("VIEW_USERS")) {
   document.body.innerHTML = `
@@ -105,12 +103,12 @@ function renderUsers(users) {
     }
 
     div.innerHTML = `
-      <p class="text-gray-800 font-medium">${user.firstname || "-"}</p>
-      <p class="text-gray-800 font-medium">${user.lastname || "-"}</p>
-      <p class="text-gray-600">${user.email}</p>
-      <p class="text-gray-600">${user.phone || "-"}</p>
-      <p class="text-gray-600">${user.gender || "-"}</p>
-      <p class="text-gray-600">${user.place || "-"}</p>
+      <p class="text-gray-800 font-medium truncate max-w-[120px]" title="${user.firstname || "-"}">${user.firstname || "-"}</p>
+      <p class="text-gray-800 font-medium truncate max-w-[120px]" title="${user.lastname || "-"}">${user.lastname || "-"}</p>
+      <p class="text-gray-600 truncate max-w-[160px]" title="${user.email}">${user.email}</p>
+      <p class="text-gray-600 truncate max-w-[100px]" title="${user.phone || "-"}">${user.phone || "-"}</p>
+      <p class="text-gray-600 truncate max-w-[80px]" title="${user.gender || "-"}">${user.gender || "-"}</p>
+      <p class="text-gray-600 truncate max-w-[100px]" title="${user.place || "-"}">${user.place || "-"}</p>
       <div class="flex justify-center space-x-1">${actions.join("")}</div>
     `;
 
@@ -170,6 +168,63 @@ function attachUserActions(users) {
   });
 }
 
+function showEditModal(user) {
+  const modal = document.createElement("div");
+  modal.className =
+    "fixed inset-0 flex items-center justify-center bg-black bg-opacity-40 backdrop-blur-sm z-50";
+
+  modal.innerHTML = `
+    <div class="bg-white rounded-xl shadow-xl p-6 w-[400px]">
+      <h2 class="text-xl font-semibold mb-4 text-gray-800">Edit User</h2>
+      <form id="editUserForm" class="flex flex-col gap-3">
+        <input type="text" id="editFirstname" value="${user.firstname || ""}" placeholder="First Name" class="border p-2 rounded-md">
+        <input type="text" id="editLastname" value="${user.lastname || ""}" placeholder="Last Name" class="border p-2 rounded-md">
+        <input type="text" id="editPhone" value="${user.phone || ""}" placeholder="Phone" class="border p-2 rounded-md">
+        <input type="text" id="editPlace" value="${user.place || ""}" placeholder="Location" class="border p-2 rounded-md">
+        <select id="editGender" class="border p-2 rounded-md">
+          <option value="">Select Gender</option>
+          <option ${user.gender === "Male" ? "selected" : ""}>Male</option>
+          <option ${user.gender === "Female" ? "selected" : ""}>Female</option>
+          <option ${user.gender === "Other" ? "selected" : ""}>Other</option>
+        </select>
+        <div class="flex justify-end gap-2 mt-4">
+          <button type="button" id="cancelEdit" class="bg-gray-300 hover:bg-gray-400 px-3 py-1 rounded-md">Cancel</button>
+          <button type="submit" class="bg-cyan-600 hover:bg-cyan-700 text-white px-4 py-1 rounded-md">Update</button>
+        </div>
+      </form>
+    </div>
+  `;
+  document.body.appendChild(modal);
+
+  document.getElementById("cancelEdit").addEventListener("click", () => {
+    modal.remove();
+  });
+
+  document
+    .getElementById("editUserForm")
+    .addEventListener("submit", async (e) => {
+      e.preventDefault();
+
+      const updatedUser = {
+        firstname: document.getElementById("editFirstname").value.trim(),
+        lastname: document.getElementById("editLastname").value.trim(),
+        phone: document.getElementById("editPhone").value.trim(),
+        place: document.getElementById("editPlace").value.trim(),
+        gender: document.getElementById("editGender").value,
+      };
+
+      try {
+        const res = await axios.put(`${BASE_URL}/user/${user.ID}`, updatedUser, {
+          headers: { Authorization: `Bearer ${accessToken}` },
+        });
+        alert(res.data.message || "User updated successfully!");
+        modal.remove();
+        fetchUsers();
+      } catch (err) {
+        alert(err.response?.data?.error || "Failed to update user.");
+      }
+    });
+}
 
 addUserBtn.addEventListener("click", () => {
   if (!hasPermission("CREATE_USER") && !hasPermission("ADD_USER")) {
@@ -212,7 +267,6 @@ addUserBtn.addEventListener("click", () => {
   document.getElementById("backToUsers").addEventListener("click", () => location.reload());
   handleCreateUser();
 });
-
 
 function handleCreateUser() {
   const createUserForm = document.getElementById("createUserForm");
