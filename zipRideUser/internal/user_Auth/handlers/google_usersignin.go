@@ -2,6 +2,7 @@ package handlers
 
 import (
 	"net/http"
+	"time"
 	"zipride/database"
 	"zipride/internal/models"
 	"zipride/utils"
@@ -45,6 +46,28 @@ func GoogleSigin(c *gin.Context) {
 
 	// refresh token
 	refresh, err := utils.GenerateRefresh(user.ID, user.Email, user.Role, nil)
+
+	ip := c.ClientIP()
+	useragent := c.GetHeader("User-Agent")
+
+	user.LastLoginIp = ip
+	user.LastLoginAt = time.Now()
+
+	if err := database.DB.Save(&user).Error; err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"err": "failed to store ip address"})
+		return
+	}
+
+	history := &models.LoginHistory{
+		UserID:    user.ID,
+		IpAddress: ip,
+		UserAgent: useragent,
+	}
+
+	if err := database.DB.Create(&history).Error; err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"err": "failed to store loginhistory"})
+		return
+	}
 
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"err": "failed to create refresh token"})
