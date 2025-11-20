@@ -3,6 +3,7 @@ package handlers
 import (
 	"encoding/json"
 	"net/http"
+	"time"
 	"zipride/database"
 	"zipride/internal/models"
 	"zipride/utils"
@@ -103,6 +104,28 @@ func SignIn(c *gin.Context) {
 	refreshtoken, err := utils.GenerateRefresh(user.ID, user.Email, user.Role, nil)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"err": "failed to create refresh token"})
+		return
+	}
+
+	ip := c.ClientIP()
+	useragent := c.GetHeader("User-Agent")
+
+	user.LastLoginAt = time.Now()
+	user.LastLoginIp = ip
+
+	if err := database.DB.Save(&user).Error; err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"err": "failed to store ip address"})
+		return
+	}
+
+	history := &models.LoginHistory{
+		UserID:    user.ID,
+		IpAddress: ip,
+		UserAgent: useragent,
+	}
+
+	if err := database.DB.Create(&history).Error; err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"err": "failed to store login history"})
 		return
 	}
 

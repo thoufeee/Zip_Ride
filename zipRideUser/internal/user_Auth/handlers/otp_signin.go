@@ -3,6 +3,7 @@ package handlers
 import (
 	"fmt"
 	"net/http"
+	"time"
 	"zipride/database"
 	"zipride/internal/constants"
 	"zipride/internal/models"
@@ -120,6 +121,28 @@ func VerifyOTP(c *gin.Context) {
 
 	// delete token after success
 	database.RDB.Del(database.Ctx, key)
+
+	ip := c.ClientIP()
+	useragent := c.GetHeader("User-Agent")
+
+	user.LastLoginIp = ip
+	user.LastLoginAt = time.Now()
+
+	if err := database.DB.Save(&user).Error; err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"err": "failed to store ip address"})
+		return
+	}
+
+	history := &models.LoginHistory{
+		UserID:    user.ID,
+		IpAddress: ip,
+		UserAgent: useragent,
+	}
+
+	if err := database.DB.Create(&history).Error; err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"err": "failed to store login history"})
+		return
+	}
 
 	c.JSON(http.StatusOK, gin.H{"res": "Successfuly Loged in",
 		"access":  access,
