@@ -1,6 +1,8 @@
 package models
 
 import (
+	"time"
+
 	"gorm.io/gorm"
 )
 
@@ -18,6 +20,9 @@ type User struct {
 	Role        string `json:"role"`
 	Block       bool   `gorm:"default:false"`
 	Isverified  bool   `json:"verified" gorm:"default:false"`
+
+	LastLoginIp string
+	LastLoginAt time.Time
 }
 
 // google authentication
@@ -28,4 +33,12 @@ type GoogleUser struct {
 	FirstName string
 	LastName  string
 	Avatar    string
+}
+
+// loginHistory
+type LoginHistory struct {
+	gorm.Model
+	UserID    uint   `gorm:"user_id"`
+	IpAddress string `gorm:"size:45"`
+	UserAgent string `gorm:"size:255"`
 }
